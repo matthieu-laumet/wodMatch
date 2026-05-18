@@ -34,7 +34,7 @@ app.use(session({
 }));
 
 
-app.use('/api/email', require('./src/routes/emailRoutes'));
+// app.use('/api/email', require('./src/routes/emailRoutes'));
 
 app.get('/api', (req, res) => {
   res.sendStatus(200);  // Renvoie uniquement le statut 200
