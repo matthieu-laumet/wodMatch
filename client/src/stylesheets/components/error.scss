@@ -1,0 +1,278 @@
+#img-500 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: top; /* Centrer l'image verticalement et l'aligner en bas */
+  // transform: translateY(10%);
+  z-index: -1;
+}
+
+.bodyContainer {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 52px;
+}
+
+.oops-wrapper {
+  position: relative;
+  height: calc(100dvh - 50px);
+}
+
+.oops-content {
+  padding-left: 10%;
+  padding-top: 12%;
+  width: 78vw;
+}
+
+.oops-text {
+  margin-bottom: 30px;
+  width: 90%;
+}
+
+#oops-text-500 {
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.oops-btn {
+  background-color: #ab9775;
+  color: #fff;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-weight: 600;
+  position: relative;
+  z-index: 10;
+  top: 10px;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+#img-500-text {
+  position: absolute;
+  top: 2%;
+  right: 5%;
+  opacity: .5;
+  height: 120px;
+}
+
+.error-msg {
+  color: $errorPrimary;
+}
+
+.detail-error-msg {
+  font-size: 20px;
+  line-height: 28px;
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+#detail-error-msg-500 {
+  font-size: 18px;
+  font-weight: 600;
+  // margin-bottom: 16px;
+}
+
+.oops-title {
+  font-size: 40px;
+  font-weight: 800;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+#oops-title-500 {
+  font-size: 26px;
+}
+
+#oops-content-404 {
+  width: 90vw;
+  position: relative;
+  z-index: 110;
+}
+
+#body-container-error-401 {
+  height: calc(100dvh - 60px);
+  margin-bottom: 0;
+}
+
+.img-error {
+  position: absolute;
+  bottom: 0%;
+  width: 174%;
+  object-fit: cover;
+  right: -68%;
+  object-position: none;
+}
+
+
+
+.img-error.lg {
+  position: absolute;
+  bottom: 0%;
+  width: 100vw;
+  height: 100%;
+  right: 0;
+  object-fit: cover;
+  object-position: none;
+}
+.img-error.xl {
+  position: absolute;
+  bottom: 0%;
+  width: 100vw;
+  height: 100%;
+  right: 0;
+  object-fit: cover;
+  object-position: right bottom !important;
+}
+
+#oops-container-404 {
+  margin-bottom: -52px;
+  background: linear-gradient(180deg,#f5f5f5 30%,rgba(252,184,47,.5));
+  position: relative;
+  z-index: -1;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+#oops-container-500 {
+  // background: linear-gradient(180deg,#ffffff 1%,rgba(#37474f,.5) 10%);
+  height: calc(112vh - 62px);
+}
+
+#oops-wrapper-500 {
+  height: 100%;
+  position: relative;
+}
+
+#btn-500 {
+  // position: absolute;
+  // top: 16%;
+  // left: 5vw;
+
+}
+
+#oops-content-500 {
+  position: relative;
+  z-index: 110;
+  padding-top: 5%;
+  padding-left: 5vw;
+  width: 95vw;
+}
+
+.no-flash-error {
+  position: absolute;
+  top: -100%;
+  width: 85vw;
+  transition: all 1s ease-in-out;
+}
+
+.error {
+  color: $errorPrimary;
+  font-weight: 600;
+  margin-top: 24px;
+}
+
+.flash-error {
+  box-shadow: 0px 0px 8px rgba($color: #000000, $alpha: .3);
+  color: #fff;
+  background-color: $error;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 42px;
+  border-radius: 8px;
+  z-index: 1500;
+  top: 5%;
+  left: 7%;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.home-error-container {
+  background-color: $error;
+  color: #fff;
+  padding: 16px 24px;
+  text-align: center;
+
+  .flash-error-home {
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .error-msg {
+    font-weight: 400;
+    font-size: 15px;
+  }
+}
+
+.home-error-container {
+  border-radius: 8px;
+}
+
+
+.close-error {
+  color: #fff;
+  position: absolute;
+  top: 41.2%;
+  left: 77vw;
+  width: 85vw;
+  z-index: 1501;
+}
+
+.error-message {
+  margin-bottom: 5px;
+}
+
+.error-error {
+  font-size: 12px;
+  font-weight: 300;
+  margin: 0;
+}
+
+#flash-error-underbanner {
+  top: 22%;
+}
+
+.img-construction1 {
+  width: 100%;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 35%);
+}
+
+
+
+
+#oops-401 {
+  .oops-content {
+    padding-top: 24px;
+    width: 100%;
+    padding-right: 10%;
+    padding-left: 10%;
+
+    h1 {
+      font-size: 40px;
+    }
+  }
+
+  .oops-text-text {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  #img-error-401 {
+    position: absolute;
+    bottom: 50px;
+    width: 100%;
+    object-fit: cover;
+    right: 0px;
+    object-position: none;
+  }
+}

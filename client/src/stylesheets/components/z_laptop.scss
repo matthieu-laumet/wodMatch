@@ -1,0 +1,16 @@
+@media (min-width: 481px) {
+  .legend-top {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .input-date-export {
+    max-width: 42px;
+  }
+  .input-date-export.large {
+    max-width: 60px;
+  }
+  .nav-right {
+    gap: 24px !important;
+  }
+}

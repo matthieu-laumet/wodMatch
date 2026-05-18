@@ -1,0 +1,77 @@
+// Graphical variables
+// @import "config/fonts";
+@import "./config/colors.scss";
+@import "./config/fonts.scss";
+@import "./config/mainSize.scss";
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
+
+// External libraries
+
+// Your CSS partials
+@import "./components/admin.scss";
+@import "./components/auth.scss";
+@import "./components/charts.scss";
+@import "./components/error.scss";
+@import "./components/footer.scss";
+@import "./components/help.scss";
+@import "./components/images.scss";
+@import "./components/z_laptop.scss";
+@import "./components/navbar.scss";
+@import "./components/search.scss";
+@import "./components/skeleton.scss";
+@import "./components/tableauHelp.scss";
+@import "./components/text.scss";
+@import "./components/user.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: $gray01;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+:root {
+  --doc-height: 100%;
+ }
+ 
+ html,
+ body {
+  padding: 0;
+  margin: 0;
+  height: 100vh; /* fallback for Js load */
+  height: var(--doc-height);
+ }
+
+.main-loader-container {
+  position: relative;
+  z-index: 10;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  z-index: 10;
+  z-index: 1100;
+}
+
+.main-loader-container.admin-compet {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  top: 60px;
+
+  .scraping-loader-img {
+    max-width: 250px;
+  }
+} 
+
+.mainContainer {
+  min-height: calc(100dvh - 60px);
+  padding-top: 60px;
+  // transition: all .5s;
+}

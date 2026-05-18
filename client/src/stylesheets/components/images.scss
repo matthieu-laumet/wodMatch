@@ -1,0 +1,140 @@
+.thumbnail-compet {
+  width: 90px;
+  height: 90px;
+  cursor: pointer;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #fff;
+  border: 1px solid $gray09;
+}
+
+.sold-out-container {
+  height: 90vh;
+  position: relative;
+  padding-left: 7%;
+  padding-right: 7%;
+  padding-top: 5%;
+
+  .sold-out-img {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Maintient le ratio de l'image tout en couvrant le conteneur */
+    // object-position: 0px 40%; /* Aligne l'ima/ge par le haut */
+  }
+}
+.sold-out-container.laptop {
+  height: calc(100vh - 60px);
+  position: relative;
+  padding-top: 100px;
+  top: -60px;
+  margin-bottom: -58px;
+  z-index: 1;
+  padding-bottom: 5%;
+  object-position: right; /* Aligne l'image par le haut */
+}
+.sold-out-container:not(.laptop) {
+  .sold-out-img {
+    object-position: 0px 25%; /* Aligne l'ima/ge par le haut */
+  }
+}
+
+.division-standard-img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid $gray07;
+}
+
+.HWW-title {
+  font-size: 32px;
+  line-height: 44px;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.HWW-texte-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 24px;
+  column-gap: 60px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 72px;
+}
+
+.HWW-image {
+  border-radius: 12px;
+  width: 100%;
+  object-fit: cover;
+  border: 1px solid $gray07;
+}
+
+.HWW-card-image {
+  width: 40px;
+}
+
+.HWW-help-container {
+  margin-top: 60px;
+  gap: 40px;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.HWW-banner {
+  border: 1px solid $gray05;
+  height: 350px;
+  border-radius: 12px;
+  background-color: $gray025;
+}
+
+.HWW-banner-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 8%;
+  padding-right: 10%;
+  width: 100%;
+}
+
+.HWW-banner-text-text {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.HWW-button {
+  background-color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  color: $blackPrimary;
+  outline: none;
+  border: 1px solid $gray07;
+  border-radius: 8px;
+  padding: 16px 12px;
+  cursor: pointer;
+  
+  &:hover {
+    color: $blackPrimary;
+  }
+}
+
+.HWW-button.nav {
+  padding: 12px 20px;
+}
+
+.HWW-banner {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  height: 350px;
+  background-image: url('https://res.cloudinary.com/dkz9knsgj/image/upload/v1739719274/banner_compet_small_2.webp');
+  background-position: left;
+  background-size: cover;  /* Remplace auto 100% */
+  background-repeat: no-repeat;
+  width: 100%;  /* Assure que la div prend toute la largeur */
+  // height: 100%; /* Ajustez cette valeur selon vos besoins */
+}
