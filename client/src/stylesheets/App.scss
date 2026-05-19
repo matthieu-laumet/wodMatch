@@ -1,17 +1,19 @@
 // Graphical variables
 // @import "config/fonts";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import "./config/colors.scss";
 @import "./config/fonts.scss";
 @import "./config/mainSize.scss";
-// @tailwind base;
-// @tailwind components;
-// @tailwind utilities;
 
 // External libraries
 
 // Your CSS partials
 @import "./components/admin.scss";
 @import "./components/auth.scss";
+@import "./components/banner.scss";
 @import "./components/charts.scss";
 @import "./components/error.scss";
 @import "./components/footer.scss";

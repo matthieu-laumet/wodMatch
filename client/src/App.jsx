@@ -5,7 +5,7 @@ import ErrorFallback from "./components/ErrorFallback";
 import ErrorMissing from './components/ErrorMissing';
 import Layout from "./components/Layout";
 import PersistLogin from "./features/auth/PersistLogin";
-import HelpIndex from "./features/HelpIndex";
+import Home from "./features/home/Home";
 
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
       <Routes>
         <Route element={<PersistLogin />}>
           <Route path='/' element={<Layout />}>
-            <Route index element={<HelpIndex />} />
+            <Route index element={<Home />} />
             <Route path='/500' element={<ErrorFallback noFooter={true}/>} />
             <Route path='*' element={<ErrorMissing />} />
           </Route>

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const allowedOrigins = [ 
   'http://localhost:5001', 
+  'http://localhost:5002', 
   'http://localhost:8081', 
   'http://localhost:8082', 
   'https://www.app.wodzone.fr',

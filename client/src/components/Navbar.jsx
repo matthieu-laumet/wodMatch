@@ -59,21 +59,13 @@ const Navbar = () => {
   return (
     <nav className={`nav nav-black`}>
       <div className={`nav-logo-title-container`} onClick={() => navigate('/')}>
-        <img src={"/images/logo_home.png"} alt="logo_home_noir" className={`h-65p mr-16`} />
-        <p className='nav-title'>Centre d'aide</p>
+        <img src={"/images/logo_home.png"} alt="logo_home_noir" className={`h-3/5`} />
+        <p className='nav-title hidden sm:block'>wodMatch</p>
       </div>
-      {(showSearchBar && windowWidth >= 744) &&
-        <SearchInput formClass={`chart-search-container min-h-40`} wrapperClass="pos-rel z-10 fl-gr-1 ml-32 mr-32 max-w-450" color={'#fff'}/>
-      }
       <div className="nav-right-wrapper">
-        <div className="menu-icon nav-right">
+        <div className="menu-icon nav-right h-3/5">
           {(showSearchBar && windowWidth < 744) &&
             <i className={`fa-solid fa-magnifying-glass loupe-nav`} onClick={() => setIsSearchActive(true)}></i>
-          }
-          {windowWidth >= 744 && 
-            <a href={`${process.env.REACT_APP_FRONT_URL_APP}/competitions`} target='_blank' className="HWW-button pt-10 pb-10 fz-14 naving-bar">
-              Commencer ma recherche
-            </a>
           }
           <div className='pos-rel' onClick={() => setShowSubMenu(!showSubMenu)}>
             {auth?.user?.email 

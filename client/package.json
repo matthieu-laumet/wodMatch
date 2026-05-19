@@ -24,11 +24,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "sass-watch": "sass --no-source-map --watch src/stylesheets/App.scss src/stylesheets/main.css",
+    "sass-watch": "sass --no-source-map --watch src/stylesheets/App.scss src/stylesheets/main.scss --style=expanded",
+    "postcss-watch": "postcss src/stylesheets/main.scss --output src/stylesheets/main.css --watch --poll",
+    "start": "npm-run-all --parallel sass-watch postcss-watch nodemon-watch",
     "nodemon-watch": "react-scripts start",
-    "nodemon-watch-dev": "nodemon -L server.js -e *",
-    "start": "npm-run-all --parallel sass-watch nodemon-watch",
-    "build": "react-scripts build",
+    "build": "sass --no-source-map src/stylesheets/App.scss src/stylesheets/main.scss && postcss src/stylesheets/main.scss --output src/stylesheets/main.css",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -36,7 +36,7 @@
     "@babel/core": "^7.23.7",
     "@babel/preset-env": "^7.23.8",
     "@babel/preset-react": "^7.23.3",
-    "autoprefixer": "^10.4.13",
+    "autoprefixer": "^10.5.0",
     "babel-loader": "^9.1.3",
     "chokidar": "^3.5.3",
     "dotenv": "^16.0.3",
@@ -44,7 +44,9 @@
     "nodemon": "^2.0.19",
     "npm-run-all": "^4.1.5",
     "path-browserify": "^1.0.1",
-    "postcss": "^8.4.19",
+    "postcss": "^8.5.14",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^3.4.19",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
   },
