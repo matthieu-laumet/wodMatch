@@ -28,7 +28,7 @@
     "postcss-watch": "postcss src/stylesheets/main.scss --output src/stylesheets/main.css --watch --poll",
     "start": "npm-run-all --parallel sass-watch postcss-watch nodemon-watch",
     "nodemon-watch": "react-scripts start",
-    "build": "sass --no-source-map src/stylesheets/App.scss src/stylesheets/main.scss && postcss src/stylesheets/main.scss --output src/stylesheets/main.css",
+    "build": "sass --no-source-map src/stylesheets/App.scss src/stylesheets/main.scss && postcss src/stylesheets/main.scss --output src/stylesheets/main.css && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

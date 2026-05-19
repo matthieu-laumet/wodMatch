@@ -37,21 +37,15 @@ const Navbar = () => {
 
   const fullname = auth?.user?.first_name + auth?.user?.last_name;
 
-  const handleNav = (link, generateCookie, isHelpService) => {
+  const handleNav = ({ url, generateCookie }) => {
     if (generateCookie) {
       const expirationDate = new Date();
       expirationDate.setMinutes(expirationDate.getMinutes() + 20);
-      const dataToShare = {
-        urlRedirect: process.env.REACT_APP_FRONT_URL
-      }
-      // document.cookie = `helpRedirect=${JSON.stringify(dataToShare)}; path=/; expires=${expirationDate.toUTCString()}`;
-      document.cookie = `helpRedirect=${JSON.stringify(dataToShare)}; domain=.wodzone.fr; path=/; expires=${expirationDate.toUTCString()}`;
+      const cookieName = 'wodMatchRedirect';
+      const dataToShare = { urlRedirect: process.env.REACT_APP_FRONT_URL, cookieName }
+      document.cookie = `${cookieName}=${JSON.stringify(dataToShare)}; domain=.wodzone.fr; path=/; expires=${expirationDate.toUTCString()}`;
     }
-    if (isHelpService) {  // si redirection vers un autre lien de l'app help
-      navigate(link)
-    } else {
-      window.location.href = link;
-    }
+    window.location.href = url;
   }
 
   const showSearchBar = !['/', '/how-wodzone-works'].includes(location.pathname)

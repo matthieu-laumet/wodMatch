@@ -1,19 +1,14 @@
-import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
-  const navigate = useNavigate();
 
   const handleNav = ({ url, generateCookie }) => {
     if (generateCookie) {
       const expirationDate = new Date();
       expirationDate.setMinutes(expirationDate.getMinutes() + 20);
-      const dataToShare = {
-        urlRedirect: process.env.REACT_APP_FRONT_URL,
-        cookieName: 'wodMatchRedirect'
-      }
-      // document.cookie = `helpRedirect=${JSON.stringify(dataToShare)}; path=/; expires=${expirationDate.toUTCString()}`;
-      document.cookie = `wodMatchRedirect=${JSON.stringify(dataToShare)}; domain=.wodzone.fr; path=/; expires=${expirationDate.toUTCString()}`;
+      const cookieName = 'wodMatchRedirect';
+      const dataToShare = { urlRedirect: process.env.REACT_APP_FRONT_URL, cookieName }
+      document.cookie = `${cookieName}=${JSON.stringify(dataToShare)}; domain=.wodzone.fr; path=/; expires=${expirationDate.toUTCString()}`;
     }
     window.location.href = url;
   }
