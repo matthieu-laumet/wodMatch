@@ -20,7 +20,7 @@ const WelcomeOnBoard = () => {
   }
 
   return (
-    <div className="h-[calc(100dvh-60px)] px-[8%] pt-6">
+    <div className="min-h-[calc(100dvh-60px)] px-[8%] pt-6">
       <h2 className="font-black text-4xl text-center">Bienvenue sur WODMATCH</h2>
       <div className="flex gap-4 items-center mt-6">
         <FontAwesomeIcon icon={faTrophy} className="trophy"/>

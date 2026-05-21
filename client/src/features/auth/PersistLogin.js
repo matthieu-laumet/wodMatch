@@ -7,12 +7,12 @@ import { selectCurrentToken, selectCurrentUser } from "./authSlice"
 import dataApplicationsContext from '../../context/dataApplicationsContext';
 
 const PersistLogin = () => {
-    const { setAuth, setIsAuthLoading } = useContext(dataApplicationsContext);
+    const { auth, setAuth, setIsAuthLoading } = useContext(dataApplicationsContext);
 
     const [persist] = usePersist()
 
     const token = useSelector(selectCurrentToken);
-    const effectRan = useRef(false)
+    const effectRan = useRef(false);
     
     const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] = useRefreshMutation()
 
@@ -20,7 +20,7 @@ const PersistLogin = () => {
     useEffect(() => {
         if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
             const verifyRefreshToken = async () => {
-                // console.log('verifying refresh token')
+                console.log('verifying refresh token')
                 try {
                     const response = await refresh();
                         setAuth({ user: response?.data?.user, accessToken: response?.data?.accessToken 

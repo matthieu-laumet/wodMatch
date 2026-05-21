@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import dataApplicationsContext from "../../context/dataApplicationsContext";
 import { useNavigate } from "react-router-dom";
 import OnboardPhotos from "./OnboardPhotos";
@@ -9,7 +9,7 @@ const Onboarding = () => {
   const { onboardinSelectedMode } = useContext(dataApplicationsContext);
 
   const navigate = useNavigate();
-  const [section, setSection] = useState(0);
+  const [section, setSection] = useState(parseInt(sessionStorage.getItem('onboardSection'), 10) || 0);
 
   const handlePrev = () => {
     if (section === 0) return navigate('/')
@@ -22,8 +22,12 @@ const Onboarding = () => {
     window.scroll(0, 0);
   };
 
+  useEffect(() => {
+    sessionStorage.setItem('onboardSection', section)
+  }, [section])
+
   return (
-    <div className="h-[calc(100dvh-60px)] px-[8%] pt-6 flex flex-col">
+    <div className="min-h-[calc(100dvh-60px)] px-[8%] pt-6 flex flex-col">
       <div className="flex">
         <i className="bi bi-arrow-left-circle text-3xl cursor-pointer" onClick={handlePrev}></i>
         <span className="progress-bar" style={{ "--progress": `${((section + 1) / 4) * 100}%` }}></span>

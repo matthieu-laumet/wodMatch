@@ -1,0 +1,83 @@
+// OnboardStrength.scss
+
+.onboard-strength {
+  &__tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  &__tag {
+    padding: 0.5rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid $gray05;
+    font-size: 11px;
+    font-weight: 500;
+    background: white;
+    color: black;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      border-color: $gray07;
+    }
+
+    &--selected {
+      background: $gray09;
+      font-weight: 600;
+      color: white;
+      border-color: black;
+
+      &:hover {
+        border-color: black;
+      }
+    }
+  }
+
+  &__search {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    padding-left: 40px;
+    padding-right: 28px;
+    border-radius: 8px;
+    border: 1px solid $gray05;
+    font-size: 13px;
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+
+    &::placeholder {
+        color: $gray07;
+    }
+
+    &:focus {
+        border-color: $gray07;
+    }
+  }
+
+  .search-strength {
+    position: sticky;
+    top: 60px;
+    border-bottom: 1px solid $gray08;
+    background-color: $gray01;
+    padding-top: 12px;
+  }
+
+  .searc-icon {
+    position: absolute;
+    top: 47%;
+    transform: translateY(-50%);
+    left: 12px;
+    color: $gray08;
+    pointer-events: none;
+  }
+  .close-icon {
+    position: absolute;
+    top: 36%;
+    transform: translateY(-50%);
+    right: 12px;
+    color: $gray08;
+  }
+}
