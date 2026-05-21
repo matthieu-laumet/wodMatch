@@ -13,4 +13,15 @@
   .nav-right {
     gap: 24px !important;
   }
+  .toast-error-register {
+    width: 400px;
+    right: 25%;
+  }
+}
+
+@media (min-width:744px) {
+  .toast-error-register {
+    width: 450px !important;
+    right: 45%;
+  }
 }

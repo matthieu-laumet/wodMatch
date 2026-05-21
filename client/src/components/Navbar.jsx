@@ -5,6 +5,7 @@ import { useSendLogoutMutation } from '../features/auth/authApiSlice';
 import secureLocalStorage from "react-secure-storage";
 import { useScrollLock } from '../hooks/useScrollLock';
 import SearchInput from './SearchInput';
+import GetAvatar from './GetAvatar';
 
 const Navbar = () => {
   const { auth, setAuth, setIsConnected, windowWidth, setIsSearchActive } = useContext(dataApplicationsContext);
@@ -48,7 +49,7 @@ const Navbar = () => {
     window.location.href = url;
   }
 
-  const showSearchBar = !['/', '/how-wodzone-works'].includes(location.pathname)
+  const showSearchBar = !['/', '/how-wodzone-works'].includes(location.pathname);
 
   return (
     <nav className={`nav nav-black`}>
@@ -62,16 +63,12 @@ const Navbar = () => {
             <i className={`fa-solid fa-magnifying-glass loupe-nav`} onClick={() => setIsSearchActive(true)}></i>
           }
           <div className='pos-rel' onClick={() => setShowSubMenu(!showSubMenu)}>
-            {auth?.user?.email 
-              ? <img 
-                  src={auth?.user?.avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${fullname}`} alt="avatar" className="avatar"
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null; // prevents looping
-                    currentTarget.src='https://res.cloudinary.com/dkz9knsgj/image/upload/v1705258636/avatar_placeholder.svg';
-                  }}
-                ></img>
-              : <i className="bi bi-person nav-people-icon"></i>
-            }
+            <GetAvatar 
+              filename={auth?.user?.avatar} 
+              fullname={fullname} 
+              className={'avatar'} 
+              skeletonClasses={'skeleton-avatar'}
+            />
             {showSubMenu &&
               <>
                 <div className="auth-sub-menu-container">

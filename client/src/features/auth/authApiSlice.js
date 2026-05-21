@@ -1,7 +1,7 @@
-import { apiSlice } from "../../app/api/apiSlice";
+import { wodzoneApiSlice } from "../../app/api/apiSlice";
 import { logOut, setCredentials } from "./authSlice";
 
-export const authApiSlice = apiSlice.injectEndpoints({
+export const authApiSlice = wodzoneApiSlice.injectEndpoints({
   endpoints: builder => ({
     login: builder.mutation({
       query: credentials => ({

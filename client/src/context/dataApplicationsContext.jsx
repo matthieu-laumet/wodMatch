@@ -18,23 +18,15 @@ const dataApplicationsContext = createContext({
 
 export const AppDataProvider = ({ children }) => {
   const [auth, setAuth] = useState([]);
-  const [activeInput, setActiveInput] = useState(null);
-  const [hasScrollbar, setHasScrollbar] = useState(false);
-  const [homeOngletActif, setHomeOngletActif] = useState('');
-  const [ongletPaiementActif, setOngletPaiementActif] = useState('');
-  const [isScrollingDown, setIsScrollingDown] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [prevScrollPos, setPrevScrollPos] = useState(window.pageYOffset);
-  const [search, setSearch] = useState('');
-  const searchInputRef = useRef(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [onboardinSelectedMode, setonboardinSelectedMode] = useState(sessionStorage.getItem('onboardingChoice') ?? null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   return (
     <dataApplicationsContext.Provider value={{
-      auth, setAuth, activeInput, setActiveInput, hasScrollbar, setHasScrollbar, isScrollingDown, setIsScrollingDown, 
-      isConnected, setIsConnected, windowWidth, setWindowWidth, ongletPaiementActif, setOngletPaiementActif,
-      prevScrollPos, setPrevScrollPos, search, setSearch, isSearchActive, setIsSearchActive, searchInputRef, homeOngletActif, setHomeOngletActif
+      auth, setAuth, isConnected, setIsConnected, windowWidth, setWindowWidth, 
+      isAuthLoading, setIsAuthLoading, onboardinSelectedMode, setonboardinSelectedMode
     }}>
       {children}
     </dataApplicationsContext.Provider>

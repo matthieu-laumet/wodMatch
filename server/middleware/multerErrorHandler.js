@@ -9,7 +9,7 @@ function multerErrorHandler(err, req, res, next) {
     if (err.code === 'LIMIT_FILE_SIZE') {
       return res.status(413).json({ 
         isMulterError: true, 
-        error: 'Fichier trop volumineux. Taille maximum : 5 Mo' 
+        error: 'Fichier trop volumineux. Taille maximum : 3 Mo' 
       });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
