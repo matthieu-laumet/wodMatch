@@ -35,6 +35,7 @@ app.use(session({
 
 
 app.use('/api/images', require('./src/routes/imagesRoutes'));
+app.use('/api/funReps', require('./src/routes/funRepsRoutes'));
 app.use('/api/strengths', require('./src/routes/strengthsRoutes'));
 
 app.get('/api', (req, res) => {
