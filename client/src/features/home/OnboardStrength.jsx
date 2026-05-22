@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
 
-const OnboardStrength = () => {
+const OnboardStrength = ({ setBtnText, setIsDisabled }) => {
   const { data: strengths, isLoading: isLoadingStrengths, isSuccess: isSuccessStrengths } = useGetStrengthsQuery();
 
   const sentinelRef = useRef(null);
@@ -31,6 +31,7 @@ const OnboardStrength = () => {
 
   useEffect(() => {
     if (isSuccessStrengths) {
+      setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
       if (search.length > 0) {
         const filterSearch = strengths?.filter((s) =>
           s.label.toLowerCase().includes(search.toLowerCase())
@@ -41,6 +42,12 @@ const OnboardStrength = () => {
       }
     }
   }, [isSuccessStrengths, search])
+
+
+  useEffect(() => {
+    setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
+    setIsDisabled(selected.length === 0)
+  }, [selected]);
 
 
   const toggle = (id) => {

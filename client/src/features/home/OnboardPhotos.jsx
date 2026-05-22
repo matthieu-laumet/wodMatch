@@ -6,11 +6,16 @@ import { useEffect } from "react";
 import { toast } from 'react-toastify';
 
 
-const OnboardPhotos = () => {
+const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
   const [photos, setPhotos] = useState([]);
   const [loadingCount, setLoadingCount] = useState(0); // ✅ nb de slots en chargement
   const inputRef = useRef(null);
   const MAX_PHOTOS = 6;
+
+  useEffect(() => {
+    setBtnText(`Suivant`)
+    setIsDisabled(photos.length === 0)
+  }, [photos])
 
   const [uploadTempImages] = useUploadTempImagesMutation();
   const [deleteTempImage] = useDeleteTempImageMutation();
