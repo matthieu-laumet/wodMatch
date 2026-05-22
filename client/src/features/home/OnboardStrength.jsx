@@ -1,24 +1,33 @@
 import { PulseLoader } from "react-spinners";
 import { useGetStrengthsQuery } from "../../slices/strengthsApiSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
 
 const OnboardStrength = () => {
   const { data: strengths, isLoading: isLoadingStrengths, isSuccess: isSuccessStrengths } = useGetStrengthsQuery();
 
-  const [selected, setSelected] = useState([]);
+  const sentinelRef = useRef(null);
+  const [isSticky, setIsSticky] = useState(false);
+  const [selected, setSelected] = useState(() => {
+    const saved = sessionStorage.getItem("onboardStrengths");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [search, setSearch] = useState("");
   const [filteredStrengths, setFilteredStrengths] = useState([]);
   const MAX_SELECTIONS = 8; // adjust as needed (image 1 shows 0/5, image 2 shows 7/8)
 
-  const toggle = (id) => {
-    setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((s) => s !== id) : prev.length < MAX_SELECTIONS
-        ? [...prev, id] : prev
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { setIsSticky(!entry.isIntersecting);},
+      { threshold: 0,  rootMargin: "-60px 0px 0px 0px" }
     );
-  };
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isSuccessStrengths]);
+
 
   useEffect(() => {
     if (isSuccessStrengths) {
@@ -33,6 +42,21 @@ const OnboardStrength = () => {
     }
   }, [isSuccessStrengths, search])
 
+
+  const toggle = (id) => {
+    setSelected((prev) => {
+      const next = prev.includes(id)
+        ? prev.filter((s) => s !== id)
+        : prev.length < MAX_SELECTIONS
+        ? [...prev, id]
+        : prev;
+
+      sessionStorage.setItem("onboardStrengths", JSON.stringify(next));
+      return next;
+    });
+  };
+
+  
   if (isLoadingStrengths) return <PulseLoader color='#222' size={10} className="mt-12 ml-12"/> 
   
 
@@ -42,7 +66,8 @@ const OnboardStrength = () => {
         <h2 className="text-2xl font-semibold mb-2">Quels sont tes points forts ?</h2>
         <p>On a tous nos mouvements préférés, ceux dans lesquels on excelle. Partage-les avec les autres.</p>
       </div>
-      <div className="search-strength">
+      <div ref={sentinelRef} style={{ height: "1px" }} />
+      <div className={`search-strength${isSticky ? " search-strength--sticky" : ""}`}>
         <input
           type="text" className="onboard-strength__search"
           placeholder="Rechercher un skill..." value={search} onChange={(e) => setSearch(e.target.value)}

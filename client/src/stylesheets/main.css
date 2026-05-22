@@ -2388,7 +2388,7 @@ video {
   padding: 0.5rem 0.85rem;
   border-radius: 8px;
   border: 1px solid #bebebe;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   background: white;
   color: black;
@@ -2428,9 +2428,11 @@ video {
 .onboard-strength .search-strength {
   position: sticky;
   top: 60px;
-  border-bottom: 1px solid #696969;
   background-color: #F5F5F5;
   padding-top: 12px;
+}
+.onboard-strength .search-strength--sticky {
+  border-bottom: 1px solid #808080;
 }
 .onboard-strength .searc-icon {
   position: absolute;
