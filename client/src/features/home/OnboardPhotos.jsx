@@ -4,16 +4,16 @@ import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useUploadTempIma
 import { PulseLoader } from "react-spinners";
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
+import OnboardingSubmit from "../../components/OnboardingSubmit";
 
 
-const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
+const OnboardPhotos = ({ setIsDisabled, isDisabled, setSection }) => {
   const [photos, setPhotos] = useState([]);
   const [loadingCount, setLoadingCount] = useState(0); // ✅ nb de slots en chargement
   const inputRef = useRef(null);
   const MAX_PHOTOS = 6;
 
   useEffect(() => {
-    setBtnText(`Suivant`)
     setIsDisabled(photos.length === 0)
   }, [photos])
 
@@ -162,6 +162,9 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
           <p className="text-black-950 mt-4">Pour réorganiser tes photos, effectue un drag and drop.</p>
         </>
       }
+      <OnboardingSubmit
+        isDisabled={isDisabled} btnText={`Suivant`} setSection={setSection}
+      />
     </>
   );
 };

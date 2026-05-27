@@ -117,6 +117,11 @@
   background: #fff;
 }
 
+.bio-wrapper.fun-rep {
+  border: 1px solid $gray05;
+  height: 150px;
+}
+
 .bio-textarea {
   width: 100%;
   height: 100%;
@@ -156,6 +161,16 @@
 }
 
 .fun-reps-container {
+  overflow-x: hidden;
+  position: relative;
+}
+
+.fun-reps-container.suggestions {
+  background-color: $gray01;
+}
+
+.fun-reps-suggestions {
+  transition: all 0.3s;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -170,4 +185,33 @@
     padding-bottom: 12px;
     cursor: pointer;
   }
+}
+
+.fun-reps-description {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.fun-reps-slider-wrapper {
+  overflow: hidden;  /* masque le panel 2 tant qu'on n'a pas slidé */
+  width: 100%;
+}
+
+.fun-reps-slider {
+  display: flex;
+  width: 200%;        /* les 2 panels côte à côte */
+  transition: transform 0.3s ease;
+}
+
+.fun-reps-panel {
+  width: 50%;         /* chaque panel = 100% de la wrapper */
+  overflow-y: auto;
 }

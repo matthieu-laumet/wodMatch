@@ -1,21 +1,21 @@
 import { PulseLoader } from "react-spinners";
-import { useGetStrengthsQuery } from "../../slices/strengthsApiSlice";
+import { useCleanUpsertUserSkillsMutation, useGetSkillsQuery } from "../../slices/skillsApiSlice";
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
-import ModalStructure from "../../components/ModalStructure";
+import OnboardingSubmit from "../../components/OnboardingSubmit";
 
-const OnboardStrength = ({ setBtnText, setIsDisabled }) => {
-  const { data: strengths, isLoading: isLoadingStrengths, isSuccess: isSuccessStrengths } = useGetStrengthsQuery();
+const OnboardSkill = ({ setIsDisabled, isDisabled, setSection }) => {
+  const { data: skills, isLoading: isLoadingSkills, isSuccess: isSuccessSkills } = useGetSkillsQuery();
 
   const sentinelRef = useRef(null);
   const [isSticky, setIsSticky] = useState(false);
   const [selected, setSelected] = useState(() => {
-    const saved = sessionStorage.getItem("onboardStrengths");
+    const saved = sessionStorage.getItem("onboardSkills");
     return saved ? JSON.parse(saved) : [];
   });
   const [search, setSearch] = useState("");
-  const [filteredStrengths, setFilteredStrengths] = useState([]);
+  const [filteredSkills, setFilteredSkills] = useState([]);
   const MAX_SELECTIONS = 8; // adjust as needed (image 1 shows 0/5, image 2 shows 7/8)
 
   useEffect(() => {
@@ -27,26 +27,24 @@ const OnboardStrength = ({ setBtnText, setIsDisabled }) => {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [isSuccessStrengths]);
+  }, [isSuccessSkills]);
 
 
   useEffect(() => {
-    if (isSuccessStrengths) {
-      setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
+    if (isSuccessSkills) {
       if (search.length > 0) {
-        const filterSearch = strengths?.filter((s) =>
+        const filterSearch = skills?.filter((s) =>
           s.label.toLowerCase().includes(search.toLowerCase())
         );
-        setFilteredStrengths(filterSearch)
+        setFilteredSkills(filterSearch)
       } else {
-        setFilteredStrengths(strengths)
+        setFilteredSkills(skills)
       }
     }
-  }, [isSuccessStrengths, search])
+  }, [isSuccessSkills, search])
 
 
   useEffect(() => {
-    setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
     setIsDisabled(selected.length === 0)
   }, [selected]);
 
@@ -54,53 +52,52 @@ const OnboardStrength = ({ setBtnText, setIsDisabled }) => {
   const toggle = (id) => {
     setSelected((prev) => {
       const next = prev.includes(id)
-        ? prev.filter((s) => s !== id)
-        : prev.length < MAX_SELECTIONS
-        ? [...prev, id]
-        : prev;
-
-      sessionStorage.setItem("onboardStrengths", JSON.stringify(next));
+        ? prev.filter((s) => s !== id) : prev.length < MAX_SELECTIONS 
+          ? [...prev, id] : prev;
       return next;
     });
   };
 
   
-  if (isLoadingStrengths) return <PulseLoader color='#222' size={10} className="mt-12 ml-12"/> 
-
+  if (isLoadingSkills) return <PulseLoader color='#222' size={10} className="mt-12 ml-12"/> 
 
   return (
     <>
-      <div className="onboard-strength mb-12">
+      <div className="onboard-skill mb-12">
         <div className="mt-2 mb-4">
           <h2 className="text-2xl font-semibold mb-2">Quels sont tes points forts ?</h2>
           <p>On a tous nos mouvements préférés, ceux dans lesquels on excelle. Partage-les avec les autres.</p>
         </div>
         <div ref={sentinelRef} style={{ height: "1px" }} />
-        <div className={`search-strength${isSticky ? " search-strength--sticky" : ""}`}>
+        <div className={`search-skill${isSticky ? " search-skill--sticky" : ""}`}>
           <input
-            type="text" className="onboard-strength__search"
+            type="text" className="onboard-skill__search"
             placeholder="Rechercher un skill..." value={search} onChange={(e) => setSearch(e.target.value)}
           />
           <FontAwesomeIcon icon={faMagnifyingGlass} className="searc-icon"/>
           {search.length > 0 && <FontAwesomeIcon icon={faX} className="close-icon" onClick={() => setSearch('')}/>}
         </div>
-        <div className="onboard-strength__tags mt-4">
-          {filteredStrengths?.map((strength) => {
-            const isSelected = selected.includes(strength.id_strength);
+        <div className="onboard-skill__tags mt-4">
+          {filteredSkills?.map((skill) => {
+            const isSelected = selected.includes(skill.id_skill);
             return (
               <button
-                key={strength.id_strength}
-                onClick={() => toggle(strength.id_strength)}
-                className={`onboard-strength__tag${isSelected ? " onboard-strength__tag--selected" : ""}`}
+                key={skill.id_skill}
+                onClick={() => toggle(skill.id_skill)}
+                className={`onboard-skill__tag${isSelected ? " onboard-skill__tag--selected" : ""}`}
               >
-                {strength.label}
+                {skill.label}
               </button>
             );
           })}
         </div>
       </div>
+      <OnboardingSubmit
+        isDisabled={isDisabled} btnText={`Suivant (${selected.length}/${MAX_SELECTIONS})`} 
+        setSection={setSection}
+      />
     </>
   );
 };
 
-export default OnboardStrength;
+export default OnboardSkill;

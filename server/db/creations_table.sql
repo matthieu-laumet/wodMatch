@@ -293,3 +293,37 @@ END; $$
 --     console.log(error)
 --   }
 -- }
+
+
+
+-- Profil utilisateur
+CREATE TABLE wodmatch.users (
+  id_user     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  username    varchar NOT NULL,
+  email       varchar UNIQUE NOT NULL,
+  avatar      varchar,           -- URL S3/CDN
+  bio         text,
+  city        varchar,
+  box_name    varchar,           -- leur salle de crossfit
+  level       varchar,           -- rx / scaled / beginner
+  created_at  timestamptz DEFAULT now()
+);
+
+-- Tu as déjà user_skills ✓
+
+-- Pour le matching type Tinder
+CREATE TABLE wodmatch.swipes (
+  id_swiper   uuid REFERENCES wodmatch.users(id_user),
+  id_swiped   uuid REFERENCES wodmatch.users(id_user),
+  direction   varchar CHECK (direction IN ('like', 'pass')),
+  created_at  timestamptz DEFAULT now(),
+  PRIMARY KEY (id_swiper, id_swiped)
+);
+
+-- Match = like mutuel
+CREATE TABLE wodmatch.matches (
+  id_match    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id_user_1   uuid REFERENCES wodmatch.users(id_user),
+  id_user_2   uuid REFERENCES wodmatch.users(id_user),
+  created_at  timestamptz DEFAULT now()
+);

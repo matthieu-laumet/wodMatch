@@ -1,0 +1,64 @@
+.grid-wodliste-export {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 16px;
+  row-gap: 12px;
+}
+.grid-wodliste-export.option-display {
+  grid-template-columns: 1fr;
+}
+.modal-export-body {
+  max-height: 70dvh;
+  overflow-y: auto;
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+.modal-completion-wrapper {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+.modal-completion-container {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputs-container {
+  flex-grow: 1;
+}
+
+.modalOverflow {
+  max-height: 95dvh;
+  overflow-y: auto;
+}
+
+.wrapper-modal-admin {
+  max-height: 60vh;
+  padding-left: 7%;
+  padding-right: 7%;
+  overflow-y: auto;
+
+  .register-sub-title {
+    font-size: 16px;
+  }
+  .already-account {
+    font-size: 14px;
+  }
+  
+  .score-select-admin-container.abs  {
+    .input-select__menu {
+      position: relative !important;
+    }
+  }
+}
+
+.wrapper-form-admin-insert-participant {
+  .register-sub-title {
+    font-size: 16px;
+  }
+  .already-account {
+    font-size: 14px;
+  }
+}

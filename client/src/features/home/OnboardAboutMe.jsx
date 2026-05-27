@@ -1,37 +1,44 @@
-import { PulseLoader } from "react-spinners";
-import { useGetStrengthsQuery } from "../../slices/strengthsApiSlice";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlus, faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import ModalStructure from "../../components/ModalStructure";
-import { useGetFunRepsQuery } from "../../slices/funRepsApiSlice";
 import ModalFunReps from "./ModalFunReps";
+import OnboardingSubmit from "../../components/OnboardingSubmit";
 
 const MAX_BIO_LENGTH = 500;
 
-const OnboardAboutMe = ({ setBtnText, setIsDisabled }) => {
+const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
 
   const [openModal, setOpenModal] = useState(false);
+  const [selectedFunRep, setSelectedFunRep] = useState(null);
+  const [scrollLeft, setScrollLeft] = useState(0);
   const [bio, setBio] = useState(() => {
     return sessionStorage.getItem("onboardBio") || "";
   });
 
-  const sentinelRef = useRef(null);
-  const [isSticky, setIsSticky] = useState(false);
-  const [selected, setSelected] = useState(() => {
-    const saved = sessionStorage.getItem("onboardStrengths");
-    return saved ? JSON.parse(saved) : [];
-  });
-
   useEffect(() => {
-    setBtnText("Suivant");
     setIsDisabled(bio.trim().length === 0);
     sessionStorage.setItem("onboardBio", bio);
   }, [bio]);
   
-  const onSubmit = () => {
-    console.log('ici')
+  const onCloseModal = () => {
+    setSelectedFunRep(null)
+    setOpenModal(false)
+    setScrollLeft(0)
   }
+
+  const onSubmit = (funRep) => {
+    const saved = sessionStorage.getItem("onboardFunReps");
+    const prev = saved ? JSON.parse(saved) : [];
+    const exists = prev.find(f => f.id_fun_rep === funRep.id_fun_rep);
+    const next = exists
+      ? prev.map(f => f.id_fun_rep === funRep.id_fun_rep ? funRep : f)
+      : [...prev, funRep];
+    sessionStorage.setItem("onboardFunReps", JSON.stringify(next));
+    onCloseModal();
+  }
+
+  const funRepsFilles = JSON.parse(sessionStorage.getItem('onboardFunRep'));
 
   return (
     <>
@@ -67,16 +74,26 @@ const OnboardAboutMe = ({ setBtnText, setIsDisabled }) => {
             <h2 className="text-2xl font-semibold mb-0">Fun rep</h2>
           </div>
           <p className="font-medium">Fais la différence avec une anecdote</p>
+          {funRepsFilles?.length > 0 &&
+            <></>
+          }     
           <button className="fun-rep-btn mt-4" onClick={() => setOpenModal(true)}>
             <p className="font-semibold">Ajouter une fun rep sur moi</p>
             <p className="">soi drôle c'est ton moment</p>
             <FontAwesomeIcon icon={faCirclePlus} className="fun-icon-plus"/>
-          </button>
+          </button>     
         </div>
       </div>
         <ModalStructure
-          openModal={openModal} setOpenModal={setOpenModal} title='Ajouter une Fun rep' body={<ModalFunReps />} 
-          btnText='OK' onSubmit={onSubmit} noFooter={true}
+          openModal={openModal} setOpenModal={onCloseModal} title='Ajouter une Fun rep' 
+          body={<ModalFunReps 
+            openModal={openModal} selectedFunRep={selectedFunRep} setSelectedFunRep={setSelectedFunRep}
+            scrollLeft={scrollLeft} setScrollLeft={setScrollLeft} onSubmit={onSubmit}
+          />} 
+          btnText='OK' noFooter={true}
+        />
+        <OnboardingSubmit
+          isDisabled={isDisabled} btnText={`Suivant`} setSection={setSection}
         />
     </>
   );
