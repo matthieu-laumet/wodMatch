@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
 import OnboardingSubmit from "../../components/OnboardingSubmit";
 
-const OnboardSkill = ({ setIsDisabled, isDisabled, setSection }) => {
+const OnboardSkill = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
   const { data: skills, isLoading: isLoadingSkills, isSuccess: isSuccessSkills } = useGetSkillsQuery();
 
   const sentinelRef = useRef(null);
@@ -45,6 +45,7 @@ const OnboardSkill = ({ setIsDisabled, isDisabled, setSection }) => {
 
 
   useEffect(() => {
+    setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
     setIsDisabled(selected.length === 0)
   }, [selected]);
 
@@ -54,6 +55,7 @@ const OnboardSkill = ({ setIsDisabled, isDisabled, setSection }) => {
       const next = prev.includes(id)
         ? prev.filter((s) => s !== id) : prev.length < MAX_SELECTIONS 
           ? [...prev, id] : prev;
+      sessionStorage.setItem("onboardSkills", JSON.stringify(next));
       return next;
     });
   };
@@ -92,10 +94,6 @@ const OnboardSkill = ({ setIsDisabled, isDisabled, setSection }) => {
           })}
         </div>
       </div>
-      <OnboardingSubmit
-        isDisabled={isDisabled} btnText={`Suivant (${selected.length}/${MAX_SELECTIONS})`} 
-        setSection={setSection}
-      />
     </>
   );
 };

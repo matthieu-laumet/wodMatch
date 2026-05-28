@@ -1,0 +1,202 @@
+$navbarHeight: 62px;
+$navbarHeightConnect: 74px;
+$bannerHeight: 60vh;
+$modalLoginHeight: 75vh;
+$footerHeight: 50px;
+$sideBarWidth: 60px;
+$easing: cubic-bezier(.25,1.7,.35,.8);
+$duration: 0.5s;
+$radius: 12px;
+$borderRadiusAll: $radius;
+$borderRadiusInput: 6px;
+$borderRadiusTop: $radius $radius 0 0;
+$modalBGColor: rgba($color: #000000, $alpha: .6);
+$opacityHover: 0.65;
+
+.swal2-backdrop-show {
+  background-color: rgba($color: #000000, $alpha: .6) !important;
+
+  .delete__popup {
+    border-radius: $borderRadiusAll !important;
+    // width: 45em !important;
+    max-width: 90vw;
+    // height: 22em !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .swal2-close {
+    display: block !important;
+  }
+
+  .swalTitle {
+    font-weight: 700 !important;
+    font-size: 22px !important;
+    color: rgba($gray09, .8) !important;
+    padding-bottom: 0 !important;
+  }
+  
+  .swalText {
+    font-size: 16px !important;
+    font-style: italic;
+    margin-top: 16px !important;
+    color: rgba($gray09, .7) !important;
+  }
+
+  .swal2-actions {
+    justify-content: flex-end !important;
+    margin: 0 !important;
+    margin-right: 45px !important;
+    margin-top: 48px !important;
+  }
+  
+  .delete__footer {
+    background-color: rgba($gray02, .5) !important;
+    margin-top: 32px !important;
+    border-top: 1px solid #E9EEF1 !important;
+    overflow: hidden !important;
+    display: block !important;
+    height: 90px !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    border-top: 1px solid $gray02 !important;
+  }
+
+  .swalConfirm {
+    background-color: #e64942 !important;
+    border: none !important;
+    padding: 12px 26px !important;
+    font-weight: 700;
+    &:hover {
+      background-color: #e64942 !important;
+      opacity: $opacityHover !important;
+    }
+  }
+
+  .swalCancel {
+    background-color: $gray02 !important;
+    border: 1px solid $gray05 !important;
+    color: $gray08 !important;
+    font-weight: 700;
+    padding: 12px 26px !important;
+  }
+}
+
+.login-expired__footer {
+  display: none !important;
+}
+
+.login-expired__popup {
+  // display: flex !important;
+  width: 37em !important;
+  border-radius: $borderRadiusAll !important;
+  position: relative !important;
+  top: 30px !important;
+  transition: all 3s;
+}
+
+// .swal2-info {
+//   position: absolute !important;
+//   top: -30px !important;
+//   left: 20px !important;
+//   // height: 51px !important;
+//   transform: scale(0.55) !important;
+// }
+
+.swal2-html-container {
+  margin-top: 2px !important;
+  font-size: 14px !important;
+}
+
+.login-expired__title {
+  font-size: 20px !important;
+}
+
+.alert-accountSession-container {
+  border: 1px solid $bleuAlertDark;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: $bleuAlert;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+
+  .alert-accountSession-icon {
+    color: $bleuAlertDark;
+    font-size: 32px;
+    position: absolute;
+  }
+
+  .alert-accountSession-content {
+    margin-left: 56px;
+  }
+  .alert-accountSession-close {
+    cursor: pointer;
+    font-size: 18px;
+    color: $bleuAlertDark;
+    position: relative;
+    margin-left: 24px;
+    &:hover {
+      color: $blackPrimary;
+    }
+  }
+  .alert-accountSession-text {
+    font-size: 14px;
+    color: $gray08;
+    font-weight: 400;
+  }
+  .text-redirection {
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 8px;
+    &:hover {
+      color: $blackPrimary;
+      font-weight: 500;
+    }
+  }
+}
+
+.alert-animation {
+  animation: bounce2 .5s ease-out;
+}
+
+@keyframes gelatine {
+}
+@keyframes bounce2 {
+	0% {transform: translateY(-80px);}
+	60%, 100% {transform: translateY(0);}
+	// 40% {transform: translateY(-10px);}
+	80% {transform: translateY(-10px);}
+}
+
+.info-light {
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 8px;
+  margin-bottom: 16px !important;
+  border: 1px solid $gray07;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.alert-accountSession-container-col {
+  flex-direction: column;
+  align-items: start;
+  .alert-accountSession-content {
+    margin-left: 0px;
+  }
+  .alert-accountSession-icon {
+    color: $bleuAlertDark;
+    font-size: 36px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .alert-accountSession-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+}

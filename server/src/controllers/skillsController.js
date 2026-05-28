@@ -3,7 +3,7 @@ const { replaceUserSkills } = require('../services/skills.service');
 
 async function getSkills(req, res) {
   try {
-    const result = await getAllSkills(req.params.filename);
+    const result = await getAllSkills();
     res.status(200).send(result);
   } catch (error) {
     console.log(error.message)

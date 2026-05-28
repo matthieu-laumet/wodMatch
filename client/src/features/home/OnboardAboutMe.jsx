@@ -4,10 +4,11 @@ import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import ModalStructure from "../../components/ModalStructure";
 import ModalFunReps from "./ModalFunReps";
 import OnboardingSubmit from "../../components/OnboardingSubmit";
+import FunRepCards from "./FunRepCards";
 
 const MAX_BIO_LENGTH = 500;
 
-const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
+const OnboardAboutMe = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedFunRep, setSelectedFunRep] = useState(null);
@@ -15,6 +16,14 @@ const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
   const [bio, setBio] = useState(() => {
     return sessionStorage.getItem("onboardBio") || "";
   });
+  const [funRepSelected, setFunRepSelected] = useState({ id_fun_rep: null, description: '', label: '' });
+  const [funRepsFilled, setFunRepsFilled] = useState(() => {
+    return JSON.parse(sessionStorage.getItem('onboardFunReps')) || [];
+  });
+
+  useEffect(() => {
+    setBtnText(`Suivant`)
+  }, []);
 
   useEffect(() => {
     setIsDisabled(bio.trim().length === 0);
@@ -24,10 +33,11 @@ const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
   const onCloseModal = () => {
     setSelectedFunRep(null)
     setOpenModal(false)
-    setScrollLeft(0)
+    setTimeout(() => setScrollLeft(0), 100);
   }
 
   const onSubmit = (funRep) => {
+    if (funRep.description?.length === 0) return 
     const saved = sessionStorage.getItem("onboardFunReps");
     const prev = saved ? JSON.parse(saved) : [];
     const exists = prev.find(f => f.id_fun_rep === funRep.id_fun_rep);
@@ -35,14 +45,18 @@ const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
       ? prev.map(f => f.id_fun_rep === funRep.id_fun_rep ? funRep : f)
       : [...prev, funRep];
     sessionStorage.setItem("onboardFunReps", JSON.stringify(next));
+    setFunRepsFilled(next);
     onCloseModal();
   }
 
-  const funRepsFilles = JSON.parse(sessionStorage.getItem('onboardFunRep'));
+  const handleAddFunRep = () => {
+    setFunRepSelected({ id_fun_rep: null, description: '', label: '' });
+    setOpenModal(true);
+  }
 
   return (
     <>
-      <div className="onboard-strength mb-12">
+      <div className="onboard-skill mb-12">
         <div className="mt-2 mb-4">
           <div className="flex gap-6 mb-2 items-center">
             <h2 className="text-2xl font-semibold mb-0">À propos de moi</h2>
@@ -71,13 +85,16 @@ const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
         </div>
         <div className="mt-12 mb-4">
           <div className="flex gap-6 mb-2 items-center">
-            <h2 className="text-2xl font-semibold mb-0">Fun rep</h2>
+            <h2 className="text-2xl font-semibold mb-0">Fun reps</h2>
           </div>
-          <p className="font-medium">Fais la différence avec une anecdote</p>
-          {funRepsFilles?.length > 0 &&
-            <></>
+          {(!funRepsFilled || funRepsFilled?.length === 0) && <p className="font-medium">Fais la différence avec une anecdote</p>}
+          {funRepsFilled?.length > 0 &&
+            <FunRepCards 
+              funRepsFilled={funRepsFilled} setFunRepsFilled={setFunRepsFilled} setOpenModal={setOpenModal} setSelectedFunRep={setSelectedFunRep}
+              setScrollLeft={setScrollLeft} funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected}
+            />
           }     
-          <button className="fun-rep-btn mt-4" onClick={() => setOpenModal(true)}>
+          <button className="fun-rep-btn mt-4" onClick={handleAddFunRep}>
             <p className="font-semibold">Ajouter une fun rep sur moi</p>
             <p className="">soi drôle c'est ton moment</p>
             <FontAwesomeIcon icon={faCirclePlus} className="fun-icon-plus"/>
@@ -89,11 +106,9 @@ const OnboardAboutMe = ({ setIsDisabled, isDisabled, setSection }) => {
           body={<ModalFunReps 
             openModal={openModal} selectedFunRep={selectedFunRep} setSelectedFunRep={setSelectedFunRep}
             scrollLeft={scrollLeft} setScrollLeft={setScrollLeft} onSubmit={onSubmit}
+            funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected} funRepsFilled={funRepsFilled}
           />} 
           btnText='OK' noFooter={true}
-        />
-        <OnboardingSubmit
-          isDisabled={isDisabled} btnText={`Suivant`} setSection={setSection}
         />
     </>
   );

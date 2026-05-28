@@ -46,6 +46,10 @@
 }
 
 @media (min-width:680px) {
+  .delete__popup {
+    width: 70vw !important;
+    max-width: 900px !important;
+  }
   .change-category-wrapper.height-auto {
     // height: min-content;
     .filtre-content-container {

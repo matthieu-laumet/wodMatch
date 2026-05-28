@@ -1,6 +1,6 @@
 // OnboardStrength.scss
 
-.onboard-strength {
+.onboard-skill {
   &__tags {
     display: flex;
     justify-content: center;
@@ -71,7 +71,7 @@
 
   .searc-icon {
     position: absolute;
-    top: 47%;
+    top: 38%;
     transform: translateY(-50%);
     left: 12px;
     color: $gray08;
@@ -86,6 +86,10 @@
   }
 }
 
+.search-skill {
+  position: relative;
+}
+
 .btn-important {
   background-color: $primary;
   color: #fff;
@@ -94,6 +98,67 @@
   margin-bottom: 0;
   padding: 8px 24px;
   border-radius: 8px;
+}
+
+.btn-submit-funrep {
+  margin-top: 1rem;
+  width: 100%;
+  background-color: #222;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-select {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #9ca3af;
+  margin-bottom: 0.75rem;
+  text-align: left;
+  background-color: white;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.icon-level {
+  width: 30px;
+  height: 100%;
+}
+
+.btn-select.active {
+  border: 2px solid black;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #111827;
+}
+
+.btn-select-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-submit-funrep:hover {
+  background-color: #333;
+}
+
+.btn-submit-funrep:active {
+  transform: scale(0.95);
+}
+
+.btn-submit-funrep:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .bio-field {
@@ -160,6 +225,21 @@
   right: -16px;
 }
 
+.fun-icon-plus.gray {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid $gray08;
+  color: $gray08;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .fun-reps-container {
   overflow-x: hidden;
   position: relative;
@@ -214,4 +294,18 @@
 .fun-reps-panel {
   width: 50%;         /* chaque panel = 100% de la wrapper */
   overflow-y: auto;
+}
+
+.funReps-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  
+  .funReps-card {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid $gray05;
+    border-radius: 8px;
+    padding: 8px 16px;
+  }
 }

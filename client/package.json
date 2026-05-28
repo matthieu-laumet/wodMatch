@@ -23,6 +23,7 @@
     "react-spinners": "^0.13.8",
     "react-toastify": "^11.1.0",
     "sass": "^1.57.1",
+    "sweetalert2": "^11.26.25",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
