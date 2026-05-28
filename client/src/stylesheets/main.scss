@@ -1548,6 +1548,18 @@
     padding-bottom: 3%;
   }
 }
+.footer-icons-containe {
+  display: flex;
+  justify-content: space-around;
+  background-color: #fff;
+  border-top: 1px solid #808080;
+  height: 60px;
+  padding-top: 12px;
+  position: fixed;
+  width: 100vw;
+  bottom: 0;
+}
+
 .help-content-container {
   margin-top: 32px;
 }
@@ -2096,6 +2108,11 @@
   height: 100%;
 }
 
+.icon-level.small {
+  width: 24px;
+  height: 100%;
+}
+
 .btn-select.active {
   border: 2px solid black;
   background-color: rgba(0, 0, 0, 0.05);
@@ -2331,6 +2348,35 @@
 }
 .wrapper-form-admin-insert-participant .already-account {
   font-size: 14px;
+}
+
+.profil-top-container {
+  height: 45dvh;
+  background-color: #fff;
+  border-bottom: 1px solid #808080;
+  position: relative;
+}
+.profil-top-container .profil-completion {
+  height: 4px;
+  background-color: #df0000;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+}
+
+.profil-bottom-container {
+  height: calc(55dvh - 120px);
+}
+.profil-bottom-container .img-fond {
+  width: 100vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.full-screen {
+  max-height: calc(100dvh - 120px);
+  overflow: hidden;
 }
 
 @media (min-width: 481px) {

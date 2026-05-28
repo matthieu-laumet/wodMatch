@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import OnboardingSubmit from "../../components/OnboardingSubmit";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { useGetLevelsQuery } from "../../slices/levelsApiSlice";
 import { PulseLoader } from "react-spinners";
 
 
-const OnboardLevel = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
+const OnboardLevel = ({ setBtnText, setIsDisabled }) => {
 
   const { data: levels, isLoading: isLoadingLevels, isSuccess: isSuccessLevels } = useGetLevelsQuery();
-  const [selectedlevels, setSelectedLevels] = useState([]);
+  const [selectedlevels, setSelectedLevels] = useState(() => {
+    const saved = sessionStorage.getItem("onBoardingLevels");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const handleSelect = (mode) => {
     console.log(mode)

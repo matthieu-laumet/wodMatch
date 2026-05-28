@@ -1,0 +1,29 @@
+.profil-top-container {
+    height: 45dvh;
+    background-color: #fff;
+    border-bottom: 1px solid $gray07;
+    position: relative;
+
+    .profil-completion {
+        height: 4px;
+        background-color: $primary;
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+    }
+}
+
+.profil-bottom-container {
+    height: calc(55dvh - 120px);
+    .img-fond {
+        width: 100vw;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center; // x y
+    }
+}
+
+.full-screen {
+    max-height: calc(100dvh - 120px);
+    overflow: hidden;
+}

@@ -3,12 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import ModalStructure from "../../components/ModalStructure";
 import ModalFunReps from "./ModalFunReps";
-import OnboardingSubmit from "../../components/OnboardingSubmit";
 import FunRepCards from "./FunRepCards";
 
 const MAX_BIO_LENGTH = 500;
 
-const OnboardAboutMe = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
+const OnboardAboutMe = ({ setBtnText, setIsDisabled }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedFunRep, setSelectedFunRep] = useState(null);

@@ -3,9 +3,8 @@ import { useCleanUpsertUserSkillsMutation, useGetSkillsQuery } from "../../slice
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
-import OnboardingSubmit from "../../components/OnboardingSubmit";
 
-const OnboardSkill = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
+const OnboardSkill = ({ setBtnText, setIsDisabled }) => {
   const { data: skills, isLoading: isLoadingSkills, isSuccess: isSuccessSkills } = useGetSkillsQuery();
 
   const sentinelRef = useRef(null);

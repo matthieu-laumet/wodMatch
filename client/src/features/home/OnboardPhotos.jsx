@@ -4,10 +4,9 @@ import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useUploadTempIma
 import { PulseLoader } from "react-spinners";
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
-import OnboardingSubmit from "../../components/OnboardingSubmit";
 
 
-const OnboardPhotos = ({ setBtnText, setIsDisabled, isDisabled, setSection }) => {
+const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
   const [photos, setPhotos] = useState([]);
   const [loadingCount, setLoadingCount] = useState(0); // ✅ nb de slots en chargement
   const inputRef = useRef(null);

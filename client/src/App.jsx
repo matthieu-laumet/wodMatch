@@ -9,6 +9,8 @@ import RequireAuth from "./features/auth/RequireAuth";
 import WelcomeOnBoard from "./features/home/WelcomeOnBoard";
 import Onboarding from "./features/home/Onboarding";
 import { ToastContainer } from 'react-toastify';
+import Profil from "./features/user/Profil";
+import ExploreWorld from "./features/user/ExploreWorld";
 
 
 function App() {
@@ -32,8 +34,13 @@ function App() {
         <Route element={<PersistLogin />}>
           <Route path='/' element={<Layout />}>
             <Route element={<RequireAuth />}>
-              <Route index element={<WelcomeOnBoard />} />
+              <Route index element={<ExploreWorld />} />
+              <Route path='/welcome' element={<WelcomeOnBoard />} />
               <Route path='/onboarding' element={<Onboarding />} />
+              <Route path='/competitions' element={<Profil />} />
+              <Route path='/favoris' element={<Profil />} />
+              <Route path='/chat' element={<Profil />} />
+              <Route path='/profil' element={<Profil />} />
             </Route>
             <Route path='/500' element={<ErrorFallback noFooter={true}/>} />
             <Route path='*' element={<ErrorMissing />} />

@@ -20,13 +20,12 @@ export const AppDataProvider = ({ children }) => {
   const [auth, setAuth] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [onboardinSelectedMode, setonboardinSelectedMode] = useState(sessionStorage.getItem('onboardingChoice') ?? null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   return (
     <dataApplicationsContext.Provider value={{
       auth, setAuth, isConnected, setIsConnected, windowWidth, setWindowWidth, 
-      isAuthLoading, setIsAuthLoading, onboardinSelectedMode, setonboardinSelectedMode
+      isAuthLoading, setIsAuthLoading
     }}>
       {children}
     </dataApplicationsContext.Provider>

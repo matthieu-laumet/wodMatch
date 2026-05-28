@@ -5,6 +5,7 @@ import usePersist from "../../hooks/usePersist"
 import { useSelector } from 'react-redux'
 import { selectCurrentToken, selectCurrentUser } from "./authSlice"
 import dataApplicationsContext from '../../context/dataApplicationsContext';
+import { useLazyGetCurrentWMUserQuery } from "../../slices/usersApiSlice"
 
 const PersistLogin = () => {
     const { auth, setAuth, setIsAuthLoading } = useContext(dataApplicationsContext);
@@ -14,8 +15,8 @@ const PersistLogin = () => {
     const token = useSelector(selectCurrentToken);
     const effectRan = useRef(false);
     
-    const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] = useRefreshMutation()
-
+    const [refresh, { isUninitialized, isLoading, isSuccess, isError, error }] = useRefreshMutation();
+    const [trigger] = useLazyGetCurrentWMUserQuery();
     
     useEffect(() => {
         if (effectRan.current === true || process.env.NODE_ENV !== 'development') { // React 18 Strict Mode
@@ -23,8 +24,16 @@ const PersistLogin = () => {
                 console.log('verifying refresh token')
                 try {
                     const response = await refresh();
-                        setAuth({ user: response?.data?.user, accessToken: response?.data?.accessToken 
-                    });
+                    const userWM = await trigger().unwrap();
+                    const { 
+                        completion_rate, created_at, focus_color, id_roles, is_developper, is_email_verifyed,
+                        is_not_visible, last_logged, not_share_email, not_share_telephone, notifications,
+                        activite, actualite, disabled_news, politique, rappel, remarques, organisateur_infos,
+                        pointure, short, short_size, tee_shirt, tee_shirt_size, telephone, token_create_event, updated_at, 
+                        updated_password,
+                        ...rest 
+                    } = response?.data?.user;
+                    setAuth({ user: { ...rest, ...userWM }, accessToken: response?.data?.accessToken });
                 }
                 catch (err) {
                     console.error(err)
