@@ -2363,15 +2363,127 @@
   bottom: -1px;
   left: 0;
 }
+.profil-top-container .main-photo-container {
+  position: relative;
+  top: 3dvh;
+  left: 0;
+  height: 140px;
+  width: 100vw;
+}
+.profil-top-container .main-photo-container .main-avatar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1px solid #808080;
+  height: 130px;
+  width: 130px;
+  object-fit: cover;
+  object-position: center center;
+}
+.profil-top-container .main-photo-container .flap-completion {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  background-color: #df0000;
+  font-weight: 600;
+  font-size: 12px;
+  color: #fff;
+  width: max-content;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.profil-top-container .second-menus-container {
+  display: flex;
+  width: 100vw;
+  justify-content: space-around;
+  position: absolute;
+  top: 26dvh;
+}
+.profil-top-container .second-menus-container .bloc {
+  border-radius: 50%;
+  border: 1px solid #303030;
+  width: 56px;
+  height: 56px;
+  position: relative;
+  cursor: pointer;
+}
+.profil-top-container .second-menus-container .bloc .bloc-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.profil-top-container .second-menus-container .bloc .bloc-label {
+  font-weight: 600;
+  font-size: 12px;
+  margin-left: -8px;
+  width: 70px;
+  text-align: center;
+  padding-top: 60px;
+}
+.profil-top-container .second-menus-container .bloc.lg {
+  width: 64px;
+  height: 64px;
+}
+.profil-top-container .second-menus-container .bloc.lg .bloc-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.profil-top-container .second-menus-container .bloc.lg .bloc-label {
+  padding-top: 68px;
+}
+.profil-top-container .second-menus-container .bloc.small {
+  top: -30px;
+}
+.profil-top-container .second-menus-container .bloc.small.black {
+  background-color: #222;
+  color: #fff;
+}
+.profil-top-container .second-menus-container .bloc.small.black .bloc-label {
+  color: #000;
+}
+.profil-top-container .second-menus-container .additionnal {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  color: #000;
+  font-size: 16px;
+  background-color: #fff;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+}
 
 .profil-bottom-container {
   height: calc(55dvh - 120px);
+  position: relative;
 }
 .profil-bottom-container .img-fond {
   width: 100vw;
   height: 100%;
   object-fit: cover;
   object-position: center center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.profil-bottom-container .text-container {
+  position: absolute;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  gap: 8px;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  text-shadow: 3px 2px 16px #fff;
 }
 
 .full-screen {

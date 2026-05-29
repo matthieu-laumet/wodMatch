@@ -4,9 +4,11 @@ import dataApplicationsContext from '../context/dataApplicationsContext';
 import Skeleton from 'react-loading-skeleton';
 import { baseColor } from '../context/dataApplicationsContext';
 import { baseColor2 } from '../context/dataApplicationsContext';
+import { useNavigate } from 'react-router-dom';
 
-const GetAvatar = ({ filename, fullname, onClick, className, id, watch, alt, skeletonClasses }) => {
+const GetAvatar = ({ filename, fullname, className, id, watch, alt, skeletonClasses }) => {
   const { auth, isAuthLoading } = useContext(dataApplicationsContext);
+  const navigate = useNavigate();
 
   const [imageError, setImageError] = useState(false);
   const [imageSrc, setImageSrc] = useState(`https://api.dicebear.com/7.x/thumbs/svg?seed=${fullname}`);
@@ -57,7 +59,7 @@ const GetAvatar = ({ filename, fullname, onClick, className, id, watch, alt, ske
           id={id}
           className={className + ' avatar'}
           onError={handleImageError}
-          onClick={onClick}
+          onClick={() => navigate('/profil')}
         />
       : <i className="bi bi-person nav-people-icon"></i>
   );

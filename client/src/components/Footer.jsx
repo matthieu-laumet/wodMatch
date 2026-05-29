@@ -22,7 +22,7 @@ export default function Footer() {
 
   let content
   if (auth?.user?.has_seen_wodmatch_welcome) {
-    const fill = (path) =>  location.pathname === path ? `-fill text-[#df0000]` : '';
+    const fill = (path) =>  location.pathname.startsWith(path) ? `-fill text-[#df0000]` : '';
     content = 
       <div className="footer-icons-containe">
         <i className={`bi bi-trophy${fill('/competitions')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/competitions')}></i>

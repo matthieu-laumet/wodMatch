@@ -1,4 +1,4 @@
-import dataApplicationsContext from '../context/dataApplicationsContext';
+import dataApplicationsContext, { titleApp } from '../context/dataApplicationsContext';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSendLogoutMutation } from '../features/auth/authApiSlice';
@@ -55,47 +55,23 @@ const Navbar = () => {
     <nav className={`nav nav-black`}>
       <div className={`nav-logo-title-container`} onClick={() => navigate('/')}>
         <img src={"/images/logo_home.png"} alt="logo_home_noir" className={`h-3/5`} />
-        <p className='nav-title hidden sm:block'>wodMatch</p>
+        <p className='nav-title hidden sm:block'>{titleApp}</p>
       </div>
       <div className="nav-right-wrapper">
         <div className="menu-icon nav-right h-3/5">
           {(showSearchBar && windowWidth < 744) &&
             <i className={`fa-solid fa-magnifying-glass loupe-nav`} onClick={() => setIsSearchActive(true)}></i>
           }
-          <div className='pos-rel' onClick={() => setShowSubMenu(!showSubMenu)}>
-            <GetAvatar 
-              filename={auth?.user?.avatar} 
-              fullname={fullname} 
-              className={'avatar'} 
-              skeletonClasses={'skeleton-avatar'}
-            />
-            {showSubMenu &&
-              <>
-                <div className="auth-sub-menu-container">
-                  <p className='auth-menulink' onClick={() => handleNav(`/topics`, false, 'isHelpService')}>Toutes les rubriques d'aide</p>
-                  <span className='nav-separator'></span>
-                  {!auth?.user?.first_name && <p className='auth-menulink' onClick={() => handleNav(`${process.env.REACT_APP_FRONT_URL_APP}/auth`, 'generateCookie')}>Connexion</p>}
-                  {!auth?.user?.first_name && <p className='auth-menulink' onClick={() => handleNav(`${process.env.REACT_APP_FRONT_URL_APP}/auth`, 'generateCookie')}>Inscription</p>}
-                  {auth?.user?.first_name && 
-                    <>
-                      <p className='auth-menulink' onClick={() => handleNav(`${process.env.REACT_APP_FRONT_URL_APP}/account-settings/events`)}>Mes inscriptions</p>
-                      <p className='auth-menulink' onClick={() => handleNav(`${process.env.REACT_APP_FRONT_URL_APP}/account-settings`)}>Favoris</p>
-                    </>
-                  }
-                  <span className='nav-separator'></span>
-                  <a className='auth-menulink' href='https://www.wodzone.fr' target='_blank'>Devenez organisateur</a>
-                  {auth?.user?.first_name && 
-                      <p className='auth-menulink' onClick={() => handleNav(`${process.env.REACT_APP_FRONT_URL_APP}/account-settings`)}>Compte</p>
-                  }
-                  <span className='nav-separator'></span>
-                  <a className='auth-menulink' href={process.env.REACT_APP_FRONT_URL_APP}>Retour sur l'App</a>
-                  {auth?.user?.first_name && <span className='nav-separator'></span>}
-                  {auth?.user?.first_name && <p className='auth-menulink' onClick={handleLogout}>Se déconnecter</p>}
-                </div>
-                <div className={`background-close ${windowWidth < 744 ? 'help' : ''}`} onClick={() => setShowSubMenu(false)}></div>
-              </>
-            }
-          </div>
+          {auth?.user?.email && 
+            <div className='pos-rel'>
+              <GetAvatar 
+                filename={auth?.user?.avatar} 
+                fullname={fullname} 
+                className={'avatar'} 
+                skeletonClasses={'skeleton-avatar'}
+              />
+            </div>
+          }
         </div>
       </div>
     </nav>

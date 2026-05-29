@@ -11,6 +11,10 @@ import Onboarding from "./features/home/Onboarding";
 import { ToastContainer } from 'react-toastify';
 import Profil from "./features/user/Profil";
 import ExploreWorld from "./features/user/ExploreWorld";
+import Competitions from "./features/competitions/Competitions";
+import EditProfile from "./features/user/EditProfile";
+import HandlePhotos from "./features/user/HandlePhotos";
+import Settings from "./features/user/Settings";
 
 
 function App() {
@@ -37,10 +41,15 @@ function App() {
               <Route index element={<ExploreWorld />} />
               <Route path='/welcome' element={<WelcomeOnBoard />} />
               <Route path='/onboarding' element={<Onboarding />} />
-              <Route path='/competitions' element={<Profil />} />
+              <Route path='/competitions' element={<Competitions />} />
               <Route path='/favoris' element={<Profil />} />
               <Route path='/chat' element={<Profil />} />
-              <Route path='/profil' element={<Profil />} />
+              <Route path='profil'>
+                <Route index element={<Profil />} />
+                <Route path='edit' element={<EditProfile />} />
+                <Route path='edit-pictures' element={<HandlePhotos />} />
+                <Route path='settings' element={<Settings />} />
+              </Route>
             </Route>
             <Route path='/500' element={<ErrorFallback noFooter={true}/>} />
             <Route path='*' element={<ErrorMissing />} />

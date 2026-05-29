@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { PulseLoader } from "react-spinners";
 import { useGetSearchModesQuery } from "../../slices/searchModesApiSlice";
 import { useState } from "react";
+import { titleApp } from "../../context/dataApplicationsContext";
 
 const WelcomeOnBoard = () => {
   const { data: searchModes, isLoading: isLoadingSearchModes, isSuccess: isSuccessSearchModes } = useGetSearchModesQuery();
@@ -29,14 +30,14 @@ const WelcomeOnBoard = () => {
 
   return (
     <div className="min-h-[calc(100dvh-60px)] px-[8%] pt-6">
-      <h2 className="font-black text-4xl text-center">Bienvenue sur WODMATCH</h2>
+      <h2 className="font-black text-4xl text-center">Bienvenue sur {titleApp}</h2>
       <div className="flex gap-4 items-center mt-6">
         <FontAwesomeIcon icon={faTrophy} className="trophy"/>
         <p className="text-xl font-semibold">Swipe ton prochain coéquipier de podium™</p>
       </div>
       <div className="mt-6">
         <p className="font-medium">
-          <span className="font-bold text-lg">WODMATCH</span> rassemble les athlètes qui souhaitent compléter leur team pour la prochaine compet. 
+          <span className="font-bold text-lg">{titleApp}</span> rassemble les athlètes qui souhaitent compléter leur team pour la prochaine compet. 
           Trouve alors ton prochain binôme, complète ta team, et monte sur le podium 💪
         </p>
       </div>

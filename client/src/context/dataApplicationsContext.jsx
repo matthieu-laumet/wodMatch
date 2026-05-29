@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect, useRef } from "react";
 import { fr } from 'date-fns/locale'
 
-export const titleApp = 'Wodzone'
+export const titleApp = 'wodMatch'
 export const baseColor = "#ebebeb"
 export const baseColor1 = "#DDD"
 export const baseColor2 = "#D3D3D3"
