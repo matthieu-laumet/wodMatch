@@ -59,6 +59,7 @@
             height: 56px;
             position: relative;
             cursor: pointer;
+            overflow: visible;
 
             .bloc-icon {
                 position: absolute;
@@ -99,18 +100,25 @@
 
             .bloc-label {
                 color: #000;
+                padding-top: 36px;
             }
         }
         .additionnal {
-            position: absolute !important;
-            bottom: 0 !important;
-            right: 0 !important;
+            position: relative !important;
+            bottom: -38px !important;
+            right: -40px !important;
             color: #000;
             font-size: 16px;
             background-color: #fff;
             border-radius: 50%;
             height: 16px;
             width: 16px;
+
+            .bi-plus-circle {
+                position: relative;
+                top: -2px;
+                left: -1px;
+            }
         }
     }
 }
@@ -147,4 +155,9 @@
 .full-screen {
     max-height: calc(100dvh - 120px);
     overflow: hidden;
+}
+
+.full-screen.padding {
+    padding-left: 7%;
+    padding-right: 7%;
 }

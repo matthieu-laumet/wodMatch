@@ -1,4 +1,4 @@
-const { getImageRaw, uploadOneImg, listTempImages, getUserTempImagesService } = require('../services/leevia.service');
+const { getImageRaw, uploadOneImg, listTempImages, getUserTempImagesService, reorderTempImagesService } = require('../services/leevia.service');
 const { webdavClient } = require('../utils/leevia.utils');
 
 async function getImage(req, res) {
@@ -40,13 +40,26 @@ async function uploadTempImages(req, res) {
       return res.status(400).json({ error: 'Aucun fichier fourni' });
     }
     const id_user = req.id_user;
+    const slot = req.body.slot !== undefined ? parseInt(req.body.slot) : null;
     const results = await Promise.all(
-      req.files.map(file => uploadOneImg({ file, prefix: `temp/${id_user}/` }))
+      req.files.map(file => uploadOneImg({ file, prefix: `temp/${id_user}/`, slot }))
     );
     res.json(results);
   } catch (error) {
     console.error('Erreur upload temp:', error.message);
     res.status(500).json({ error: "Erreur lors de l'upload" });
+  }
+}
+
+async function reorderTempImages(req, res) {
+  try {
+    const id_user = req.id_user;
+    const { filenames } = req.body; // tableau ordonné des filenames actuels
+    const results = await reorderTempImagesService({ filenames, id_user })
+    res.json(results);
+  } catch (error) {
+    console.error('Erreur reorder:', error.message);
+    res.status(500).json({ error: "Erreur lors du renommage" });
   }
 }
 
@@ -80,5 +93,5 @@ async function deleteTempImage(req, res) {
 }
 
 module.exports = {
-  getImage, uploadImg, uploadTempImages, getUserTempImages, deleteTempImage
+  getImage, uploadImg, uploadTempImages, getUserTempImages, reorderTempImages, deleteTempImage
 }

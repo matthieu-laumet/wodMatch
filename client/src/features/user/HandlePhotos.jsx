@@ -1,30 +1,22 @@
-import { useContext, useEffect, useState } from "react";
-import dataApplicationsContext, { titleApp } from "../../context/dataApplicationsContext";
-import { useGetUserTempImagesQuery } from "../../slices/imagesApiSlice";
-import { PulseLoader } from "react-spinners";
+import { useState } from "react";
+import OnboardPhotos from "../home/OnboardPhotos";
+import { useNavigate } from "react-router-dom";
 
 export default function HandlePhotos({ }) {
-  const { auth } = useContext(dataApplicationsContext);
-  const { data: remotePhotos = [], isLoading: isLoadingTempImages, isSuccess: isSuccessTempImages } = useGetUserTempImagesQuery();
 
-  const [photos, setPhotos] = useState([]);
+  const [btnText, setBtnText] = useState('Ajouter un média');
+  const [isDisabled, setIsDisabled] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (remotePhotos.length === 0) return;
-    setPhotos(remotePhotos.map(photo => ({
-      id: crypto.randomUUID(), filename: photo.filename, url: photo.url, // ✅ base64 direct, pas besoin d'un 2ème appel
-    })));
-  }, [remotePhotos]);
-
-  const mainPhoto = isLoadingTempImages
-    ? <PulseLoader color='#505050' size={8} className="pl-14 pt-16 main-avatar"/>
-    : <img src={photos[0]?.url} className='main-avatar'/>
-
-  const tauxCompletion = auth?.user?.taux_completion || 65;
+  const handlePrev = () => {
+    window.scroll(0, 0);
+    navigate('/profil')
+  };
 
   return (
-    <div className='full-screen'>
-      <p>Edit pictures</p>
+    <div className='full-screen padding pt-6'>
+       <i className="bi bi-arrow-left-circle text-3xl cursor-pointer" onClick={handlePrev}></i>
+      <OnboardPhotos btnText={btnText} setBtnText={setBtnText} setIsDisabled={setIsDisabled} showAllSlots/>
     </div>
   )
 }

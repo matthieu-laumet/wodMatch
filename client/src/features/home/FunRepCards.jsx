@@ -1,5 +1,3 @@
-import { faCircleXmark, faWpexplorer } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Swal from 'sweetalert2';
 import { alerteDeleteFunrep } from "../../components/Alert";
 

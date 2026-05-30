@@ -624,6 +624,59 @@
   right: 16px;
 }
 
+.photo__popup {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  width: 320px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.photo__popup .swal2-icon,
+.photo__popup .swal2-title,
+.photo__popup .swal2-html-container {
+  display: none !important;
+}
+.photo__popup .swal2-close {
+  display: none !important;
+}
+.photo__popup .swal2-actions {
+  flex-direction: column !important;
+  width: 100% !important;
+  margin: 0 !important;
+  gap: 8px !important;
+}
+
+.photo__confirm,
+.photo__cancel {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  background: white !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.photo__confirm:hover,
+.photo__cancel:hover {
+  background: white !important;
+}
+
+.photo__confirm {
+  color: #e64942 !important;
+  letter-spacing: 0.08em;
+}
+
+.photo__cancel {
+  color: #696969 !important;
+  letter-spacing: 0.05em;
+}
+
+.photo__popup .swal2-actions {
+  flex-direction: column-reverse !important;
+}
+
 .auth-main-container {
   display: flex;
   align-items: center;
@@ -2408,6 +2461,7 @@
   height: 56px;
   position: relative;
   cursor: pointer;
+  overflow: visible;
 }
 .profil-top-container .second-menus-container .bloc .bloc-icon {
   position: absolute;
@@ -2445,17 +2499,23 @@
 }
 .profil-top-container .second-menus-container .bloc.small.black .bloc-label {
   color: #000;
+  padding-top: 36px;
 }
 .profil-top-container .second-menus-container .additionnal {
-  position: absolute !important;
-  bottom: 0 !important;
-  right: 0 !important;
+  position: relative !important;
+  bottom: -38px !important;
+  right: -40px !important;
   color: #000;
   font-size: 16px;
   background-color: #fff;
   border-radius: 50%;
   height: 16px;
   width: 16px;
+}
+.profil-top-container .second-menus-container .additionnal .bi-plus-circle {
+  position: relative;
+  top: -2px;
+  left: -1px;
 }
 
 .profil-bottom-container {
@@ -2489,6 +2549,11 @@
 .full-screen {
   max-height: calc(100dvh - 120px);
   overflow: hidden;
+}
+
+.full-screen.padding {
+  padding-left: 7%;
+  padding-right: 7%;
 }
 
 @media (min-width: 481px) {

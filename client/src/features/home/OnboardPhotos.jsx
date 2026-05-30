@@ -1,24 +1,31 @@
 import { useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useUploadTempImagesMutation } from "../../slices/imagesApiSlice";
+import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useReorderTempImagesMutation, useUploadTempImagesMutation } from "../../slices/imagesApiSlice";
 import { PulseLoader } from "react-spinners";
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
+import { MAX_PHOTOS } from "../../context/dataApplicationsContext";
+import CropModal from "../../components/CropModal";
+import Swal from 'sweetalert2';
+import { alerteDeleteFunrep, alerteDeletePhoto } from "../../components/Alert";
 
 
-const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
+const OnboardPhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllSlots = false }) => {
   const [photos, setPhotos] = useState([]);
   const [loadingCount, setLoadingCount] = useState(0); // ✅ nb de slots en chargement
+  const [cropQueue, setCropQueue] = useState([]); // fichiers en attente de crop
+  const [currentCrop, setCurrentCrop] = useState(null); // { file, objectUrl }
+
   const inputRef = useRef(null);
-  const MAX_PHOTOS = 6;
 
   useEffect(() => {
-    setBtnText('Suivant')
+    setBtnText(btnText)
     setIsDisabled(photos.length === 0)
   }, [photos])
 
   const [uploadTempImages] = useUploadTempImagesMutation();
   const [deleteTempImage] = useDeleteTempImageMutation();
+  const [reorderTempImages] = useReorderTempImagesMutation();
   const { data: remotePhotos = [], isLoading: isLoadingTempImages, isSuccess: isSuccessTempImages } = useGetUserTempImagesQuery();
 
   useEffect(() => {
@@ -30,48 +37,112 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
     })));
   }, [remotePhotos]);
 
+  const handleSlotClick = () => {
+  inputRef.current.click();
+};
+
   const handleAddPhoto = async (e) => {
+    const targetSlot = photos.length + loadingCount; // ← toujours la suite, peu importe le slot cliqué
     const files = Array.from(e.target.files).slice(0, MAX_PHOTOS - photos.length - loadingCount);
     if (files.length === 0) return;
-    setLoadingCount((prev) => prev + files.length); // ✅ ouvre les slots loading
-    try {
-      const results = await uploadTempImages(files).unwrap();
-      const newPhotos = results.map((result) => ({
-        id: crypto.randomUUID(),
-        filename: result.filename,
-        url: URL.createObjectURL(files.find(f => f.name === result.filename) || files[0]),
-      }));
-      setPhotos((prev) => [...prev, ...newPhotos]);
-    } catch (error) {
-      console.error('Erreur upload:', error);
-      toast.error(error?.message || error?.data?.error || 'Une erreur est survenue lors de la soumission.', { 
-        autoClose: 6000, closeButton: true, className: 'toast-error-register' 
-      });
-    } finally {
-      setLoadingCount((prev) => prev - files.length); // ✅ ferme les slots loading
-    }
     e.target.value = null;
+
+    const [first, ...rest] = files;
+    setCropQueue(rest.map((file, i) => ({ file, slotIndex: targetSlot + 1 + i })));
+    setCurrentCrop({ file: first, objectUrl: URL.createObjectURL(first), slotIndex: targetSlot });
   };
+
+  const handleCropConfirm = async (blob) => {
+    const slotIndex = currentCrop.slotIndex;
+    const file = new File([blob], currentCrop.file.name, { type: 'image/jpeg' });
+    URL.revokeObjectURL(currentCrop.objectUrl);
+
+    if (cropQueue.length > 0) {
+      const [next, ...rest] = cropQueue;
+      setCropQueue(rest);
+      setCurrentCrop({ file: next.file, objectUrl: URL.createObjectURL(next.file), slotIndex: next.slotIndex });
+    } else {
+      setCurrentCrop(null);
+    }
+
+    setLoadingCount((prev) => prev + 1);
+    try {
+      const results = await uploadTempImages({ files: [file], slot: slotIndex }).unwrap();
+      const newPhoto = {
+        id: crypto.randomUUID(),
+        filename: results[0].filename,
+        url: URL.createObjectURL(blob),
+      };
+      setPhotos((prev) => [...prev, newPhoto]);
+    } catch (error) {
+      toast.error(error?.data?.error || 'Erreur upload', { autoClose: 6000 });
+    } finally {
+      setLoadingCount((prev) => prev - 1);
+    }
+  };
+
+  const handleCropCancel = () => {
+    URL.revokeObjectURL(currentCrop.objectUrl);
+    if (cropQueue.length > 0) {
+      const [next, ...rest] = cropQueue;
+      setCropQueue(rest);
+      setCurrentCrop({ file: next.file, objectUrl: URL.createObjectURL(next.file), slotIndex: next.slotIndex });
+    } else {
+      setCurrentCrop(null);
+    }
+  };
+
 
   const handleRemove = async (id) => {
-    const photo = photos.find((p) => p.id === id);
-    setPhotos((prev) => prev.filter((p) => p.id !== id)); // optimistic update
-    if (photo?.filename) {
-      try {
-        await deleteTempImage(photo.filename).unwrap();
-      } catch (error) {
-        console.error('Erreur suppression:', error);
-        setPhotos((prev) => [...prev, photo]); // rollback si erreur
+    try {
+      const result = await Swal.fire(alerteDeletePhoto());
+      if (!result.isConfirmed) return;
+
+      const photo = photos.find((p) => p.id === id);
+      const newPhotos = photos.filter((p) => p.id !== id);
+      setPhotos(newPhotos); // optimistic update
+
+      if (photo?.filename) {
+        try {
+          await deleteTempImage(photo.filename).unwrap();
+
+          // Réordonner seulement si ce n'était pas la dernière photo
+          if (newPhotos.length > 0) {
+            const results = await reorderTempImages({ filenames: newPhotos.map(p => p.filename) }).unwrap();
+            setPhotos(newPhotos.map((p, i) => ({
+              ...p,
+              filename: results[i].newFilename,
+            })));
+          }
+        } catch (error) {
+          console.error('Erreur suppression:', error);
+          setPhotos(photos); // rollback
+        }
       }
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
     }
   };
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = async (result) => {
     if (!result.destination) return;
+
     const reordered = Array.from(photos);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
-    setPhotos(reordered);
+    setPhotos(reordered); // optimistic update immédiat
+
+    try {
+      const results = await reorderTempImages({ filenames: reordered.map(p => p.filename) }).unwrap();
+      // Mettre à jour les filenames avec les nouveaux noms
+      setPhotos(reordered.map((photo, i) => ({
+        ...photo,
+        filename: results[i].newFilename,
+      })));
+    } catch (error) {
+      console.error('Erreur reorder:', error);
+      setPhotos(photos); // rollback
+    }
   };
 
   const totalUsed = photos.length + loadingCount;
@@ -82,10 +153,19 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
     slots.push({ id: `loading-${i}`, isLoading: true });
   }
 
-  // Slot "ajouter"
-  if (totalUsed < MAX_PHOTOS) slots.push({ id: 'add', isAdd: true });
-  // Padding pour aligner la grille
-  while (slots.length % 3 !== 0) slots.push({ id: `empty-${slots.length}`, isEmpty: true });
+  if (showAllSlots) {
+    // Affiche tous les slots vides jusqu'à MAX_PHOTOS, avec un seul bouton "+"
+    const remaining = MAX_PHOTOS - totalUsed;
+    for (let i = 0; i < remaining; i++) {
+      slots.push({ id: `add-${i}`, isAdd: true });
+    }
+  } else {
+    // Comportement par défaut : un seul slot "+"
+    if (totalUsed < MAX_PHOTOS) slots.push({ id: 'add', isAdd: true });
+  }
+
+  // Padding pour aligner la grille (plus nécessaire avec showAllSlots car MAX_PHOTOS est divisible par 3)
+  while (slots.length % 3 !== 0) slots.push({ id: `empty-pad-${slots.length}`, isEmpty: true });
 
   return (
     <>
@@ -106,10 +186,11 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
                   className="grid grid-cols-3 gap-2"
                 >
                   {slots.map((slot, index) => {
+                    const slotPosition = index;
                     if (slot.isAdd) return (
                       <div
-                        key="add"
-                        onClick={() => inputRef.current.click()}
+                        key={slot.id}
+                        onClick={() => handleSlotClick(slotPosition)}
                         className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#505050] bg-gray-100 flex items-center justify-center cursor-pointer"
                       >
                         <span className="text-2xl text-gray-950">+</span>
@@ -117,7 +198,10 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
                     );
 
                     if (slot.isEmpty) return (
-                      <div key={slot.id} className="aspect-[3/4]" />
+                      <div
+                        key={slot.id}
+                        className={`aspect-[3/4] rounded-xl ${slot.isPlaceholder ? 'border-2 border-dashed border-[#505050] bg-gray-100' : ''}`}
+                      />
                     );
 
                     if (slot.isLoading) return (
@@ -162,6 +246,13 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled }) => {
           <p className="text-black-950 mt-4">Pour réorganiser tes photos, effectue un drag and drop.</p>
         </>
       }
+      {currentCrop && (
+        <CropModal
+          imageSrc={currentCrop.objectUrl}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
     </>
   );
 };

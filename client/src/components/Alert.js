@@ -8,9 +8,6 @@ const customClass = {
   popup: 'delete__popup',
   footer: 'delete__footer',
 }
-const showCancelButton = true;
-const reverseButtons = true;
-const icon = 'warning';
 const cancelButtonText = 'Annuler';
 
 
@@ -24,6 +21,20 @@ export const alerteDeleteFunrep = () => {
     confirmButtonText: "Confirmer", // Modifier le texte du bouton de confirmation ici
     icon: 'info',
     cancelButtonText
+  }
+}
+
+export const alerteDeletePhoto = () => {
+  return {
+    showCancelButton: true,
+    reverseButtons: true,
+    confirmButtonText: "Supprimer",
+    cancelButtonText: "Annuler",
+    customClass: {
+      popup: 'delete__popup photo__popup',
+      confirmButton: 'photo__confirm',   // ← pas de swalConfirm ici
+      cancelButton: 'photo__cancel',     // ← pas de swalCancel ici
+    },
   }
 }
 

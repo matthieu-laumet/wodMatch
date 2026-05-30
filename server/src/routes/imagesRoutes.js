@@ -28,12 +28,13 @@ router.get('/get-one-image/:filename', imagesController.getImage);
 
 // ==================== PROTECTION ====================
 router.use(validateProtectedRoutes([
-  '/upload-temp-images', '/get-user-temp-images', '/delete-temp-image'
+  '/upload-temp-images', '/get-user-temp-images', '/delete-temp-image', '/reorder-temp-images'
 ]));
 router.use(verifyJWT); // Tout ce qui suit nécessite JWT
 // ====================================================
 router.get('/get-user-temp-images', imagesController.getUserTempImages);
 router.post('/upload-temp-images', upload.array('files', 6), multerErrorHandler, imagesController.uploadTempImages);
+router.post('/reorder-temp-images', imagesController.reorderTempImages);
 router.delete('/delete-temp-image/:filename', imagesController.deleteTempImage);
 
 

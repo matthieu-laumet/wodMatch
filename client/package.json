@@ -13,6 +13,7 @@
     "react": "^18.2.0",
     "react-awesome-reveal": "^4.3.1",
     "react-dom": "^18.2.0",
+    "react-easy-crop": "^5.5.7",
     "react-loading-skeleton": "^3.3.1",
     "react-mobile-picker": "^1.0.1",
     "react-redux": "^8.0.5",

@@ -14,12 +14,13 @@ async function getImageRaw(filename) {
   };
 }
 
+
 async function getImageAsBase64(filename) {
   const { data, contentType } = await getImageRaw(filename);
   return `data:${contentType};base64,${Buffer.from(data).toString('base64')}`;
 }
 
-async function uploadOneImg({ file, prefix = '' }) {
+async function uploadOneImg({ file, prefix = '', slot = null }) {
   if (!file) throw new Error('Aucun fichier fourni');
 
   if (prefix) {
@@ -27,7 +28,8 @@ async function uploadOneImg({ file, prefix = '' }) {
   }
 
   const metadata = await sharp(file.buffer).metadata();
-  const filename = `${prefix}${generateUniqueId()}${path.extname(file.originalname)}`;
+  const uniqueName = `${generateUniqueId()}${path.extname(file.originalname)}`;
+  const filename = `${prefix}${slot !== null ? `${slot}-` : ''}${uniqueName}`;
   
   await webdavClient.put(filename, file.buffer, {
     headers: { 'Content-Type': file.mimetype },
@@ -37,6 +39,31 @@ async function uploadOneImg({ file, prefix = '' }) {
     success: true, filename, width: metadata.width, height: metadata.height,
     ratio: metadata.width / metadata.height
   };
+}
+
+async function reorderTempImagesService({ filenames, id_user }) {
+  const results = await Promise.all(
+    filenames.map(async (filename, newSlot) => {
+      // Extraire le nom sans préfixe : "temp/userId/2-xxxx.jpg" → "xxxx.jpg"
+      const basename = path.basename(filename); // "2-xxxx.jpg"
+      const nameWithoutPrefix = basename.replace(/^\d+-/, ''); // "xxxx.jpg"
+      const newFilename = `temp/${id_user}/${newSlot}-${nameWithoutPrefix}`;
+
+      if (filename === newFilename) return { oldFilename: filename, newFilename };
+
+      // Lire + réécrire sous le nouveau nom + supprimer l'ancien
+      const response = await webdavClient.get(filename, { responseType: 'arraybuffer' });
+      await webdavClient.put(newFilename, response.data, {
+        headers: { 'Content-Type': response.headers['content-type'] },
+        timeout: 30000
+      });
+      await webdavClient.delete(filename);
+
+      return { oldFilename: filename, newFilename };
+    })
+  );
+
+  return results
 }
 
 
@@ -76,5 +103,5 @@ async function getUserTempImagesService(id_user) {
 
 
 module.exports = {
-  getImageAsBase64, uploadOneImg, getImageRaw, getUserTempImagesService
+  getImageAsBase64, uploadOneImg, getImageRaw, getUserTempImagesService, reorderTempImagesService
 }

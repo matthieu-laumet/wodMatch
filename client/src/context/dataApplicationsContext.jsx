@@ -9,6 +9,7 @@ export const baseColor3 = "#DCDCDC"
 export const baseColor35 = "#bcbcbc"
 export const baseColor4 = "#A9A9A9"
 export const dateOptions = { locale: fr, timeZone: 'Europe/Paris' }
+export const MAX_PHOTOS = 6;
 
 // const dataApplicationsContext = createContext({});
 const dataApplicationsContext = createContext({

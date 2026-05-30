@@ -42,7 +42,9 @@ export default function Profil({ }) {
           </div>
           <div className="bloc small black" onClick={() => navigate('edit-pictures')}>
             <i className="bloc-icon bi bi-camera-fill text-3xl"></i>
-            <i className="bi bi-plus-circle additionnal"></i>
+            <span className="additionnal">
+              <i className="bi bi-plus-circle"></i>
+            </span>
             <p className="bloc-label">Gérer mes photos</p>
           </div>
         </div>

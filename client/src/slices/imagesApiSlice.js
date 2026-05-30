@@ -31,30 +31,45 @@ export const imagesApiSlice = wodmatchApiSlice.injectEndpoints({
     }),
     getUserTempImages: builder.query({
       query: () => '/images/get-user-temp-images',
+      providesTags: ['Image'],
     }),
     uploadTempImages: builder.mutation({
-      query: (files) => {
+      query: ({ files, slot }) => {
         const formData = new FormData();
         files.forEach(file => formData.append('files', file));
+        if (slot !== undefined && slot !== null) {
+          formData.append('slot', slot);
+        }
         return {
           url: '/images/upload-temp-images',
           method: 'POST',
           body: formData,
         };
       },
-      providesTags: ['User', 'Image'],
+    }),
+    reorderTempImages: builder.mutation({
+      query: data => ({
+          url: '/images/reorder-temp-images',
+          method: 'post',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['Image']
     }),
     deleteTempImage: builder.mutation({
       query: (filename) => ({
         url: `/images/delete-temp-image/${encodeURIComponent(filename)}`,
         method: 'DELETE',
+        invalidatesTags: ['Image']
       }),
     }),
   }),
 })
 
 export const { 
-  useGetImageQuery, useUploadTempImagesMutation, useGetUserTempImagesQuery, useDeleteTempImageMutation
+  useGetImageQuery, useUploadTempImagesMutation, useGetUserTempImagesQuery, useDeleteTempImageMutation,
+  useReorderTempImagesMutation
 } = imagesApiSlice
 
 // Fonction utilitaire pour nettoyer le cache (à appeler lors de la déconnexion)
