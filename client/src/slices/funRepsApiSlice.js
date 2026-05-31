@@ -11,9 +11,19 @@ export const funRepsApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       providesTags: ['FunRep']
     }),
+    upsertUserFunReps: builder.mutation({
+      query: data => ({
+          url: `/funReps/upsert-user-fun-reps`,
+          method: 'post',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['FunRep', 'User']
+    }),
   }),
 })
 
 export const { 
-  useGetFunRepsQuery
+  useGetFunRepsQuery, useUpsertUserFunRepsMutation
 } = funRepsApiSlice

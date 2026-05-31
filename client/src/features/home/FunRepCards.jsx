@@ -1,17 +1,19 @@
 import Swal from 'sweetalert2';
 import { alerteDeleteFunrep } from "../../components/Alert";
 
-const FunRepCards = ({ funRepsFilled, setFunRepsFilled, setOpenModal, setSelectedFunRep, setScrollLeft, funRepSelected, setFunRepSelected }) => {
+const FunRepCards = ({ 
+  funRepsFilled, setFunRepsFilled, setOpenModal, setSelectedFunRep, setScrollLeft, setFunRepSelected,
+  oldRepValue, setOldRepValue
+}) => {
 
   const handleClick = (rep) => {
     setSelectedFunRep(rep);
     setScrollLeft(-100);
     setTimeout(() => setOpenModal(true), 100);
 
-    setFunRepSelected(prev => {
-      const current = funRepsFilled.find(data => data.id_fun_rep === rep.id_fun_rep);
-      return current
-    });
+    const current = funRepsFilled.find(data => data.id_fun_rep === rep.id_fun_rep);
+    setFunRepSelected(current);
+    !oldRepValue && setOldRepValue(current.id_fun_rep)
   }
 
   const handleDelete = async (rep) => {

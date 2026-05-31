@@ -50,9 +50,13 @@ const Onboarding = () => {
       const result = await onboardingUser({
         levelIds, userBio, userFunReps, skills, userSearchMode
       }).unwrap();
-      console.log(result)
       setAuth(prev => ({ ...prev, user: { ...prev.user, has_seen_wodmatch_welcome: result.has_seen_wodmatch_welcome } }));
-      navigate('/profil')
+      navigate('/profil');
+      sessionStorage.removeItem('onBoardingLevels');
+      sessionStorage.removeItem('onboardBio');
+      sessionStorage.removeItem('onboardFunReps');
+      sessionStorage.removeItem('onboardSkills');
+      sessionStorage.removeItem('onboardingChoice');
     } catch (error) {
       console.log(error)
     }

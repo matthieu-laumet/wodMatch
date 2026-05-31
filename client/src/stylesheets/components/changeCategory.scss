@@ -92,6 +92,16 @@
   cursor: pointer;
 }
 
+.close-input-change-category.left {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-weight: bold;
+  font-size: 20px;
+  z-index: 1201;
+  cursor: pointer;
+}
+
 .close-submit {
   position: absolute;
   top: 16px;
@@ -106,6 +116,7 @@
 .close-submit.disabled {
   color: $gray08;
   opacity: .7;
+  cursor: not-allowed;
 }
 
 .title-filter {

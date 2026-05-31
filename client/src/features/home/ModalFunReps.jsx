@@ -6,7 +6,7 @@ const MAX_FUN_REPS_LENGTH = 150;
 
 const ModalFunReps = ({ 
   openModal, selectedFunRep, setSelectedFunRep, scrollLeft, setScrollLeft, onSubmit, funRepSelected, setFunRepSelected,
-  funRepsFilled
+  funRepsFilled, hasSubmitBtn = true,
 }) => {
   
   const { data: funReps, isLoading: isLoadingFunReps, isSuccess: isSuccessFunReps } = useGetFunRepsQuery();
@@ -68,12 +68,14 @@ const ModalFunReps = ({
             />
             <span className="bio-counter">{MAX_FUN_REPS_LENGTH - funRepSelected.description.length}</span>
           </div>
-          <button 
-            onClick={() => onSubmit(funRepSelected)} disabled={funRepSelected.description?.length === 0}
-            className="btn-submit-funrep"
-          >
-            Ajouter
-          </button>
+          {hasSubmitBtn && 
+            <button 
+              onClick={() => onSubmit(funRepSelected)} disabled={funRepSelected.description?.length === 0}
+              className="btn-submit-funrep"
+            >
+              Ajouter
+            </button>
+          }
         </div>
       </div>
     </>

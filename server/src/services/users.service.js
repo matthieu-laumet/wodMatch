@@ -1,4 +1,4 @@
-const { upsertUserFunReps } = require('../models/funReps.model');
+const { upsertOneUserFunReps } = require('../models/funReps.model');
 const { upsertUserLevel } = require('../models/levels.model');
 const { upsertUserSearchMode } = require('../models/searchModes.model');
 const { upsertUserSkill } = require('../models/skills.model');
@@ -13,7 +13,7 @@ async function onboardingUserService({ id_user, levelIds, userBio, userFunReps, 
 
   await Promise.all(skills.map((skill) => upsertUserSkill({ id_user, id_skill: skill.id_skill })));
   await Promise.all(levelIds.map((id_level) => upsertUserLevel({ id_user, id_level })));
-  userFunReps && await Promise.all(userFunReps.map((rep) => upsertUserFunReps({ id_user, id_fun_rep: rep.id_fun_rep, description: rep.description })));
+  userFunReps && await Promise.all(userFunReps.map((rep) => upsertOneUserFunReps({ id_user, id_fun_rep: rep.id_fun_rep, description: rep.description })));
   await updateSeenWelcomeUser({ has_seen_wodmatch_welcome: true, id_user })
   return { message: 'ok', has_seen_wodmatch_welcome: true };
 }

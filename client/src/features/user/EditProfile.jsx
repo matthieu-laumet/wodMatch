@@ -12,6 +12,7 @@ import FunRepCards from "../home/FunRepCards";
 import ModalSkills from "./ModalSkills";
 import { toast } from 'react-toastify';
 import { useCleanUpsertUserSkillsMutation } from "../../slices/skillsApiSlice";
+import { useUpsertUserFunRepsMutation } from "../../slices/funRepsApiSlice";
 
 
 const schema = yup.object().shape({
@@ -29,6 +30,7 @@ export default function EditProfile() {
   const [openModal, setOpenModal] = useState(false);
   const [openModalSkill, setOpenModalSkill] = useState(false);
   const [selectedFunRep, setSelectedFunRep] = useState(null);
+  const [oldRepValue, setOldRepValue] = useState(null);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [funRepSelected, setFunRepSelected] = useState({ id_fun_rep: null, description: '', label: '' });
   const [funRepsFilled, setFunRepsFilled] = useState(auth?.user?.user_fun_reps || []);
@@ -38,6 +40,7 @@ export default function EditProfile() {
   );
 
   const [cleanUpsertUserSkills] = useCleanUpsertUserSkillsMutation();
+  const [upsertUserFunReps] = useUpsertUserFunRepsMutation();
 
   const form = useForm({
     defaultValues: { bio: auth?.user?.bio || '' },
@@ -74,6 +77,20 @@ export default function EditProfile() {
   const handleAddFunRep = () => {
     setFunRepSelected({ id_fun_rep: null, description: '', label: '' });
     setOpenModal(true);
+  };
+
+  const handleSubmitFunReps = async () => {
+    if (funRepSelected?.description?.length === 0) return
+    try {
+      const result = await upsertUserFunReps({ oldRepId: oldRepValue, newFunRep: funRepSelected }).unwrap();
+      setFunRepsFilled(result.user_fun_reps)
+      setAuth(prev => ({ ...prev, user: { ...prev.user, user_fun_reps: result.user_fun_reps } }));
+      setOldRepValue(null)
+      onCloseModal();
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.error || 'Erreur serveur', { autoClose: 6000 });
+    }
   };
 
   const handleSubmitSkills = async () => {
@@ -129,7 +146,8 @@ export default function EditProfile() {
           {funRepsFilled.length > 0 &&
             <FunRepCards
               funRepsFilled={funRepsFilled} setFunRepsFilled={setFunRepsFilled}
-              setOpenModal={setOpenModal} setSelectedFunRep={setSelectedFunRep}
+              setOpenModal={setOpenModal} setSelectedFunRep={setSelectedFunRep} 
+              oldRepValue={oldRepValue} setOldRepValue={setOldRepValue}
               setScrollLeft={setScrollLeft} funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected}
             />
           }
@@ -161,13 +179,15 @@ export default function EditProfile() {
           openModal={openModal} selectedFunRep={selectedFunRep} setSelectedFunRep={setSelectedFunRep}
           scrollLeft={scrollLeft} setScrollLeft={setScrollLeft} onSubmit={onSubmitFunRep}
           funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected} funRepsFilled={funRepsFilled}
+          hasSubmitBtn={false} oldRepValue={oldRepValue} setOldRepValue={setOldRepValue}
         />}
-        noFooter
+        onSubmit={handleSubmitFunReps} isDisabled={funRepSelected?.description?.length === 0}
+        noFooter closeSubmit closeLeft
       />
       <ModalStructure
         openModal={openModalSkill} setOpenModal={onCloseModal} title='Modifier mes skills'
-        body={<ModalSkills userSkills={userSkills} onSelectionChange={setSelectedSkillIds} />} noFooter closeSubmit
-        onSubmit={handleSubmitSkills} isDisabled={selectedSkillIds?.length === 0}
+        body={<ModalSkills userSkills={userSkills} onSelectionChange={setSelectedSkillIds} />} 
+        onSubmit={handleSubmitSkills} isDisabled={selectedSkillIds?.length === 0} noFooter closeSubmit
       />
     </div>
   );
