@@ -1,21 +1,28 @@
 import { PulseLoader } from "react-spinners";
-import { useCleanUpsertUserSkillsMutation, useGetSkillsQuery } from "../../slices/skillsApiSlice";
+import { useGetSkillsQuery } from "../../slices/skillsApiSlice";
 import { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass, faX } from "@fortawesome/free-solid-svg-icons";
+import { MAX_SELECTIONS } from "../../context/dataApplicationsContext";
 
-const OnboardSkill = ({ setBtnText, setIsDisabled }) => {
+const OnboardSkill = ({ setBtnText = null, setIsDisabled = false, userSkills = null, onSelectionChange = null }) => {
   const { data: skills, isLoading: isLoadingSkills, isSuccess: isSuccessSkills } = useGetSkillsQuery();
 
   const sentinelRef = useRef(null);
   const [isSticky, setIsSticky] = useState(false);
   const [selected, setSelected] = useState(() => {
     const saved = sessionStorage.getItem("onboardSkills");
+    if (userSkills) return userSkills;
     return saved ? JSON.parse(saved) : [];
   });
   const [search, setSearch] = useState("");
   const [filteredSkills, setFilteredSkills] = useState([]);
-  const MAX_SELECTIONS = 8; // adjust as needed (image 1 shows 0/5, image 2 shows 7/8)
+
+  useEffect(() => {
+    if (userSkills) {
+      setSelected(userSkills)
+    }
+  }, [userSkills])
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -44,21 +51,24 @@ const OnboardSkill = ({ setBtnText, setIsDisabled }) => {
 
 
   useEffect(() => {
-    setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`)
-    setIsDisabled(selected.length === 0)
+    if (setBtnText) {
+      setBtnText(`Suivant (${selected.length}/${MAX_SELECTIONS})`);
+      setIsDisabled(selected.length === 0);
+    }
+    onSelectionChange?.(selected); // 👈 déplacé ici
   }, [selected]);
 
 
-  const toggle = (id) => {
+  const toggle = (skill) => {
     setSelected((prev) => {
-      const next = prev.includes(id)
-        ? prev.filter((s) => s !== id) : prev.length < MAX_SELECTIONS 
-          ? [...prev, id] : prev;
-      sessionStorage.setItem("onboardSkills", JSON.stringify(next));
+      const exists = prev.find((s) => s.id_skill === skill.id_skill);
+      const next = exists
+        ? prev.filter((s) => s.id_skill !== skill.id_skill)
+        : prev.length < MAX_SELECTIONS ? [...prev, skill] : prev;
+      !userSkills && sessionStorage.setItem("onboardSkills", JSON.stringify(next));
       return next;
     });
   };
-
   
   if (isLoadingSkills) return <PulseLoader color='#222' size={10} className="mt-12 ml-12"/> 
 
@@ -66,7 +76,10 @@ const OnboardSkill = ({ setBtnText, setIsDisabled }) => {
     <>
       <div className="onboard-skill mb-12">
         <div className="mt-2 mb-4">
-          <h2 className="text-2xl font-semibold mb-2">Quels sont tes points forts ?</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold mb-2">Quels sont tes points forts ?</h2>
+            <h2 className="text-md font-regular mb-2">({selected?.length}/{MAX_SELECTIONS})</h2>
+          </div>
           <p>On a tous nos mouvements préférés, ceux dans lesquels on excelle. Partage-les avec les autres.</p>
         </div>
         <div ref={sentinelRef} style={{ height: "1px" }} />
@@ -80,11 +93,11 @@ const OnboardSkill = ({ setBtnText, setIsDisabled }) => {
         </div>
         <div className="onboard-skill__tags mt-4">
           {filteredSkills?.map((skill) => {
-            const isSelected = selected.includes(skill.id_skill);
+            const isSelected = selected.some((s) => s.id_skill === skill.id_skill);
             return (
               <button
                 key={skill.id_skill}
-                onClick={() => toggle(skill.id_skill)}
+                onClick={() => toggle(skill)}
                 className={`onboard-skill__tag${isSelected ? " onboard-skill__tag--selected" : ""}`}
               >
                 {skill.label}

@@ -3,7 +3,7 @@ import { useScrollLock } from "../hooks/useScrollLock";
 
 export default function ModalStructure({ 
   openModal, setOpenModal, title, body, btnText, onSubmit, hideOnFocuse, titleClass, cancelText = 'Annuler', wrapperClass,
-  handleModalClose, noFooter, btnText2, submit2, titleSuffix
+  handleModalClose, noFooter, btnText2, submit2, titleSuffix, closeSubmit = false, isDisabled = false
 }) {
 
   const { lockScroll, unlockScroll } = useScrollLock();
@@ -70,6 +70,7 @@ export default function ModalStructure({
     mouseDownPosRef.current = null;
   };
 
+  console.log(isDisabled)
 
   return (
     <>
@@ -80,7 +81,10 @@ export default function ModalStructure({
         onMouseUp={handleMouseUp}
       >
         <div className={`change-category-wrapper pl-0 ${openModal ? 'change-category-active' : ''} ${wrapperClass}`}>
-          <i className="bi bi-x-lg close-input-change-category" onClick={handleClose}></i>
+          {closeSubmit
+            ? <p className={`close-submit ${isDisabled ? 'disabled' : ''}`} onClick={submit}>Terminé</p>
+            : <i className="bi bi-x-lg close-input-change-category" onClick={handleClose}></i>
+          }
           <h1 className={`title-filter-competition ${titleClass}`}>
             {title}{titleSuffix && <span className="fw-500 ml-8 fz-14">({titleSuffix})</span>}
           </h1>

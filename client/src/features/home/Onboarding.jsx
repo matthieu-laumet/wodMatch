@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import dataApplicationsContext from "../../context/dataApplicationsContext";
 import { useNavigate } from "react-router-dom";
-import OnboardPhotos from "./OnboardPhotos";
 import OnboardSkills from "./OnboardSkills";
 import OnboardAboutMe from "./OnboardAboutMe";
 import OnboardLevel from "./OnboardLevel";
 import { useOnboardingUserMutation } from "../../slices/usersApiSlice";
+import HandlePhotos from "../../components/HandlePhotos";
+import dataApplicationsContext from "../../context/dataApplicationsContext";
 
 
 const Onboarding = () => {
-  const { auth } = useContext(dataApplicationsContext);
+  const { setAuth } = useContext(dataApplicationsContext);
 
   const navigate = useNavigate();
   const [btnText, setBtnText] = useState('Suivant');
@@ -44,12 +44,14 @@ const Onboarding = () => {
       const levelIds = JSON.parse(sessionStorage.getItem('onBoardingLevels'));
       const userBio = sessionStorage.getItem('onboardBio');
       const userFunReps = JSON.parse(sessionStorage.getItem('onboardFunReps'));
-      const skillIds = JSON.parse(sessionStorage.getItem('onboardSkills'));
+      const skills = JSON.parse(sessionStorage.getItem('onboardSkills'));
       const userSearchMode = JSON.parse(sessionStorage.getItem('onboardingChoice'));
 
-      await onboardingUser({
-        levelIds, userBio, userFunReps, skillIds, userSearchMode
-      })
+      const result = await onboardingUser({
+        levelIds, userBio, userFunReps, skills, userSearchMode
+      }).unwrap();
+      console.log(result)
+      setAuth(prev => ({ ...prev, user: { ...prev.user, has_seen_wodmatch_welcome: result.has_seen_wodmatch_welcome } }));
       navigate('/profil')
     } catch (error) {
       console.log(error)
@@ -62,7 +64,7 @@ const Onboarding = () => {
         <i className="bi bi-arrow-left-circle text-3xl cursor-pointer" onClick={handlePrev}></i>
         <span className="progress-bar" style={{ "--progress": `${((section + 1) / 4) * 100 - 10}%` }}></span>
       </div>
-      {section === 0 && <OnboardPhotos setBtnText={setBtnText} setIsDisabled={setIsDisabled}/>}
+      {section === 0 && <HandlePhotos setBtnText={setBtnText} setIsDisabled={setIsDisabled}/>}
       {section === 1 && <OnboardSkills setBtnText={setBtnText} setIsDisabled={setIsDisabled}/>}
       {section === 2 && <OnboardAboutMe setBtnText={setBtnText} setIsDisabled={setIsDisabled}/>}
       {section === 3 && <OnboardLevel setBtnText={setBtnText} setIsDisabled={setIsDisabled}/>}

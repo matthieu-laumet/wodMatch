@@ -92,6 +92,22 @@
   cursor: pointer;
 }
 
+.close-submit {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1201;
+  cursor: pointer;
+  color: $primary;
+}
+
+.close-submit.disabled {
+  color: $gray08;
+  opacity: .7;
+}
+
 .title-filter {
   text-align: center;
   margin-top: 40px;

@@ -471,6 +471,9 @@ video {
 .mb-24{
   margin-bottom: 6rem;
 }
+.mb-3{
+  margin-bottom: 0.75rem;
+}
 .mb-4{
   margin-bottom: 1rem;
 }
@@ -512,6 +515,9 @@ video {
 }
 .mt-0{
   margin-top: 0px;
+}
+.mt-1{
+  margin-top: 0.25rem;
 }
 .mt-12{
   margin-top: 3rem;
@@ -684,6 +690,10 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
 }
+.border-red-500{
+  --tw-border-opacity: 1;
+  border-color: rgb(239 68 68 / var(--tw-border-opacity, 1));
+}
 .bg-\[\#222\]{
   --tw-bg-opacity: 1;
   background-color: rgb(34 34 34 / var(--tw-bg-opacity, 1));
@@ -719,6 +729,9 @@ video {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
+.pb-16{
+  padding-bottom: 4rem;
+}
 .pb-24{
   padding-bottom: 6rem;
 }
@@ -739,6 +752,9 @@ video {
 }
 .pr-32{
   padding-right: 8rem;
+}
+.pr-4{
+  padding-right: 1rem;
 }
 .pt-16{
   padding-top: 4rem;
@@ -812,6 +828,10 @@ video {
 .text-gray-950{
   --tw-text-opacity: 1;
   color: rgb(3 7 18 / var(--tw-text-opacity, 1));
+}
+.text-red-500{
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity, 1));
 }
 .text-white{
   --tw-text-opacity: 1;
@@ -1854,6 +1874,22 @@ video {
   font-size: 20px;
   z-index: 1201;
   cursor: pointer;
+}
+
+.close-submit {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1201;
+  cursor: pointer;
+  color: #df0000;
+}
+
+.close-submit.disabled {
+  color: #696969;
+  opacity: 0.7;
 }
 
 .title-filter {
@@ -2967,6 +3003,10 @@ video {
   color: #696969;
 }
 
+.onboard-skill__tags.start {
+  justify-content: start;
+}
+
 .search-skill {
   position: relative;
 }
@@ -3066,6 +3106,10 @@ video {
   height: 200px;
   padding: 20px;
   background: #fff;
+}
+
+.bio-wrapper.small {
+  height: 150px;
 }
 
 .bio-wrapper.fun-rep {
@@ -3406,6 +3450,20 @@ video {
 .full-screen.padding {
   padding-left: 7%;
   padding-right: 7%;
+}
+
+.padding7p {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+.skill-icon-add {
+  position: absolute;
+  right: -14px;
+  top: 0;
+  font-size: 28px;
+  cursor: pointer;
+  color: #df0000;
 }
 
 @media (min-width: 481px) {

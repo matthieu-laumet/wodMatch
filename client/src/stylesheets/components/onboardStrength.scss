@@ -86,6 +86,11 @@
   }
 }
 
+
+.onboard-skill__tags.start {
+  justify-content: start;
+}
+
 .search-skill {
   position: relative;
 }
@@ -185,6 +190,10 @@
   height: 200px;
   padding: 20px;
   background: #fff;
+}
+
+.bio-wrapper.small {
+  height: 150px;
 }
 
 .bio-wrapper.fun-rep {

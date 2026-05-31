@@ -13,9 +13,9 @@ async function getSkills(req, res) {
 
 async function CleanUpsertUserSkills(req, res) {
   try {
-    const { skillIds } = req.body;
+    const { skills } = req.body;
     const id_user = req.id_user;
-    const result = await replaceUserSkills({ id_user, skillIds });
+    const result = await replaceUserSkills({ id_user, skills });
     res.status(200).send(result);
   } catch (error) {
     console.log(error.message)

@@ -13,8 +13,8 @@ import Profil from "./features/user/Profil";
 import ExploreWorld from "./features/user/ExploreWorld";
 import Competitions from "./features/competitions/Competitions";
 import EditProfile from "./features/user/EditProfile";
-import HandlePhotos from "./features/user/HandlePhotos";
 import Settings from "./features/user/Settings";
+import EditPhotos from "./features/user/EditPhotos";
 
 
 function App() {
@@ -47,7 +47,7 @@ function App() {
               <Route path='profil'>
                 <Route index element={<Profil />} />
                 <Route path='edit' element={<EditProfile />} />
-                <Route path='edit-pictures' element={<HandlePhotos />} />
+                <Route path='edit-pictures' element={<EditPhotos />} />
                 <Route path='settings' element={<Settings />} />
               </Route>
             </Route>

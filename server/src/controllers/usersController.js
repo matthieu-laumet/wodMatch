@@ -16,8 +16,8 @@ async function getCurrentWMUser(req, res) {
 async function onboardingUser(req, res) {
   try {
     const id_user = req.id_user;
-    const { levelIds, userBio, userFunReps, skillIds, userSearchMode } = req.body;
-    const result = await onboardingUserService({ id_user, levelIds, userBio, userFunReps, skillIds, userSearchMode });
+    const { levelIds, userBio, userFunReps, skills, userSearchMode } = req.body;
+    const result = await onboardingUserService({ id_user, levelIds, userBio, userFunReps, skills, userSearchMode });
     res.status(200).send(result);
   } catch (error) {
     console.log(error.message)

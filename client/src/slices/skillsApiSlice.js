@@ -19,7 +19,7 @@ export const skillsApiSlice = wodmatchApiSlice.injectEndpoints({
               ...data,
           }
       }),
-      invalidatesTags: ['Skill']
+      invalidatesTags: ['Skill', 'User']
     }),
   }),
 })

@@ -1,16 +1,16 @@
 import { useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useReorderTempImagesMutation, useUploadTempImagesMutation } from "../../slices/imagesApiSlice";
+import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useReorderTempImagesMutation, useUploadTempImagesMutation } from "../slices/imagesApiSlice";
 import { PulseLoader } from "react-spinners";
 import { useEffect } from "react";
 import { toast } from 'react-toastify';
-import { MAX_PHOTOS } from "../../context/dataApplicationsContext";
-import CropModal from "../../components/CropModal";
+import { MAX_PHOTOS } from "../context/dataApplicationsContext";
+import CropModal from "./CropModal";
 import Swal from 'sweetalert2';
-import { alerteDeleteFunrep, alerteDeletePhoto } from "../../components/Alert";
+import { alerteDeletePhoto } from "./Alert";
 
 
-const OnboardPhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllSlots = false }) => {
+const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllSlots = false }) => {
   const [photos, setPhotos] = useState([]);
   const [loadingCount, setLoadingCount] = useState(0); // ✅ nb de slots en chargement
   const [cropQueue, setCropQueue] = useState([]); // fichiers en attente de crop
@@ -38,8 +38,8 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAll
   }, [remotePhotos]);
 
   const handleSlotClick = () => {
-  inputRef.current.click();
-};
+    inputRef.current.click();
+  };
 
   const handleAddPhoto = async (e) => {
     const targetSlot = photos.length + loadingCount; // ← toujours la suite, peu importe le slot cliqué
@@ -257,4 +257,4 @@ const OnboardPhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAll
   );
 };
 
-export default OnboardPhotos;
+export default HandlePhotos;

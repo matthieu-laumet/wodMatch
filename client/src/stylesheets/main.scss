@@ -1004,6 +1004,22 @@
   cursor: pointer;
 }
 
+.close-submit {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1201;
+  cursor: pointer;
+  color: #df0000;
+}
+
+.close-submit.disabled {
+  color: #696969;
+  opacity: 0.7;
+}
+
 .title-filter {
   text-align: center;
   margin-top: 40px;
@@ -2115,6 +2131,10 @@
   color: #696969;
 }
 
+.onboard-skill__tags.start {
+  justify-content: start;
+}
+
 .search-skill {
   position: relative;
 }
@@ -2214,6 +2234,10 @@
   height: 200px;
   padding: 20px;
   background: #fff;
+}
+
+.bio-wrapper.small {
+  height: 150px;
 }
 
 .bio-wrapper.fun-rep {
@@ -2554,6 +2578,20 @@
 .full-screen.padding {
   padding-left: 7%;
   padding-right: 7%;
+}
+
+.padding7p {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+.skill-icon-add {
+  position: absolute;
+  right: -14px;
+  top: 0;
+  font-size: 28px;
+  cursor: pointer;
+  color: #df0000;
 }
 
 @media (min-width: 481px) {

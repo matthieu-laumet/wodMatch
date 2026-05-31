@@ -10,6 +10,8 @@ export const baseColor35 = "#bcbcbc"
 export const baseColor4 = "#A9A9A9"
 export const dateOptions = { locale: fr, timeZone: 'Europe/Paris' }
 export const MAX_PHOTOS = 6;
+export const MAX_BIO_LENGTH = 500;
+export const MAX_SELECTIONS = 8; // adjust as needed (image 1 shows 0/5, image 2 shows 7/8)
 
 // const dataApplicationsContext = createContext({});
 const dataApplicationsContext = createContext({

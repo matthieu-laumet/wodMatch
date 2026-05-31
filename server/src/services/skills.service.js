@@ -2,17 +2,17 @@ const pool = require('../../db/db_config');
 const { deleteAllUserSkills, upsertUserSkill } = require('../models/skills.model');
 
 
-async function replaceUserSkills({ id_user, skillIds }) {
+async function replaceUserSkills({ id_user, skills }) {
   const client = await pool().connect();
   try {
     await client.query('BEGIN');
     
     await deleteAllUserSkills({ db: client, id_user });
 
-    if (skillIds.length > 0) {
+    if (skills.length > 0) {
       await Promise.all(
-        skillIds.map(async (id_skill) => {
-          await upsertUserSkill({ db: client, id_user, id_skill })
+        skills.map(async (skill) => {
+          await upsertUserSkill({ db: client, id_user, id_skill: skill.id_skill })
         })
       );
     }

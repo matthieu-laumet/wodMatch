@@ -4,11 +4,10 @@ import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import ModalStructure from "../../components/ModalStructure";
 import ModalFunReps from "./ModalFunReps";
 import FunRepCards from "./FunRepCards";
+import { MAX_BIO_LENGTH } from "../../context/dataApplicationsContext";
 
-const MAX_BIO_LENGTH = 500;
 
 const OnboardAboutMe = ({ setBtnText, setIsDisabled }) => {
-
   const [openModal, setOpenModal] = useState(false);
   const [selectedFunRep, setSelectedFunRep] = useState(null);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -100,15 +99,15 @@ const OnboardAboutMe = ({ setBtnText, setIsDisabled }) => {
           </button>     
         </div>
       </div>
-        <ModalStructure
-          openModal={openModal} setOpenModal={onCloseModal} title='Ajouter une Fun rep' 
-          body={<ModalFunReps 
-            openModal={openModal} selectedFunRep={selectedFunRep} setSelectedFunRep={setSelectedFunRep}
-            scrollLeft={scrollLeft} setScrollLeft={setScrollLeft} onSubmit={onSubmit}
-            funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected} funRepsFilled={funRepsFilled}
-          />} 
-          btnText='OK' noFooter={true}
-        />
+      <ModalStructure
+        openModal={openModal} setOpenModal={onCloseModal} title='Ajouter une Fun rep' 
+        body={<ModalFunReps 
+          openModal={openModal} selectedFunRep={selectedFunRep} setSelectedFunRep={setSelectedFunRep}
+          scrollLeft={scrollLeft} setScrollLeft={setScrollLeft} onSubmit={onSubmit}
+          funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected} funRepsFilled={funRepsFilled}
+        />} 
+        btnText='OK' noFooter={true}
+      />
     </>
   );
 };

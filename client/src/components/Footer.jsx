@@ -20,6 +20,8 @@ export default function Footer() {
     navigate(link)
   }
 
+  if (location.pathname === '/profil/edit') return null;
+  
   let content
   if (auth?.user?.has_seen_wodmatch_welcome) {
     const fill = (path) =>  location.pathname.startsWith(path) ? `-fill text-[#df0000]` : '';

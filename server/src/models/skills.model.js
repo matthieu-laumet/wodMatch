@@ -3,7 +3,7 @@ const pool = require('../../db/db_config');
 
 async function getAllSkills() {
   const results = await pool().query(`
-    SELECT id_skill, "label", "group" FROM wodmatch.skills
+    SELECT id_skill, "label", "group" FROM wodmatch.skills ORDER BY id_skill
   ;`);
   return results.rows
 }

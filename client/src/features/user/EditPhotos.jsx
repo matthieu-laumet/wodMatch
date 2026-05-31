@@ -1,8 +1,8 @@
 import { useState } from "react";
-import OnboardPhotos from "../home/OnboardPhotos";
+import OnboardPhotos from "../../components/HandlePhotos";
 import { useNavigate } from "react-router-dom";
 
-export default function HandlePhotos({ }) {
+export default function EditPhotos({ }) {
 
   const [btnText, setBtnText] = useState('Ajouter un média');
   const [isDisabled, setIsDisabled] = useState(false);
