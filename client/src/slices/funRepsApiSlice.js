@@ -21,9 +21,16 @@ export const funRepsApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       invalidatesTags: ['FunRep', 'User']
     }),
+    deleteUserFunRep: builder.mutation({
+      query: ({ id_fun_rep }) => ({
+          url: `/funReps/delete-user-fun-rep/${id_fun_rep}`,
+          method: 'DELETE'
+      }),
+      invalidatesTags: ['FunRep', 'User']
+    }),
   }),
 })
 
 export const { 
-  useGetFunRepsQuery, useUpsertUserFunRepsMutation
+  useGetFunRepsQuery, useUpsertUserFunRepsMutation, useDeleteUserFunRepMutation
 } = funRepsApiSlice

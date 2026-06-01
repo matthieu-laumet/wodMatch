@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { MAX_PHOTOS } from "../context/dataApplicationsContext";
 import CropModal from "./CropModal";
 import Swal from 'sweetalert2';
-import { alerteDeletePhoto } from "./Alert";
+import { alerteDeleteSimple } from "./Alert";
 
 
 const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllSlots = false }) => {
@@ -95,7 +95,7 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
 
   const handleRemove = async (id) => {
     try {
-      const result = await Swal.fire(alerteDeletePhoto());
+      const result = await Swal.fire(alerteDeleteSimple());
       if (!result.isConfirmed) return;
 
       const photo = photos.find((p) => p.id === id);

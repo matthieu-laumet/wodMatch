@@ -1,10 +1,14 @@
 import Swal from 'sweetalert2';
-import { alerteDeleteFunrep } from "../../components/Alert";
+import { alerteDeleteSimple } from "../../components/Alert";
+import { toast } from 'react-toastify';
+import { useContext } from 'react';
+import dataApplicationsContext from '../../context/dataApplicationsContext';
 
 const FunRepCards = ({ 
   funRepsFilled, setFunRepsFilled, setOpenModal, setSelectedFunRep, setScrollLeft, setFunRepSelected,
-  oldRepValue, setOldRepValue
+  oldRepValue, setOldRepValue, onDelete
 }) => {
+  const { setAuth } = useContext(dataApplicationsContext);
 
   const handleClick = (rep) => {
     setSelectedFunRep(rep);
@@ -18,15 +22,20 @@ const FunRepCards = ({
 
   const handleDelete = async (rep) => {
     try {
-      await Swal.fire(alerteDeleteFunrep()).then(async (result) => {
+      await Swal.fire(alerteDeleteSimple()).then(async (result) => {
         if (result.isConfirmed) {
           const updated = funRepsFilled.filter(f => f.id_fun_rep !== rep.id_fun_rep);
-          sessionStorage.setItem('onboardFunReps', JSON.stringify(updated));
           setFunRepsFilled(updated);
+          setAuth(prev => ({ ...prev, user: { ...prev.user, user_fun_reps: updated } }));
+          if (onDelete) {
+            return await onDelete(rep);
+          }
+          sessionStorage.setItem('onboardFunReps', JSON.stringify(updated));
         } 
       })
-    } catch (err) {
-      console.log(`Error: ${err.message}`)
+    } catch (error) {
+      toast.error(error?.data?.error || 'Erreur serveur', { autoClose: 6000 });
+      console.log(`Error: ${error.message}`)
     } 
   }
 

@@ -12,7 +12,7 @@ import FunRepCards from "../home/FunRepCards";
 import ModalSkills from "./ModalSkills";
 import { toast } from 'react-toastify';
 import { useCleanUpsertUserSkillsMutation } from "../../slices/skillsApiSlice";
-import { useUpsertUserFunRepsMutation } from "../../slices/funRepsApiSlice";
+import { useDeleteUserFunRepMutation, useUpsertUserFunRepsMutation } from "../../slices/funRepsApiSlice";
 
 
 const schema = yup.object().shape({
@@ -41,6 +41,7 @@ export default function EditProfile() {
 
   const [cleanUpsertUserSkills] = useCleanUpsertUserSkillsMutation();
   const [upsertUserFunReps] = useUpsertUserFunRepsMutation();
+  const [deleteUserFunRep] = useDeleteUserFunRepMutation();
 
   const form = useForm({
     defaultValues: { bio: auth?.user?.bio || '' },
@@ -77,6 +78,15 @@ export default function EditProfile() {
   const handleAddFunRep = () => {
     setFunRepSelected({ id_fun_rep: null, description: '', label: '' });
     setOpenModal(true);
+  };
+
+  const handleDeleteFunRep = async (rep) => {
+    try {
+      await deleteUserFunRep({ id_fun_rep: rep.id_fun_rep })
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.data?.error || 'Erreur serveur', { autoClose: 6000 });
+    }
   };
 
   const handleSubmitFunReps = async () => {
@@ -147,7 +157,7 @@ export default function EditProfile() {
             <FunRepCards
               funRepsFilled={funRepsFilled} setFunRepsFilled={setFunRepsFilled}
               setOpenModal={setOpenModal} setSelectedFunRep={setSelectedFunRep} 
-              oldRepValue={oldRepValue} setOldRepValue={setOldRepValue}
+              oldRepValue={oldRepValue} setOldRepValue={setOldRepValue} onDelete={handleDeleteFunRep}
               setScrollLeft={setScrollLeft} funRepSelected={funRepSelected} setFunRepSelected={setFunRepSelected}
             />
           }

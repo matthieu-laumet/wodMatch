@@ -457,37 +457,36 @@
 .swal2-backdrop-show {
   background-color: rgba(0, 0, 0, 0.6) !important;
 }
-.swal2-backdrop-show .delete__popup {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) {
   border-radius: 12px !important;
   max-width: 90vw;
   position: relative !important;
   overflow: hidden !important;
 }
-.swal2-backdrop-show .swal2-close {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-close {
   display: block !important;
 }
-.swal2-backdrop-show .swalTitle {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalTitle {
   font-weight: 700 !important;
   font-size: 22px !important;
   color: rgba(48, 48, 48, 0.8) !important;
   padding-bottom: 0 !important;
 }
-.swal2-backdrop-show .swalText {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalText {
   font-size: 16px !important;
   font-style: italic;
   margin-top: 16px !important;
   color: rgba(48, 48, 48, 0.7) !important;
 }
-.swal2-backdrop-show .swal2-actions {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions {
   justify-content: flex-end !important;
   margin: 0 !important;
   margin-right: 45px !important;
   margin-top: 48px !important;
 }
-.swal2-backdrop-show .delete__footer {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .delete__footer {
   background-color: rgba(235, 235, 235, 0.5) !important;
   margin-top: 32px !important;
-  border-top: 1px solid #E9EEF1 !important;
   overflow: hidden !important;
   display: block !important;
   height: 90px !important;
@@ -497,22 +496,83 @@
   width: 100% !important;
   border-top: 1px solid #ebebeb !important;
 }
-.swal2-backdrop-show .swalConfirm {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalConfirm {
   background-color: #e64942 !important;
   border: none !important;
   padding: 12px 26px !important;
   font-weight: 700;
 }
-.swal2-backdrop-show .swalConfirm:hover {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalConfirm:hover {
   background-color: #e64942 !important;
   opacity: 0.65 !important;
 }
-.swal2-backdrop-show .swalCancel {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalCancel {
   background-color: #ebebeb !important;
   border: 1px solid #bebebe !important;
   color: #696969 !important;
   font-weight: 700;
   padding: 12px 26px !important;
+}
+
+.swal2-container:has(.photo__popup) {
+  background: rgba(0, 0, 0, 0.5) !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.photo__popup {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  width: 320px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+.photo__popup .swal2-icon,
+.photo__popup .swal2-title,
+.photo__popup .swal2-html-container {
+  display: none !important;
+}
+.photo__popup .swal2-close {
+  display: none !important;
+}
+.photo__popup .swal2-actions {
+  flex-direction: column-reverse !important;
+  width: 90% !important;
+  margin: 0 !important;
+  gap: 8px !important;
+  position: fixed !important;
+  bottom: 10dvh !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.photo__confirm,
+.photo__cancel {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  background: white !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.photo__confirm:hover,
+.photo__cancel:hover {
+  background: white !important;
+}
+
+.photo__confirm {
+  color: #e64942 !important;
+  letter-spacing: 0.08em;
+}
+
+.photo__cancel {
+  color: #696969 !important;
+  letter-spacing: 0.05em;
 }
 
 .login-expired__footer {
@@ -583,16 +643,15 @@
   animation: bounce2 0.5s ease-out;
 }
 
-@keyframes gelatine {}
 @keyframes bounce2 {
   0% {
     transform: translateY(-80px);
   }
-  60%, 100% {
-    transform: translateY(0);
-  }
   80% {
     transform: translateY(-10px);
+  }
+  60%, 100% {
+    transform: translateY(0);
   }
 }
 .info-light {
@@ -624,57 +683,30 @@
   right: 16px;
 }
 
-.photo__popup {
-  padding: 0 !important;
-  border-radius: 16px !important;
-  width: 320px !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-.photo__popup .swal2-icon,
-.photo__popup .swal2-title,
-.photo__popup .swal2-html-container {
-  display: none !important;
-}
-.photo__popup .swal2-close {
-  display: none !important;
+@keyframes photoButtonIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .photo__popup .swal2-actions {
-  flex-direction: column !important;
-  width: 100% !important;
-  margin: 0 !important;
-  gap: 8px !important;
+  position: fixed !important;
+  bottom: 10dvh !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
 }
-
-.photo__confirm,
-.photo__cancel {
-  width: 100% !important;
-  margin: 0 !important;
-  padding: 18px !important;
-  border-radius: 14px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  background: white !important;
-  box-shadow: none !important;
-  border: none !important;
+.photo__popup .swal2-actions button {
+  animation: photoButtonIn 0.3s ease-out both;
 }
-.photo__confirm:hover,
-.photo__cancel:hover {
-  background: white !important;
+.photo__popup .swal2-actions button:nth-child(1) {
+  animation-delay: 0.05s;
 }
-
-.photo__confirm {
-  color: #e64942 !important;
-  letter-spacing: 0.08em;
-}
-
-.photo__cancel {
-  color: #696969 !important;
-  letter-spacing: 0.05em;
-}
-
-.photo__popup .swal2-actions {
-  flex-direction: column-reverse !important;
+.photo__popup .swal2-actions button:nth-child(2) {
+  animation-delay: 0.15s;
 }
 
 .auth-main-container {

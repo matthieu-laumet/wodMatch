@@ -24,16 +24,26 @@ export const alerteDeleteFunrep = () => {
   }
 }
 
-export const alerteDeletePhoto = () => {
+export const alerteDeleteSimple = () => {
   return {
     showCancelButton: true,
     reverseButtons: true,
     confirmButtonText: "Supprimer",
     cancelButtonText: "Annuler",
+    showClass: {
+      popup: '',
+      backdrop: '',
+      icon: ''
+    },
+    hideClass: {
+      popup: '',
+      backdrop: '',
+      icon: ''
+    },
     customClass: {
       popup: 'delete__popup photo__popup',
-      confirmButton: 'photo__confirm',   // ← pas de swalConfirm ici
-      cancelButton: 'photo__cancel',     // ← pas de swalCancel ici
+      confirmButton: 'photo__confirm',
+      cancelButton: 'photo__cancel',
     },
   }
 }
