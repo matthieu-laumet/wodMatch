@@ -1,5 +1,5 @@
 const { getWMUserById } = require("../models/users.model");
-const { onboardingUserService } = require("../services/users.service");
+const { onboardingUserService, updateUserProlfilService } = require("../services/users.service");
 
 
 async function getCurrentWMUser(req, res) {
@@ -25,6 +25,18 @@ async function onboardingUser(req, res) {
   }
 }
 
+async function updateUserProlfil(req, res) {
+  try {
+    const id_user = req.id_user;
+    const { bio } = req.body;
+    const result = await updateUserProlfilService({ id_user, bio });
+    res.status(200).send(result);
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
+
 module.exports = {
-  onboardingUser, getCurrentWMUser
+  onboardingUser, getCurrentWMUser, updateUserProlfil
 }

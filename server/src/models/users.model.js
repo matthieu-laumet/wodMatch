@@ -30,7 +30,9 @@ async function upsertUserBio({ id_user, bio }) {
   const results = await pool().query(`
     INSERT INTO wodmatch.wm_users (id_user, bio, created_at, updated_at)
     VALUES ($1, $2, NOW(), NOW())
-    ON CONFLICT (id_user) DO UPDATE SET bio = EXCLUDED.bio, updated_at = NOW()
+    ON CONFLICT (id_user) DO UPDATE 
+      SET bio = EXCLUDED.bio, updated_at = NOW()
+      WHERE wm_users.bio IS DISTINCT FROM EXCLUDED.bio
   ;`, [id_user, bio]);
   return results.rows;
 }

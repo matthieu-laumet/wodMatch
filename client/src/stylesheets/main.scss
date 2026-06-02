@@ -2637,6 +2637,30 @@
   color: #df0000;
 }
 
+.title-sticky {
+  position: fixed;
+  top: 60px;
+  padding-left: 7%;
+  padding-right: 7%;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  border-bottom: 1px solid #808080;
+}
+.title-sticky .texte {
+  font-weight: 800;
+  font-size: 20px;
+}
+.title-sticky .submit {
+  font-weight: 600;
+  font-size: 16px;
+  color: #df0000;
+  cursor: pointer;
+}
+
 @media (min-width: 481px) {
   .legend-top {
     flex-direction: row !important;

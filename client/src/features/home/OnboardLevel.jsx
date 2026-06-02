@@ -3,16 +3,16 @@ import { useGetLevelsQuery } from "../../slices/levelsApiSlice";
 import { PulseLoader } from "react-spinners";
 
 
-const OnboardLevel = ({ setBtnText, setIsDisabled }) => {
+const OnboardLevel = ({ setBtnText = null, setIsDisabled = null, userLevels }) => {
 
   const { data: levels, isLoading: isLoadingLevels, isSuccess: isSuccessLevels } = useGetLevelsQuery();
   const [selectedlevels, setSelectedLevels] = useState(() => {
     const saved = sessionStorage.getItem("onBoardingLevels");
+    if (userLevels) return userLevels;
     return saved ? JSON.parse(saved) : [];
   });
 
   const handleSelect = (mode) => {
-    console.log(mode)
     setSelectedLevels(prev => {
       const updated = prev.includes(mode) ? prev.filter(l => l !== mode) : [...prev, mode];
       sessionStorage.setItem('onBoardingLevels', JSON.stringify(updated));
@@ -21,11 +21,15 @@ const OnboardLevel = ({ setBtnText, setIsDisabled }) => {
   }
 
   useEffect(() => {
-    setIsDisabled(selectedlevels.length === 0);
+    if (setIsDisabled) {
+      setIsDisabled(selectedlevels.length === 0);
+    }
   }, [selectedlevels]);
 
   useEffect(() => {
-    setBtnText(`Terminer`)
+    if (setBtnText) {
+      setBtnText(`Terminer`)
+    }
   }, []);
 
   if (isLoadingLevels) return <PulseLoader color='#222' size={10} className="mt-12 ml-12"/> 

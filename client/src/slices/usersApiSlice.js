@@ -21,9 +21,19 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User']
     }),
+    updateUserProlfil: builder.mutation({
+      query: data => ({
+          url: `/users/update-user-prolfil`,
+          method: 'post',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['User']
+    }),
   }),
 })
 
 export const { 
-  useGetCurrentWMUserQuery, useLazyGetCurrentWMUserQuery, useOnboardingUserMutation
+  useGetCurrentWMUserQuery, useLazyGetCurrentWMUserQuery, useOnboardingUserMutation, useUpdateUserProlfilMutation
 } = usersApiSlice

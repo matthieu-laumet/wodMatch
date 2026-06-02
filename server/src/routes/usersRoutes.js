@@ -11,12 +11,13 @@ const validateProtectedRoutes = require('../../middleware/validateProtectedRoute
 
 // ==================== PROTECTION ====================
 router.use(validateProtectedRoutes([
-  '/get-current-wm-user', '/onboarding-user'
+  '/get-current-wm-user', '/onboarding-user', '/update-user-prolfil'
 ]));
 router.use(verifyJWT); // Tout ce qui suit nécessite JWT
 // ====================================================
 router.get('/get-current-wm-user', usersController.getCurrentWMUser);
 router.post('/onboarding-user', usersController.onboardingUser);
+router.post('/update-user-prolfil', usersController.updateUserProlfil);
 
 
 module.exports = router;

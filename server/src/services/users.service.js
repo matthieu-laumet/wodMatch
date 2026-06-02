@@ -18,7 +18,12 @@ async function onboardingUserService({ id_user, levelIds, userBio, userFunReps, 
   return { message: 'ok', has_seen_wodmatch_welcome: true };
 }
 
+async function updateUserProlfilService({ id_user, bio }) {
+  await upsertUserBio({ id_user, bio })
+  return { message: 'ok' };
+}
+
 
 module.exports = {
-  onboardingUserService
+  onboardingUserService, updateUserProlfilService
 }
