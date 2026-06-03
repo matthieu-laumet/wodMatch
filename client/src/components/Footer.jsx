@@ -20,7 +20,8 @@ export default function Footer() {
     navigate(link)
   }
 
-  if (location.pathname === '/profil/edit') return null;
+  const noFooterPaths = ['/profil/edit', '/profil/settings']
+  if (noFooterPaths.includes(location.pathname)) return null;
   
   let content
   if (auth?.user?.has_seen_wodmatch_welcome) {

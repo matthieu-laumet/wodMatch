@@ -86,6 +86,12 @@
   }
 }
 
+.onboard-skill__tags.small {
+  .onboard-skill__tag {
+    font-size: 13px;
+  }
+}
+
 
 .onboard-skill__tags.start {
   justify-content: start;
@@ -130,6 +136,15 @@
   background-color: white;
   transition: all 0.2s;
   cursor: pointer;
+}
+
+.btn-select.small {
+  padding: 0.55rem;
+  padding-left: 1rem;
+
+  .level-label {
+    font-size: 13px;
+  }
 }
 
 .icon-level {

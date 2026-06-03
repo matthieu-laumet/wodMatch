@@ -24,6 +24,19 @@ export const alerteDeleteFunrep = () => {
   }
 }
 
+export const alerteChangeEmail = () => {
+  return {
+    title: `Supprimer`,
+    text: `Tu veux vraiment supprimer cette Fun Rep ?`,
+    showCancelButton: true,
+    reverseButtons: true,
+    customClass: customClass,
+    confirmButtonText: "Confirmer", // Modifier le texte du bouton de confirmation ici
+    icon: 'info',
+    cancelButtonText
+  }
+}
+
 export const alerteDeleteSimple = () => {
   return {
     showCancelButton: true,
@@ -45,6 +58,28 @@ export const alerteDeleteSimple = () => {
       confirmButton: 'photo__confirm',
       cancelButton: 'photo__cancel',
     },
+  }
+}
+
+export const alerteWarningSimple = ({ warningText = "Attention, cette action est irréversible." } = {}) => {
+  return {
+    showCancelButton: true,
+    reverseButtons: true,
+    confirmButtonText: "Confirmer",
+    cancelButtonText: "Annuler",
+    showClass: { popup: '', backdrop: '', icon: '' },
+    hideClass:  { popup: '', backdrop: '', icon: '' },
+    customClass: {
+      popup:         'delete__popup photo__popup',
+      confirmButton: 'photo__confirm',
+      cancelButton:  'photo__cancel',
+    },
+    html: `
+      <div class="photo__warning">
+        <span class="photo__warning-icon">⚠️</span>
+        <p class="photo__warning-text">${warningText}</p>
+      </div>
+    `,
   }
 }
 

@@ -18,13 +18,10 @@ import OnboardLevel from "../home/OnboardLevel";
 
 
 const schema = yup.object().shape({
-  bio: yup
-    .string()
-    .required('La bio est obligatoire')
-    .max(MAX_BIO_LENGTH, `La bio ne peut pas dépasser ${MAX_BIO_LENGTH} caractères`),
-  levels: yup
-    .array()
-    .min(1, 'Sélectionne au moins un niveau'),
+  // bio: yup
+  //   .string()
+  //   .required('La bio est obligatoire')
+  //   .max(MAX_BIO_LENGTH, `La bio ne peut pas dépasser ${MAX_BIO_LENGTH} caractères`),
 });
 
 
@@ -35,7 +32,7 @@ export default function EditProfile() {
   const [openModal, setOpenModal] = useState(false);
   const [openModalSkill, setOpenModalSkill] = useState(false);
   const [selectedFunRep, setSelectedFunRep] = useState(null);
-  const [userLevels, setUserLevels] = useState(auth?.user?.user_levels || []);
+  const [selectedLevels, setSelectedLevels] = useState(auth?.user?.user_levels || []);
   const [oldRepValue, setOldRepValue] = useState(null);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [funRepSelected, setFunRepSelected] = useState({ id_fun_rep: null, description: '', label: '' });
@@ -51,22 +48,21 @@ export default function EditProfile() {
   const [updateUserProlfil] = useUpdateUserProlfilMutation();
 
   const form = useForm({
-  defaultValues: {
-    bio: auth?.user?.bio || '',
-    levels: auth?.user?.user_levels?.map(l => l.id_level) || [],
-  },
-  resolver: yupResolver(schema),
+    defaultValues: {
+      bio: auth?.user?.bio || '',
+      levels: auth?.user?.user_levels?.map(l => l.id_level) || [],
+    },
+    resolver: yupResolver(schema),
   });
 
   const { register, handleSubmit, watch, formState: { errors } } = form;
   const bioValue = watch("bio");
 
   const onSubmit = async (data) => {
-    console.log(data);
     const { bio } = data;
     try {
-      await updateUserProlfil({ bio });
-      setAuth(prev => ({ ...prev, user: { ...prev.user, bio } }));
+      await updateUserProlfil({ bio, levels: selectedLevels });
+      setAuth(prev => ({ ...prev, user: { ...prev.user, bio, user_levels: selectedLevels } }));
       navigate('/profil');
     } catch (error) {
       console.log(error)
@@ -153,7 +149,10 @@ export default function EditProfile() {
             <span className="texte">Modifier mes informations</span>
             <span className="submit" onClick={handleSubmit(onSubmit)}>Terminé</span>
           </h3>
-          <p className="mt-[64px]">Les podiums se construisent à plusieurs. Complète ton profil et trouve les partenaires qui vont te faire monter de niveau. 🥇</p>
+          <p className="mt-[64px]">
+            Les podiums se construisent à plusieurs. Complète ton profil et trouve les partenaires qui vont te faire 
+            monter de niveau. <span className="text-2xl ml-1">🥇</span>
+          </p>
         </div>
         <div className="bio-field mt-4">
           <label className="font-semibold text-lg">Ma bio d'athlète :</label>
@@ -190,7 +189,7 @@ export default function EditProfile() {
         <div className="mt-12 mb-3">
           <h2 className="font-semibold text-lg mb-2">Tes Skills</h2>
           <div className="relative">
-            <div className="onboard-skill__tags start pr-4">
+            <div className="onboard-skill__tags small start pr-4">
               {userSkills?.map(skill => {
                 return(
                   <p className="onboard-skill__tag" key={skill.id_skill} onClick={handleOpenSkills}>{skill.label}</p>
@@ -203,11 +202,9 @@ export default function EditProfile() {
         <div className="mt-12 mb-3">
           <h2 className="font-semibold text-lg mb-2">Niveau de Fitness</h2>
           <OnboardLevel
-            userLevels={userLevels}
+            userLevels={selectedLevels} onLevelsChange={setSelectedLevels}
           />
         </div>
-
-        {/* <button type="submit" className="btn-primary mt-6 w-full">Enregistrer</button> */}
       </form>
       <ModalStructure
         openModal={openModal} setOpenModal={onCloseModal} title='Ajouter une Fun rep'

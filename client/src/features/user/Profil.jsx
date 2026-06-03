@@ -27,7 +27,7 @@ export default function Profil({ }) {
   return (
     <div className='full-screen'>
       <div className="section profil-top-container">
-        <div className="main-photo-container">
+        <div className="main-photo-container" onClick={() => navigate('edit-pictures')}>
           {mainPhoto}
           <p className="flap-completion">Complété à {tauxCompletion}%</p>
         </div>

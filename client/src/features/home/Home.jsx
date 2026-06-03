@@ -16,7 +16,7 @@ const Home = () => {
   return (
     <div className="h-[calc(100dvh-60px)] relative">
       <h1 className="banner-title">Swipe ton prochain coéquipier de podium™</h1>
-      <img src="images/wodmatch_banner.png" className="banner-image"/>
+      <img src="/images/wodmatch_banner.png" className="banner-image"/>
       <div className="btn-containers">
         <button className="btn btn-register">Créer un compte</button>
         <button 

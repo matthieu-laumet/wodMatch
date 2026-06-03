@@ -24,12 +24,13 @@ const PersistLogin = () => {
                 console.log('verifying refresh token')
                 try {
                     const response = await refresh();
+                    if (response?.error) return;
                     const userWM = await trigger().unwrap();
                     const { 
                         completion_rate, created_at, focus_color, id_roles, is_developper, is_email_verifyed,
                         is_not_visible, last_logged, not_share_email, not_share_telephone, notifications,
                         activite, actualite, disabled_news, politique, rappel, remarques, organisateur_infos,
-                        pointure, short, short_size, tee_shirt, tee_shirt_size, telephone, token_create_event, updated_at, 
+                        pointure, short, short_size, tee_shirt, tee_shirt_size, token_create_event, updated_at, 
                         updated_password,
                         ...rest 
                     } = response?.data?.user;

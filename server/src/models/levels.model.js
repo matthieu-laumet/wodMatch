@@ -8,6 +8,13 @@ async function getAllLevels() {
   return results.rows
 }
 
+async function getUsersLevels({ id_user }) {
+  const results = await pool().query(`
+    SELECT id_user, id_level FROM wodmatch.user_levels WHERE id_user=$1
+  ;`, [id_user]);
+  return results.rows
+}
+
 async function upsertUserLevel({ id_user, id_level }) {
   const result = await pool().query(`
     INSERT INTO wodmatch.user_levels (id_user, id_level)
@@ -17,13 +24,13 @@ async function upsertUserLevel({ id_user, id_level }) {
   return result.rowCount;
 }
 
-// async function deleteAllUserLevels({ db = pool(), id_user }) {
-//   await db.query(`
-//     DELETE FROM wodmatch.user_levels WHERE id_user = $1
-//   `, [id_user]);
-// }
+async function deleteAllUserLevels({ id_user }) {
+  await pool().query(`
+    DELETE FROM wodmatch.user_levels WHERE id_user=$1
+  `, [id_user]);
+}
 
 module.exports = {
-  getAllLevels, upsertUserLevel
+  getAllLevels, upsertUserLevel, getUsersLevels, deleteAllUserLevels
   // deleteAllUserLevels
 }

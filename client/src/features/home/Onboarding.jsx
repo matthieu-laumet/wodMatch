@@ -41,14 +41,14 @@ const Onboarding = () => {
 
   const handleSubmitOnboarding = async () => {
     try {
-      const levelIds = JSON.parse(sessionStorage.getItem('onBoardingLevels'));
+      const levels = JSON.parse(sessionStorage.getItem('onBoardingLevels'));
       const userBio = sessionStorage.getItem('onboardBio');
       const userFunReps = JSON.parse(sessionStorage.getItem('onboardFunReps'));
       const skills = JSON.parse(sessionStorage.getItem('onboardSkills'));
       const userSearchMode = JSON.parse(sessionStorage.getItem('onboardingChoice'));
 
       const result = await onboardingUser({
-        levelIds, userBio, userFunReps, skills, userSearchMode
+        levels, userBio, userFunReps, skills, userSearchMode
       }).unwrap();
       setAuth(prev => ({ ...prev, user: { ...prev.user, has_seen_wodmatch_welcome: result.has_seen_wodmatch_welcome } }));
       navigate('/profil');

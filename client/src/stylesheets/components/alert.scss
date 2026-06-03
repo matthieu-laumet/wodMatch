@@ -123,6 +123,7 @@ $opacityHover: 0.65;
 }
 
 .photo__confirm,
+.photo__deny,
 .photo__cancel {
   width: 100% !important;
   margin: 0 !important;
@@ -287,5 +288,47 @@ $opacityHover: 0.65;
 
     &:nth-child(1) { animation-delay: 0.05s; }
     &:nth-child(2) { animation-delay: 0.15s; }
+  }
+}
+
+
+// ─── WARNING BLOCK (photo popup) ─────────────────────────────────────────────
+
+.photo__popup {
+  .swal2-html-container {
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}
+
+.photo__warning {
+  width: 90%;
+  background: white;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: fixed;
+  bottom: calc(10dvh + (18px * 2 + 16px) * 2 + 8px + 16px + 24px); // au-dessus des 2 boutons + gap
+  animation: photoButtonIn 0.3s ease-out both;
+  animation-delay: 0s;
+
+  .photo__warning-icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .photo__warning-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: $gray08;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
   }
 }
