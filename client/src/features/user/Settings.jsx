@@ -60,15 +60,30 @@ export default function Settings({ }) {
     }
     const email = val.toLowerCase().trim();
     const result = await Swal.fire(
-      alerteWarningSimple({ 
-        warningText: "Un email, deux apps — WodMatch™ et WodZone® seront mis à jour simultanément comme un WOD team." 
+      alerteWarningSimple({
+        warningText: `
+          <p>Cette modification mettra à jour votre email sur <strong>WodMatch™</strong> et <strong>WodZone®</strong>.</p>
+          <p style="margin-top:12px;">
+            Votre nouvelle adresse email servira désormais à vous connecter aux deux applications.
+          </p>
+        `
       })
     );
-    if (!result.isConfirmed) return handleActive('email');
-    await updateUserEmail({ email });
-    setAuth(prev => ({ ...prev, user: { ...prev.user, email } }));
-    toast.success('L\'e-mail a bien été mis à jour');
+    try {
+      const updateResult = await updateUserEmail({ email }).unwrap();
+      setAuth(prev => ({ ...prev, user: { ...prev.user, email } }));
+      (updateResult?.message !== 'no update') && toast.success('L\'e-mail a bien été mis à jour');
+    } catch (error) {
+      console.log(error)
+      if (error?.status === 409) {
+        toast.error('Cet e-mail est déjà utilisé');
+      } else {
+        toast.error('Une erreur est survenue');
+      }
+      throw new Error('update failed'); // ← pour que EditableLine reste ouvert
+    }
   };
+
 
   const handleSaveTelephone = async (telephone) => {
     const phoneRegex = /^\+?[\d\s\-().]{7,15}$/;
@@ -76,9 +91,18 @@ export default function Settings({ }) {
       toast.error('Numéro de téléphone invalide');
       throw new Error('invalid');
     }
-    await updateUserTelephone({ telephone });
-    setAuth(prev => ({ ...prev, user: { ...prev.user, telephone } }));
-    toast.success('Le numéro de téléphone a bien mis à jour');
+    try {
+      const updateResult = await updateUserTelephone({ telephone }).unwrap();
+      setAuth(prev => ({ ...prev, user: { ...prev.user, telephone } }));
+      (updateResult?.message !== 'no update') && toast.success('Le numéro de téléphone a bien mis à jour');
+    } catch (error) {
+      if (error?.status === 409) {
+        toast.error('Ce numéro de téléphone est déjà utilisé');
+      } else {
+        toast.error('Une erreur est survenue');
+      }
+      throw new Error('update failed'); // ← pour que EditableLine reste ouvert
+    }
   };
 
   const handleLogout = async () => {

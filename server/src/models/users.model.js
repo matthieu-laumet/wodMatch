@@ -55,6 +55,22 @@ async function getUserInfo({ id_user }) {
   return result.rows[0];
 }
 
+async function isEmailAlreadyUsed({ email }) {
+  const result = await pool({ bdd: 'WODZONE' }).query(
+    `SELECT email FROM wodzone.users WHERE lower(email)=$1;`,
+    [email.toLowerCase()]
+  );
+  return result.rows.length > 0;
+}
+
+async function isTelephoneAlreadyUsed({ telephone }) {
+  const result = await pool({ bdd: 'WODZONE' }).query(
+    `SELECT telephone FROM wodzone.users WHERE telephone=$1;`,
+    [telephone]
+  );
+  return result.rows.length > 0;
+}
+
 async function updateOneUserEmail({ email, id_user }) {
   const updated_at = new Date(format(new Date(), 'yyyy-MM-dd HH:mm:ss', dateOptions));
   const result = await pool({ bdd: 'WODZONE' }).query(
@@ -75,6 +91,6 @@ async function updateOneUserTelephone({ telephone, id_user }) {
 
 module.exports = {
   upsertUserBio, getWMUserById, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone,
-  getUserInfo
+  getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed
   // upsertUserLevel, deleteAllUserLevels
 }

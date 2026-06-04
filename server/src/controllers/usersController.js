@@ -45,7 +45,7 @@ async function updateUserEmail(req, res) {
     res.status(200).send(result);
   } catch (error) {
     console.log('[updateUserEmail]', error.message)
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
   }
 }
 
@@ -57,7 +57,7 @@ async function updateUserTelephone(req, res) {
     res.status(200).send(result);
   } catch (error) {
     console.log('[updateUserTelephone]', error.message)
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
   }
 }
 

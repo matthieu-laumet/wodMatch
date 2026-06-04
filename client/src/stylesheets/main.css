@@ -1836,7 +1836,7 @@ video {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 70px;
+  bottom: 50px;
   display: flex;
   flex-direction: column;
   width: 90%;
@@ -1894,6 +1894,8 @@ video {
   font-weight: 400;
   padding-bottom: 30px;
   margin-bottom: 30px;
+  padding-left: 7%;
+  padding-right: 7%;
 }
 
 .change-category-container {

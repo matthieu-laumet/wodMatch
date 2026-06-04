@@ -2,7 +2,7 @@ const { upsertOneUserFunReps } = require('../models/funReps.model');
 const { upsertUserLevel, getUsersLevels, deleteAllUserLevels } = require('../models/levels.model');
 const { upsertUserSearchMode } = require('../models/searchModes.model');
 const { upsertUserSkill } = require('../models/skills.model');
-const { upsertUserBio, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone, getUserInfo } = require('../models/users.model');
+const { upsertUserBio, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone, getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed } = require('../models/users.model');
 const { formatPhoneFR } = require('../utils/users.utils');
 const { sendEmail } = require('./emailService');
 
@@ -38,6 +38,8 @@ async function updateUserService({ id_user, type, payload }) {
   if (type === 'e-mail') {
     const newEmail = payload.email;
     if (currentEmail.trim().toLowerCase() === newEmail.trim().toLowerCase()) return { message: 'no update' };
+    const isUsed = await isEmailAlreadyUsed({ email: newEmail });
+    if (isUsed) throw Object.assign(new Error('E-mail déjà utilisé...'), { status: 409 });
     await updateOneUserEmail({ email: newEmail, id_user });
     await sendEmail({ object: 'updated_info', inputUpdated: type, email: newEmail });
   }
@@ -46,6 +48,8 @@ async function updateUserService({ id_user, type, payload }) {
     const normalizedCurrent = formatPhoneFR(user.telephone);
     const normalizedNew = formatPhoneFR(newTelephone);
     if (normalizedCurrent === normalizedNew) return { message: 'no update' };
+    const isUsed = await isTelephoneAlreadyUsed({ telephone: normalizedNew });
+    if (isUsed) throw Object.assign(new Error('Téléphone déjà utilisé...'), { status: 409 });
     await updateOneUserTelephone({ telephone: normalizedNew, id_user });
   }
   await sendEmail({ object: 'updated_info', inputUpdated: type, email: currentEmail });
