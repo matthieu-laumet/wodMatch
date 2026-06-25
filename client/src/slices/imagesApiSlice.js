@@ -7,7 +7,7 @@ export const imagesApiSlice = wodmatchApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getImage: builder.query({
       query: (filename) => ({
-        url: `/images/get-one-image/${filename}`,
+        url: `/images/get-one-photo/${filename}`,
         responseHandler: async (response) => {
           // Vérifier si on a déjà une blob URL en cache
           if (blobUrlCache.has(filename)) {

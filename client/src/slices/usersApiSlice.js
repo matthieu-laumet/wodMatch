@@ -11,6 +11,24 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       providesTags: ['User']
     }),
+    getBlockedAthlets: builder.query({
+      query: () => ({
+        url: `/users/get-blocked-athlets`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError
+        }, 
+      }),
+      providesTags: ['User', 'Blocked']
+    }),
+    getVisiblesAthleteLists: builder.query({
+      query: () => ({
+        url: `/users/get-visibles-athlete-lists`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError
+        }, 
+      }),
+      providesTags: ['User']
+    }),
     onboardingUser: builder.mutation({
       query: data => ({
           url: `/users/onboarding-user`,
@@ -30,6 +48,16 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
           }
       }),
       invalidatesTags: ['User']
+    }),
+    addBlockedUser: builder.mutation({
+      query: data => ({
+          url: `/users/add-blocked-user`,
+          method: 'post',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['User', 'Blocked']
     }),
     updateUserEmail: builder.mutation({
       query: data => ({
@@ -51,10 +79,38 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User']
     }),
+    handleHideUserProfil: builder.mutation({
+      query: data => ({
+          url: `/users/handle-hide-user-profil`,
+          method: 'PUT',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['User']
+    }),
+    deleteBlockedUser: builder.mutation({
+      query: data => ({
+          url: `/users/delete-blocked-user`,
+          method: 'PUT',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['User']
+    }),
+    deleteBlockedUser: builder.mutation({
+      query: ({ id_user_blocked, blocked_email }) => ({  // ← destructure l'objet
+        url: `/users/delete-blocked-user/${id_user_blocked}/${encodeURIComponent(blocked_email)}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User', 'Blocked']  // ← doit être au même niveau que query
+    }),
   }),
 })
 
 export const { 
   useGetCurrentWMUserQuery, useLazyGetCurrentWMUserQuery, useOnboardingUserMutation, useUpdateUserProlfilMutation,
-  useUpdateUserEmailMutation, useUpdateUserTelephoneMutation
+  useUpdateUserEmailMutation, useUpdateUserTelephoneMutation, useHandleHideUserProfilMutation,
+  useGetBlockedAthletsQuery, useAddBlockedUserMutation, useDeleteBlockedUserMutation, useGetVisiblesAthleteListsQuery
 } = usersApiSlice

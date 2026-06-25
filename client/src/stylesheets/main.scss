@@ -472,13 +472,13 @@
   color: rgba(48, 48, 48, 0.8) !important;
   padding-bottom: 0 !important;
 }
-.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalText {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) .swalText {
   font-size: 16px !important;
   font-style: italic;
   margin-top: 16px !important;
   color: rgba(48, 48, 48, 0.7) !important;
 }
-.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) {
   justify-content: flex-end !important;
   margin: 0 !important;
   margin-right: 45px !important;
@@ -496,13 +496,13 @@
   width: 100% !important;
   border-top: 1px solid #ebebeb !important;
 }
-.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalConfirm {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) .swalConfirm {
   background-color: #e64942 !important;
   border: none !important;
   padding: 12px 26px !important;
   font-weight: 700;
 }
-.swal2-backdrop-show .delete__popup:not(.photo__popup) .swalConfirm:hover {
+.swal2-backdrop-show .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) .swalConfirm:hover {
   background-color: #e64942 !important;
   opacity: 0.65 !important;
 }
@@ -744,6 +744,34 @@
   text-align: center;
   margin: 0;
   line-height: 1.4;
+}
+
+.swal2-actions.delete-account__actions {
+  flex-direction: column;
+  width: 100%;
+  padding: 0 1.5rem;
+  margin-top: 12px;
+}
+
+.delete-account__actions .swal2-confirm,
+.delete-account__actions .swal2-cancel {
+  width: 100%;
+  margin: 4px 0;
+  outline: none !important;
+}
+
+.delete-account__actions .swal2-confirm {
+  background-color: #222 !important;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.delete-account__actions .swal2-cancel {
+  margin-top: 6px;
+}
+
+.grace-info {
+  margin-top: 16px;
 }
 
 .auth-main-container {
@@ -1240,6 +1268,42 @@
 
 .select-change-division__menu-list {
   max-height: 65dvh !important;
+}
+
+.contact-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #bebebe;
+  padding-bottom: 12px;
+}
+
+.btn.unblock {
+  background-color: #fff;
+}
+.btn.unblock:hover {
+  color: #222;
+  font-weight: 600;
+  border: #222 2px solid;
+}
+
+.submit-form {
+  font-weight: 600;
+}
+
+.submit-form.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.submit-form.valide {
+  opacity: 1;
+  cursor: pointer;
+  color: #df0000;
 }
 
 .chart-table {
@@ -3331,6 +3395,10 @@
   border-radius: 6px;
 }
 
+.react-loading-skeleton {
+  display: inline-block;
+}
+
 .full-line-container {
   max-height: 50px;
   overflow-y: hidden;
@@ -3393,6 +3461,227 @@
 }
 .editable-input:focus {
   border-color: #9ca3af;
+}
+
+.select-container {
+  width: 180px !important;
+  position: relative;
+  z-index: 1200;
+}
+
+.select-__control {
+  background-color: transparent !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.select-__indicators {
+  display: none !important;
+}
+
+.select-__single-value {
+  text-align: center;
+  color: #fff !important;
+  font-weight: 500;
+  font-size: 11px !important;
+  border-color: #fff 1px solid !important;
+}
+
+.css-t3ipsp-control, .css-yk16xz-control {
+  border-color: 1px solid #fff !important;
+}
+
+.select-__control:focus {
+  border-color: #fff !important; /* Change this to your desired border color or set to "transparent" */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0) !important; /* Remove the blue box shadow */
+  outline: 0 !important; /* Remove the outline */
+}
+
+.select-__value-container, .select-__input-container {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.select-__menu {
+  width: 250px !important;
+  right: -40px;
+}
+
+.select-__option {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding-left: 20px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.select-score-container {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 16px;
+}
+
+.select-score__single-value {
+  font-size: 17px !important;
+  font-weight: 500 !important;
+}
+
+.select-score__option {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 16px !important;
+  white-space: nowrap !important; /* Prevents wrapping to multiple lines */
+  overflow: hidden !important; /* Hides any overflowing content */
+  text-overflow: ellipsis !important; /* Adds an ellipsis (...) at the end if the content overflows */
+}
+
+.select-score__menu {
+  z-index: 21 !important;
+}
+
+.select-score__control {
+  min-height: 44px !important;
+  border-radius: 8px !important;
+}
+
+.select-score__value-container {
+  padding-left: 16px !important;
+}
+
+.select-label {
+  margin-bottom: 2px;
+}
+
+.input-select__control {
+  border-radius: 6px !important;
+  border: 1px solid #808080 !important;
+  height: 40px;
+  outline: none !important;
+  padding-left: 16px !important;
+  cursor: pointer !important;
+}
+.input-select__control .input-select__value-container {
+  padding-left: 0;
+}
+
+.score-select-admin-container.user-box .input-select__control {
+  height: auto;
+}
+
+.input-select__menu {
+  z-index: 55 !important;
+}
+
+.input-select-main-container {
+  flex-grow: 1;
+}
+.input-select-main-container .input-container {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.input-select__single-value {
+  font-weight: 400;
+  font-size: 16px !important;
+}
+
+.input-select__option {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 16px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important; /* Prevents wrapping to multiple lines */
+  overflow: hidden !important; /* Hides any overflowing content */
+  text-overflow: ellipsis !important; /* Adds an ellipsis (...) at the end if the content overflows */
+}
+
+.contact-form .input-select__single-value {
+  font-size: 14px !important;
+}
+.contact-form .input-select__option {
+  font-size: 14px !important;
+  white-space: wrap !important; /* Prevents wrapping to multiple lines */
+  overflow: auto !important; /* Hides any overflowing content */
+  text-overflow: auto !important; /* Adds an ellipsis (...) at the end if the content overflows */
+}
+
+.selectAthleteError .input-select__control {
+  border: 2px solid #d10d20 !important;
+}
+
+.user-register-select-container.selected {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -20px;
+}
+.user-register-select-container.selected:hover {
+  background-color: transparent;
+}
+
+.select-athlete-container .input-select__value-container {
+  overflow: visible !important;
+}
+.select-athlete-container .input-select__control {
+  min-height: 50px !important;
+}
+
+.select-athlete-container.user-visibility .input-select__menu {
+  position: relative !important;
+}
+
+.select-admin-add {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+.select-admin-add .input-select__value-container {
+  overflow: visible !important;
+}
+.select-admin-add .input-select__control {
+  min-height: 50px !important;
+  border: 1px solid #bebebe !important;
+}
+
+.select-relative .input-select__menu {
+  position: relative !important;
+}
+.select-relative .input-select__control--menu-is-open {
+  margin-bottom: 12px !important;
+}
+
+.user-register-select-container {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  padding-left: 20px;
+  transition: background-color 0.15s;
+}
+.user-register-select-container:hover {
+  background-color: #DCDCDC;
+  cursor: pointer;
+}
+.user-register-select-container .avatar-register {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  border-radius: 50%;
+  border: 1px solid #808080;
+  object-fit: cover;
+}
+.user-register-select-container .user-register-label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  margin-left: 14px;
+}
+.user-register-select-container .user-register-club {
+  font-size: 11px;
+  font-weight: 400;
+  color: #808080;
+  margin-left: 14px;
+  margin-top: -2px;
 }
 
 .help-table {

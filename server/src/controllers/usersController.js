@@ -1,4 +1,4 @@
-const { getWMUserById } = require("../models/users.model");
+const { getWMUserById, updateHideOneUserProfile, getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists, verifyVisibilityAndGetEmail } = require("../models/users.model");
 const { onboardingUserService, updateUserProlfilService, updateUserService } = require("../services/users.service");
 
 
@@ -61,6 +61,70 @@ async function updateUserTelephone(req, res) {
   }
 }
 
+async function handleHideUserProfil(req, res) {
+  try {
+    const id_user = req.id_user;
+    const { is_hidden } = req.body;
+    const result = await updateHideOneUserProfile({ id_user, is_hidden });
+    res.status(200).send(result);
+  } catch (error) {
+    console.log('[handleHideUserProfil]', error.message)
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
+  }
+}
+
+async function getBlockedAthlets(req, res) {
+  try {
+    const id_user = req.id_user;
+    const result = await getAllBlockedAthletes({ id_user });
+    res.status(200).send(result);
+  } catch (error) {
+    console.log('[getBlockedAthlets]', error.message)
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
+  }
+}
+
+async function addBlockedUser(req, res) {
+  try {
+    const id_user = req.id_user;
+    const { blocked_email, contact_fullname, id_user_blocked } = req.body;
+
+    const { email, fullname } = id_user_blocked
+      ? await verifyVisibilityAndGetEmail({ id_user, id_user_blocked })
+      : { email: blocked_email, fullname: contact_fullname };
+
+    await insertOneBlockedUser({ id_user, blocked_email: email, contact_fullname: fullname, id_user_blocked });
+    res.status(200).send({ message: 'insertion ok' });
+  } catch (error) {
+    console.log('[addBlockedUser]', error.message)
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Erreur serveur' });
+  }
+}
+
+async function deleteBlockedUser(req, res) {
+  try {
+    const id_user = req.id_user;
+    const { id_user_blocked, blocked_email } = req.params;
+    await deleteOneBlockedUser({ id_user, id_user_blocked, blocked_email });
+    res.status(200).send({ message: 'insertion ok'});
+  } catch (error) {
+    console.log('[handleHideUserProfil]', error.message)
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
+  }
+}
+
+async function getVisiblesAthleteLists(req, res) {
+  try {
+    const id_user = req.id_user;
+    const results = await getAllVisiblesAthleteLists({ id_user });
+    res.status(200).send(results);
+  } catch (error) {
+    console.log('[getVisiblesAthleteLists]', error.message)
+    res.status(error.status || 500).json({ error: 'Erreur serveur' });
+  }
+}
+
 module.exports = {
-  onboardingUser, getCurrentWMUser, updateUserProlfil, updateUserEmail, updateUserTelephone
+  onboardingUser, getCurrentWMUser, updateUserProlfil, updateUserEmail, updateUserTelephone, handleHideUserProfil,
+  getBlockedAthlets, addBlockedUser, deleteBlockedUser, getVisiblesAthleteLists
 }

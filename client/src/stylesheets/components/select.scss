@@ -1,0 +1,239 @@
+.select-container {
+  width: 180px !important;
+  position: relative;
+  z-index: 1200;
+}
+
+.select-__control {
+  background-color: transparent !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.select-__indicators {
+  display: none !important;
+}
+
+.select-__single-value {
+  text-align: center;
+  color: #fff !important;
+  font-weight: 500;
+  font-size: 11px !important;
+  border-color: #fff 1px solid !important;
+}
+
+.css-t3ipsp-control, .css-yk16xz-control {
+  border-color: 1px solid #fff !important;
+}
+
+.select-__control:focus {
+  border-color: #fff !important; /* Change this to your desired border color or set to "transparent" */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0) !important; /* Remove the blue box shadow */
+  outline: 0 !important; /* Remove the outline */
+}
+
+.select-__value-container, .select-__input-container {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.select-__menu {
+  width: 250px !important;
+  right: -40px;
+}
+
+.select-__option {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding-left: 20px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.select-score-container {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 16px;
+}
+
+.select-score__single-value {
+  font-size: 17px !important;
+  font-weight: 500 !important;
+}
+
+.select-score__option {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 16px !important;
+  white-space: nowrap !important; /* Prevents wrapping to multiple lines */
+  overflow: hidden !important; /* Hides any overflowing content */
+  text-overflow: ellipsis !important; /* Adds an ellipsis (...) at the end if the content overflows */
+}
+
+.select-score__menu {
+  z-index: 21 !important;
+}
+
+.select-score__control {
+  min-height: 44px !important;
+  border-radius: 8px !important; 
+}
+
+.select-score__value-container {
+  padding-left: 16px !important;
+}
+
+.select-label {
+  margin-bottom: 2px;
+}
+
+.input-select__control {
+  border-radius: 6px !important;
+  border: 1px solid $gray07 !important;
+  height: 40px;
+  outline: none !important;
+  padding-left: 16px !important;
+  cursor: pointer !important;
+
+  .input-select__value-container {
+    padding-left: 0;
+  }
+}
+.score-select-admin-container.user-box {
+  .input-select__control {
+    height: auto;
+  }
+}
+
+.input-select__menu {
+  z-index: 55 !important;
+}
+
+.input-select-main-container {
+  flex-grow: 1;
+  .input-container {
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+}
+
+.input-select__single-value {
+  font-weight: 400;
+  font-size: 16px !important;
+}
+
+.input-select__option {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  padding: 12px 16px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important; /* Prevents wrapping to multiple lines */
+  overflow: hidden !important; /* Hides any overflowing content */
+  text-overflow: ellipsis !important; /* Adds an ellipsis (...) at the end if the content overflows */
+}
+
+.contact-form {
+  .input-select__single-value {
+    font-size: 14px !important;
+  }
+  .input-select__option {
+    font-size: 14px !important;
+    white-space: wrap !important; /* Prevents wrapping to multiple lines */
+    overflow: auto !important; /* Hides any overflowing content */
+    text-overflow: auto !important; /* Adds an ellipsis (...) at the end if the content overflows */
+  }
+}
+
+.selectAthleteError {
+  .input-select__control {
+    border: 2px solid $errorPrimary !important;
+  }
+}
+
+
+.user-register-select-container.selected {
+  position: absolute;
+  top: 50%; 
+  transform: translateY(-50%);
+  left: -20px;
+  
+  &:hover {
+    background-color: transparent;
+  } 
+}
+
+.select-athlete-container {
+  .input-select__value-container {
+    overflow: visible !important;
+  }
+  .input-select__control {
+    min-height: 50px !important;
+  }
+}
+
+.select-athlete-container.user-visibility {
+  .input-select__menu {
+    position: relative !important;
+  }
+}
+
+.select-admin-add {
+  padding-left: 5%;
+  padding-right: 5%;
+  
+  .input-select__value-container {
+    overflow: visible !important;
+  }
+  .input-select__control {
+    min-height: 50px !important;
+    border: 1px solid $gray05 !important;
+    // margin-bottom: 32px;
+  }
+}
+
+.select-relative {
+  .input-select__menu {
+    position: relative !important;
+  }
+  .input-select__control--menu-is-open {
+    margin-bottom: 12px !important;
+  }
+}
+
+.user-register-select-container {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  padding-left: 20px;
+  transition: background-color 0.15s;
+  // border-bottom: 1px solid $gray05;
+
+  &:hover {
+    background-color: $gray03;
+    cursor: pointer;
+  }
+
+  .avatar-register {
+    width: 26px !important;
+    height: 26px !important; 
+    min-width: 26px !important;
+    border-radius: 50%;
+    border: 1px solid $gray07;
+    object-fit: cover;
+  }
+  .user-register-label {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 14px;
+  }
+  .user-register-club {
+    font-size: 11px;
+    font-weight: 400;
+    color: $gray07;
+    margin-left: 14px;
+    margin-top: -2px;
+  }
+}

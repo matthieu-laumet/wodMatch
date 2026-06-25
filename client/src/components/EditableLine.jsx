@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function EditableLine({ label, value, onSave, type = 'text', className = '', isActive, onToggle, inputMode = 'text' }) {
+export default function EditableLine({ 
+  label, value, onSave, type = 'text', className = '', isActive, onToggle, inputMode = 'text',
+  onClick
+}) {
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState(value || '');
 
@@ -28,11 +31,11 @@ export default function EditableLine({ label, value, onSave, type = 'text', clas
   };
 
   return (
-    <div className={`full-line-container ${isActive ? 'active' : ''} ${className}`}>
+    <div className={`full-line-container ${isActive ? 'active' : ''} ${className}`} onClick={onClick}>
       <div className="full-line" onClick={onToggle}>
         <p className="label">{label}</p>
         <div className="flex items-center ml-4 min-w-0">
-          {!isActive && (
+          {(!isActive && value) && (
             <p className="text-sm font-regular truncate">{value}</p>
           )}
           <i className={`bi bi-chevron-${!isActive ? 'right' : 'down'} ml-2 text-sm flex-shrink-0`}></i>

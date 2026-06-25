@@ -45,5 +45,5 @@ function generateUniqueId() {
 }
 
 module.exports = {
-  webdavClient, userImageUrl, validateFilename, generateUniqueId
+  webdavClient, userImageUrl, validateFilename, generateUniqueId, WEBDAV_URL
 };

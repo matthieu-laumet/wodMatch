@@ -3,7 +3,6 @@ import OnboardPhotos from "../../components/HandlePhotos";
 import { useNavigate } from "react-router-dom";
 
 export default function EditPhotos({ }) {
-
   const [btnText, setBtnText] = useState('Ajouter un média');
   const [isDisabled, setIsDisabled] = useState(false);
   const navigate = useNavigate();

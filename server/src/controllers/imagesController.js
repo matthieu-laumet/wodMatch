@@ -1,12 +1,27 @@
 const { getImageRaw, uploadOneImg, listTempImages, getUserTempImagesService, reorderTempImagesService } = require('../services/leevia.service');
 const { webdavClient } = require('../utils/leevia.utils');
+const crypto = require('crypto');
+
+const ALLOWED_PATH_PATTERN = /^.*$/i;
+// const ALLOWED_PATH_PATTERN = /^(app\/competitions\/\d+\/[\w-]+\.(jpg|jpeg|png|gif|webp)|app\/users\/[\w-]+\.(jpg|jpeg|png|gif|webp)|[\w-]+\.(jpg|jpeg|png|gif|webp))$/i;
 
 async function getImage(req, res) {
   try {
-    const { data, contentType } = await getImageRaw(req.params.filename);
+    let filename;
+    try {
+      filename = decodeURIComponent(req.params.filename);
+    } catch {
+      return res.status(400).json({ error: 'Nom de fichier invalide' });
+    }
+
+    if (!filename || filename.includes('..') || !ALLOWED_PATH_PATTERN.test(filename)) {
+      return res.status(400).json({ error: 'Nom de fichier invalide' });
+    }
+    const { data, contentType } = await getImageRaw(filename);
+    
     res.set('Content-Type', contentType);
     res.set('Cache-Control', 'public, max-age=86400');
-    res.set('ETag', `"${req.params.filename}"`);
+    res.set('ETag', `"${crypto.createHash('md5').update(filename).digest('hex')}"`);
     res.send(data);
   } catch (error) {
     if (error.message === 'Nom de fichier invalide') {

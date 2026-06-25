@@ -24,7 +24,7 @@ const upload = multer({
 });
 
 // ==================== DATA (public) ====================
-router.get('/get-one-image/:filename', imagesController.getImage);
+router.get('/get-one-photo/:filename(*)', imagesController.getImage);
 
 // ==================== PROTECTION ====================
 router.use(validateProtectedRoutes([

@@ -15,6 +15,8 @@ import Competitions from "./features/competitions/Competitions";
 import EditProfile from "./features/user/EditProfile";
 import Settings from "./features/user/Settings";
 import EditPhotos from "./features/user/EditPhotos";
+import BlockAthletes from "./features/user/BlockAthletes";
+import AddBlockAthlete from "./features/user/AddBlockAthlete";
 
 
 function App() {
@@ -48,7 +50,11 @@ function App() {
                 <Route index element={<Profil />} />
                 <Route path='edit' element={<EditProfile />} />
                 <Route path='edit-pictures' element={<EditPhotos />} />
-                <Route path='settings' element={<Settings />} />
+                <Route path='settings'>
+                  <Route index element={<Settings />} />
+                  <Route path='block-athletes' element={<BlockAthletes />} />
+                  <Route path='block-athletes/add-contact' element={<AddBlockAthlete />} />
+                </Route>
               </Route>
             </Route>
             <Route path='/500' element={<ErrorFallback noFooter={true}/>} />

@@ -4,11 +4,9 @@ import dataApplicationsContext from '../context/dataApplicationsContext';
 import Skeleton from 'react-loading-skeleton';
 import { baseColor } from '../context/dataApplicationsContext';
 import { baseColor2 } from '../context/dataApplicationsContext';
-import { useNavigate } from 'react-router-dom';
 
-const GetAvatar = ({ filename, fullname, className, id, watch, alt, skeletonClasses }) => {
-  const { auth, isAuthLoading } = useContext(dataApplicationsContext);
-  const navigate = useNavigate();
+const GetAvatar = ({ filename, fullname, onClick, className, id, watch, alt, skeletonClasses }) => {
+  const { auth } = useContext(dataApplicationsContext);
 
   const [imageError, setImageError] = useState(false);
   const [imageSrc, setImageSrc] = useState(`https://api.dicebear.com/7.x/thumbs/svg?seed=${fullname}`);
@@ -42,26 +40,19 @@ const GetAvatar = ({ filename, fullname, className, id, watch, alt, skeletonClas
 
   
   
-  if (isLoading || isAuthLoading) {
-    return (
-      <div
-        className={className + ' ' + skeletonClasses + ' avatar'}
-        style={{ borderRadius: '50%', background: 'linear-gradient(90deg, #D3D3D3 25%, #ebebeb 50%, #D3D3D3 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1s infinite' }}
-      />
-    );
+  if (isLoading) {
+    return <Skeleton className={className + ' ' + skeletonClasses} baseColor={baseColor2} highlightColor={baseColor} duration='1'/>;
   }
 
   return (   
-    auth?.user?.email 
-      ? <img 
-          src={imageSrc} 
-          alt={alt || 'avatar'} 
-          id={id}
-          className={className + ' avatar'}
-          onError={handleImageError}
-          onClick={() => navigate('/profil')}
-        />
-      : <i className="bi bi-person nav-people-icon"></i>
+    <img 
+      src={imageSrc} 
+      alt={alt || 'avatar'} 
+      id={id}
+      className={className}
+      onError={handleImageError}
+      onClick={onClick}
+    />
   );
 };
 

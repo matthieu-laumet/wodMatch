@@ -1,9 +1,22 @@
-const { validateFilename, userImageUrl, webdavClient, generateUniqueId } = require('../utils/leevia.utils');
+const { webdavClient, generateUniqueId, WEBDAV_URL, validateFilename, userImageUrl } = require('../utils/leevia.utils');
 const path = require('path');
 const sharp = require('sharp');
 
 
 async function getImageRaw(filename) {
+  // Plus de validateFilename ici, ou une version qui accepte les /
+  const url = filename.startsWith('app/') 
+    ? `${WEBDAV_URL}/${filename}`      // chemin complet → app/competitions/1/xxx.jpg
+    : `${WEBDAV_URL}/app/users/${filename}`;  // ancien format → xxx.jpg seul
+
+  const response = await webdavClient.get(url, { responseType: 'arraybuffer' });
+  return {
+    data: response.data,
+    contentType: response.headers['content-type'] || 'image/jpeg'
+  };
+}
+
+async function getImageRawWodMatch(filename) {
   validateFilename(filename);
   const response = await webdavClient.get(userImageUrl(filename), {
     responseType: 'arraybuffer'
@@ -13,7 +26,6 @@ async function getImageRaw(filename) {
     contentType: response.headers['content-type'] || 'image/jpeg'
   };
 }
-
 
 async function getImageAsBase64(filename) {
   const { data, contentType } = await getImageRaw(filename);
@@ -70,7 +82,6 @@ async function reorderTempImagesService({ filenames, id_user }) {
 
 async function getUserTempImagesService(id_user) {
   const dirPath = `temp/${id_user}/`;
-  
   try {
     const response = await webdavClient.request({
       method: 'PROPFIND',
@@ -88,11 +99,13 @@ async function getUserTempImagesService(id_user) {
     const images = await Promise.all(
       filenames.map(async (filename) => {
         const fullPath = `${dirPath}${filename}`;
-        const { data, contentType } = await getImageRaw(fullPath);
+        const { data, contentType } = await getImageRawWodMatch(fullPath);
         const base64 = `data:${contentType};base64,${Buffer.from(data).toString('base64')}`;
         return { filename: fullPath, url: base64 };
       })
     );
+
+    console.log(images)
 
     return images;
   } catch (e) {
@@ -103,5 +116,5 @@ async function getUserTempImagesService(id_user) {
 
 
 module.exports = {
-  getImageAsBase64, uploadOneImg, getImageRaw, getUserTempImagesService, reorderTempImagesService
+  getImageAsBase64, uploadOneImg, getImageRawWodMatch, getImageRaw, getUserTempImagesService, reorderTempImagesService
 }

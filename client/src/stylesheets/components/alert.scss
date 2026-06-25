@@ -36,14 +36,14 @@ $opacityHover: 0.65;
     padding-bottom: 0 !important;
   }
 
-  .delete__popup:not(.photo__popup) .swalText {
+  .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) .swalText {
     font-size: 16px !important;
     font-style: italic;
     margin-top: 16px !important;
     color: rgba($gray09, .7) !important;
   }
 
-  .delete__popup:not(.photo__popup) .swal2-actions {
+  .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) {
     justify-content: flex-end !important;
     margin: 0 !important;
     margin-right: 45px !important;
@@ -63,7 +63,7 @@ $opacityHover: 0.65;
     border-top: 1px solid $gray02 !important;
   }
 
-  .delete__popup:not(.photo__popup) .swalConfirm {
+  .delete__popup:not(.photo__popup) .swal2-actions:not(.delete-account__actions) .swalConfirm {
     background-color: #e64942 !important;
     border: none !important;
     padding: 12px 26px !important;
@@ -82,6 +82,7 @@ $opacityHover: 0.65;
     padding: 12px 26px !important;
   }
 }
+
 
 // ─── PHOTO POPUP ──────────────────────────────────────────────────────────────
 
@@ -331,4 +332,30 @@ $opacityHover: 0.65;
     margin: 0;
     line-height: 1.4;
   }
+}
+
+.swal2-actions.delete-account__actions {
+  flex-direction: column;
+  width: 100%;
+  padding: 0 1.5rem;
+  margin-top: 12px;
+}
+
+.delete-account__actions .swal2-confirm,
+.delete-account__actions .swal2-cancel {
+  width: 100%;
+  margin: 4px 0;
+  outline: none !important;
+}
+.delete-account__actions .swal2-confirm {
+  background-color: #222 !important;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+.delete-account__actions .swal2-cancel {
+  margin-top: 6px;
+}
+
+.grace-info {
+  margin-top: 16px;
 }

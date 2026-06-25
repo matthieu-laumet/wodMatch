@@ -83,6 +83,70 @@ export const alerteWarningSimple = ({ warningText = "Attention, cette action est
   }
 }
 
+export const alerteDeleteAccount = ({ isInTeam = false, warningText = "Attention, cette action est irréversible."}) => {
+  // Étape 1 : la modale "Masquer vs Supprimer"
+  return Swal.fire({
+    title: 'Masquer mon compte',
+    html: `
+      <p>Besoin de break ? Tu peux masquer ton profil et disparaître des recherches. 
+      Ton compte reste intact, tu reviens quand tu veux.</p>
+    `,
+    confirmButtonText: 'Masquer mon compte',
+    cancelButtonText: 'Supprimer mon compte',
+    showCancelButton: true,
+    reverseButtons: false,
+    customClass: { ...customClass, footer: null, actions: 'delete-account__actions' },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // L'utilisateur a choisi "Masquer" → action directe
+      return { action: 'hide' }
+    } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+      // L'utilisateur a choisi "Supprimer" → étape 2
+      return Swal.fire({
+        title: 'Confirmer la suppression',
+        html: `
+          <p>Cette action est <strong>irréversible</strong>. Tu perdras :</p>
+          <ul>
+            <li>Ton profil et tes photos</li>
+            <li>Les informations que tu as saisies</li>
+          </ul>
+          <p class="grace-info">Tu recevras un email avec un lien pour annuler pendant 14 jours.</p>
+        `,
+        confirmButtonText: 'Oui, supprimer définitivement',
+        cancelButtonText: 'Annuler',
+        showCancelButton: true,
+        customClass: { ...customClass, footer: null, actions: 'delete-account__actions' },
+      }).then((result) => {
+        if (result.isConfirmed) return { action: 'delete' }
+        return { action: 'cancel' }
+      })
+    }
+    return { action: 'cancel' }
+  })
+}
+
+
+export const alerteDeleteAccountConfirm = () => {
+  return Swal.fire({
+    title: 'Confirmer la suppression',
+    html: `
+      <p>Cette action est <strong>irréversible</strong>. Tu perdras :</p>
+      <ul>
+        <li>Ton profil et tes photos</li>
+        <li>Les informations que tu as saisies</li>
+      </ul>
+      <p class="grace-info">Tu recevras un email avec un lien pour annuler pendant 14 jours.</p>
+    `,
+    confirmButtonText: 'Oui, supprimer définitivement',
+    cancelButtonText: 'Annuler',
+    showCancelButton: true,
+    customClass: { ...customClass, footer: null, actions: 'delete-account__actions' },
+  }).then((result) => {
+    if (result.isConfirmed) return { action: 'delete' }
+    return { action: 'cancel' }
+  })
+}
+
 // export const AlerteSlotsOpen = (participant) => {
 //   return {
 //     title: `Êtes-vous sûr(e) ?`,
