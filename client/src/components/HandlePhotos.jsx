@@ -180,57 +180,70 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="photos" direction="horizontal">
               {(provided) => (
+                // ⛔ avant : className="grid grid-cols-3 gap-2"
+                // ✅ après : flex + flex-wrap, le "gap" devient du padding porté par
+                // chaque slot (voir plus bas), annulé sur les bords par -m-1 ici.
+                // @hello-pangea/dnd ne lit jamais le `gap` du conteneur grid pour ses
+                // calculs de repositionnement → c'était une source d'erreur de calcul.
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="grid grid-cols-3 gap-2"
+                  className="flex flex-wrap -m-1"
                 >
                   {slots.map((slot, index) => {
                     const slotPosition = index;
                     if (slot.isAdd) return (
-                      <div
-                        key={slot.id}
-                        onClick={() => handleSlotClick(slotPosition)}
-                        className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#505050] bg-gray-100 flex items-center justify-center cursor-pointer"
-                      >
-                        <span className="text-2xl text-gray-950">+</span>
+                      <div key={slot.id} className="w-1/3 p-1">
+                        <div
+                          onClick={() => handleSlotClick(slotPosition)}
+                          className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#505050] bg-gray-100 flex items-center justify-center cursor-pointer"
+                        >
+                          <span className="text-2xl text-gray-950">+</span>
+                        </div>
                       </div>
                     );
 
                     if (slot.isEmpty) return (
-                      <div
-                        key={slot.id}
-                        className={`aspect-[3/4] rounded-xl ${slot.isPlaceholder ? 'border-2 border-dashed border-[#505050] bg-gray-100' : ''}`}
-                      />
+                      <div key={slot.id} className="w-1/3 p-1">
+                        <div
+                          className={`aspect-[3/4] rounded-xl ${slot.isPlaceholder ? 'border-2 border-dashed border-[#505050] bg-gray-100' : ''}`}
+                        />
+                      </div>
                     );
 
                     if (slot.isLoading) return (
-                      <div
-                        key={slot.id}
-                        className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-300"
-                      >
-                        <PulseLoader color='#505050' size={8} className="ml-6 mt-16"/>
+                      <div key={slot.id} className="w-1/3 p-1">
+                        <div className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
+                          <PulseLoader color='#505050' size={8} className="ml-6 mt-16"/>
+                        </div>
                       </div>
                     );
 
                     return (
                       <Draggable key={slot.id} draggableId={slot.id} index={index}>
                         {(provided, snapshot) => (
+                          // ✅ le padding (spacing) vit ICI, sur l'élément que la lib
+                          // mesure réellement pour calculer la cible de drop / le
+                          // placeholder. C'est l'élément visuel (carte) qui est à
+                          // l'intérieur, pas le rect mesuré par la lib.
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`relative aspect-[3/4] rounded-xl overflow-hidden border-2 border-black
-                              ${snapshot.isDragging ? 'ring-2 ring-brand' : ''}`}
-                              // ✅ border-2 border-black sur les cards complètes
+                            className="w-1/3 p-1"
                           >
-                            <img src={slot.url} alt="" className="w-full h-full object-cover" />
-                            <button
-                              onClick={() => handleRemove(slot.id)}
-                              className="absolute bottom-1 right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center shadow text-xs text-white"
+                            <div
+                              className={`relative aspect-[3/4] rounded-xl overflow-hidden border-2
+                                ${snapshot.isDragging ? 'border-brand' : 'border-black'}`}
                             >
-                              ✕
-                            </button>
+                              <img src={slot.url} alt="" className="w-full h-full object-cover" />
+                              <button
+                                onClick={() => handleRemove(slot.id)}
+                                className="absolute bottom-1 right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center shadow text-xs text-white"
+                              >
+                                ✕
+                              </button>
+                            </div>
                           </div>
                         )}
                       </Draggable>

@@ -105,8 +105,6 @@ async function getUserTempImagesService(id_user) {
       })
     );
 
-    console.log(images)
-
     return images;
   } catch (e) {
     if (e.response?.status === 404) return [];
