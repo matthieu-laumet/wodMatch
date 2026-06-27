@@ -1,4 +1,4 @@
-import { wodmatchApiSlice } from "../app/api/apiSlice";
+import { wodmatchApiSlice, wodzoneApiSlice } from "../app/api/apiSlice";
 
 export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -109,8 +109,46 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
   }),
 })
 
+export const wodzoneUsersApiSlice = wodzoneApiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getUserBoxVisibilities: builder.query({
+      query: () => ({
+        url: `/users/get-user-box-visibilities`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError
+        }, 
+      }),
+      providesTags: ['User']
+    }),
+    upsertUserVisibility: builder.mutation({
+      query: initialUsersData => ({
+          url: `/users/upsert-visibility`,
+          method: 'post',
+          body: {
+              ...initialUsersData,
+          }
+      }),
+      invalidatesTags: ["User"]
+    }),
+    updateUserClubVisibilities: builder.mutation({
+      query: initialUsersData => ({
+          url: `/users/update-user-box-visibilities`,
+          method: 'put',
+          body: {
+              ...initialUsersData,
+          }
+      }),
+      invalidatesTags: ["User"]
+    }),
+  }),
+})
+
 export const { 
   useGetCurrentWMUserQuery, useLazyGetCurrentWMUserQuery, useOnboardingUserMutation, useUpdateUserProlfilMutation,
   useUpdateUserEmailMutation, useUpdateUserTelephoneMutation, useHandleHideUserProfilMutation,
   useGetBlockedAthletsQuery, useAddBlockedUserMutation, useDeleteBlockedUserMutation, useGetVisiblesAthleteListsQuery
 } = usersApiSlice
+
+export const { 
+  useGetUserBoxVisibilitiesQuery, useUpsertUserVisibilityMutation, useUpdateUserClubVisibilitiesMutation
+} = wodzoneUsersApiSlice

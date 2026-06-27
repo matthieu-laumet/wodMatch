@@ -154,15 +154,11 @@ export default function Settings({ }) {
     }
   }
 
-  const handleBlockAthlete = async (e) => {
+  const handleNavigate = async (e, link, blank = null) => {
     e.stopPropagation();
-    navigate('block-athletes')
     window.scroll(0,0)
-  };
-
-  const handleNavigate = async (e, link) => {
-    e.stopPropagation();
-    window.open(link, '_blank');
+    if (blank) return window.open(link, '_blank');
+    navigate(link)
   };
 
   return (
@@ -196,27 +192,35 @@ export default function Settings({ }) {
           </p>
           <EditableLine
             label="Bloquer des Athlètes" value={null} type="BlockedAthletes" className="mt-[24px]"  
-            onClick={handleBlockAthlete}
+            onClick={(e) => handleNavigate(e, 'block-athletes')}
           />
           <p className="text-md font-regular mt-3 opacity-70">
             On ne choisit pas ses partenaires de box, mais sur WodMatch si. Ajoute les emails des profils que tu veux éviter — promis, ils ne sauront jamais.
           </p>
+          <EditableLine
+            label="Gérer ma visibilité" value={null} type="BlockedAthletes" className="mt-[24px]"  
+            onClick={(e) => handleNavigate(e, 'visibility')}
+          />
+          <p className="text-md font-regular mt-3 opacity-70">
+            Choisis qui peut te voir dans la liste des athletes — tout le monde, personne, ou uniquement les membres de tes box.
+            Valable aussi pour WodZone®
+          </p>
 
 
           <EditableLine
-            label="Centre d'aides" value={null} className="mt-[24px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr')}
+            label="Centre d'aides" value={null} className="mt-[24px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
           />
           <EditableLine
-            label="Règle et Communauté" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr')}
+            label="Règle et Communauté" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
           />
           <EditableLine
-            label="Politique relative au cookies" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr')}
+            label="Politique relative au cookies" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
           />
           <EditableLine
-            label="Politique de confidentialité" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr/topics/about/62')}
+            label="Politique de confidentialité" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr/topics/about/62', '_blank')}
           />
           <EditableLine
-            label="Condition d'utilisation" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr')}
+            label="Condition d'utilisation" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
           />
 
           <div className="full-line block mt-12" onClick={handleLogout}>

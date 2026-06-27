@@ -1,0 +1,71 @@
+.slick-arrow, .slick-prev, .slick-next {
+  color: $gray09 !important;
+  // background-color: $gray09 !important;
+  z-index: 15 !important;
+  font-size: 30px;
+}
+
+.slick-prev:before, .slick-next:before {
+  color: $gray09 !important;
+  font-size: 24px !important;
+}
+
+.picto-filter-rapide-container {
+  .slick-slider {
+    width: 75vw;
+  }
+}
+
+.slick-slide {
+  .icon-filter-container  {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+// .slick-slider {
+//   z-index: 100 !important;
+// }
+
+.compet-tags-line {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 8px;
+
+  .icon-filter {
+    height: 30px;
+    width: 35px !important;
+    margin-right: 16px;
+  }
+
+  .tag-label {
+    font-weight: 500;
+    font-size: 16px;
+  }
+}
+
+.icon-filter {
+  height: 30px;
+  width: 35px !important;
+}
+
+.label-icon-filter {
+  font-weight: 600;
+  color: $gray08;
+  font-size: 11px;
+  width: max-content;
+}
+
+.icon-filter-container  {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 12px;
+}
+
+.icon-filter-container.active {
+  border-bottom: 3px solid $blackPrimary;
+}

@@ -40,5 +40,5 @@ export const wodzoneApiSlice = createAppApi('api', process.env.REACT_APP_BASE_UR
 
 // wodmatchApiSlice.js
 export const wodmatchApiSlice = createAppApi('wodmatchApi', process.env.REACT_APP_WODMATCH_URL, 
-  ['Profile', 'Strength', 'FunRep', 'Level', 'SearchMode', 'User', 'Blocked']
+  ['Profile', 'Strength', 'FunRep', 'Level', 'SearchMode', 'User', 'Blocked', 'Club', 'Tag']
 );

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import ErrorFallback from "./components/ErrorFallback";
 import ErrorMissing from './components/ErrorMissing';
@@ -17,6 +17,7 @@ import Settings from "./features/user/Settings";
 import EditPhotos from "./features/user/EditPhotos";
 import BlockAthletes from "./features/user/BlockAthletes";
 import AddBlockAthlete from "./features/user/AddBlockAthlete";
+import Visibility from "./features/user/Visibility";
 
 
 function App() {
@@ -30,6 +31,10 @@ function App() {
     return () => window.removeEventListener('resize', documentHeight);
   }, []);
 
+  const [currentCompetId, setCurrentCompetId] = useState(
+    () => localStorage.getItem('currentCompetId') // lazy init ✅ réactif au mount
+  );
+
   return (
     <>
       <ToastContainer
@@ -40,7 +45,7 @@ function App() {
         <Route element={<PersistLogin />}>
           <Route path='/' element={<Layout />}>
             <Route element={<RequireAuth />}>
-              <Route index element={<ExploreWorld />} />
+              <Route index element={currentCompetId ? <ExploreWorld /> : <Competitions />} />
               <Route path='/welcome' element={<WelcomeOnBoard />} />
               <Route path='/onboarding' element={<Onboarding />} />
               <Route path='/competitions' element={<Competitions />} />
@@ -53,6 +58,7 @@ function App() {
                 <Route path='settings'>
                   <Route index element={<Settings />} />
                   <Route path='block-athletes' element={<BlockAthletes />} />
+                  <Route path='visibility' element={<Visibility />} />
                   <Route path='block-athletes/add-contact' element={<AddBlockAthlete />} />
                 </Route>
               </Route>

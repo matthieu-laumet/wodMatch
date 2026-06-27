@@ -34,6 +34,7 @@ app.use(session({
 }));
 
 
+app.use('/api/competitions', require('./src/routes/competitionsRoutes'));
 app.use('/api/images', require('./src/routes/imagesRoutes'));
 app.use('/api/funReps', require('./src/routes/funRepsRoutes'));
 app.use('/api/levels', require('./src/routes/levelsRoutes'));

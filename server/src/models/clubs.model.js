@@ -5,19 +5,19 @@ const dateOptions = { locale: fr, timeZone: 'Europe/Berlin' }
 
 
 async function getAllClubsData() {
-  const results = await pool.query(`SELECT id_club, "name" FROM wodzone.clubs ORDER BY "name";`);
+  const results = await pool().query(`SELECT id_club, "name" FROM wodzone.clubs ORDER BY "name";`);
   return results.rows
 }
 
 async function insertOneClubOnValidation({ club_name, id_user }) {
-  const results = await pool.query(`
+  const results = await pool().query(`
     INSERT INTO wodzone.clubs_on_validations ("club_name", "id_user") VALUES($1, $2) returning *
   ;`, [club_name, id_user]);
   return results.rows[0]
 }
 
 async function getIdClubFromUser({ id_user }) {
-  const results = await pool.query(`SELECT u.id_club FROM wodzone.users u WHERE u.id = $1;`, [id_user]);
+  const results = await pool().query(`SELECT u.id_club FROM wodzone.users u WHERE u.id = $1;`, [id_user]);
   return results.rows[0]
 }
 

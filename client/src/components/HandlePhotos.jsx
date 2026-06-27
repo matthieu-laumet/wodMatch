@@ -1,14 +1,36 @@
-import { useRef, useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useRef, useState, useEffect } from "react";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { useDeleteTempImageMutation, useGetUserTempImagesQuery, useReorderTempImagesMutation, useUploadTempImagesMutation } from "../slices/imagesApiSlice";
 import { PulseLoader } from "react-spinners";
-import { useEffect } from "react";
 import { toast } from 'react-toastify';
 import { MAX_PHOTOS } from "../context/dataApplicationsContext";
 import CropModal from "./CropModal";
 import Swal from 'sweetalert2';
 import { alerteDeleteSimple } from "./Alert";
+import { useSortablePhotos } from "../hooks/useSortablePhotos";
+import { useSortableCard } from "../hooks/useSortableCard";
 
+// Carte photo individuelle : c'est ELLE qui appelle useSortable (impossible à éviter, dnd-kit fonctionne par hook posé sur chaque item triable).
+const PhotoCard = ({ id, url, onRemove }) => {
+  const { setNodeRef, attributes, listeners, style, isDragging } = useSortableCard(id);
+
+  return (
+    <div
+      ref={setNodeRef} style={style} {...attributes} {...listeners}
+      className={`relative aspect-[3/4] rounded-xl overflow-hidden border-2 ${isDragging ? 'border-brand' : 'border-black'}`}
+    >
+      <img src={url} alt="" className="w-full h-full object-cover" />
+      <button
+        onClick={() => onRemove(id)}
+        onPointerDownCapture={(e) => e.stopPropagation()} // empêche le bouton de déclencher un drag
+        className="absolute bottom-1 right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center shadow text-xs text-white"
+      >
+        ✕
+      </button>
+    </div>
+  );
+};
 
 const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllSlots = false }) => {
   const [photos, setPhotos] = useState([]);
@@ -28,11 +50,13 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
   const [reorderTempImages] = useReorderTempImagesMutation();
   const { data: remotePhotos = [], isLoading: isLoadingTempImages, isSuccess: isSuccessTempImages } = useGetUserTempImagesQuery();
 
+  // ✅ tout le câblage dnd-kit (sensors + handleDragEnd) vit dans ce hook
+  const { sensors, handleDragEnd } = useSortablePhotos(photos, setPhotos, reorderTempImages);
+
   useEffect(() => {
     if (remotePhotos.length === 0) return;
     setPhotos(remotePhotos.map(photo => ({
-      id: crypto.randomUUID(),
-      filename: photo.filename,
+      id: crypto.randomUUID(), filename: photo.filename,
       url: photo.url, // ✅ base64 direct, pas besoin d'un 2ème appel
     })));
   }, [remotePhotos]);
@@ -46,7 +70,6 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
     const files = Array.from(e.target.files).slice(0, MAX_PHOTOS - photos.length - loadingCount);
     if (files.length === 0) return;
     e.target.value = null;
-
     const [first, ...rest] = files;
     setCropQueue(rest.map((file, i) => ({ file, slotIndex: targetSlot + 1 + i })));
     setCurrentCrop({ file: first, objectUrl: URL.createObjectURL(first), slotIndex: targetSlot });
@@ -69,9 +92,7 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
     try {
       const results = await uploadTempImages({ files: [file], slot: slotIndex }).unwrap();
       const newPhoto = {
-        id: crypto.randomUUID(),
-        filename: results[0].filename,
-        url: URL.createObjectURL(blob),
+        id: crypto.randomUUID(), filename: results[0].filename, url: URL.createObjectURL(blob),
       };
       setPhotos((prev) => [...prev, newPhoto]);
     } catch (error) {
@@ -91,7 +112,6 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
       setCurrentCrop(null);
     }
   };
-
 
   const handleRemove = async (id) => {
     try {
@@ -124,48 +144,26 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
     }
   };
 
-  const handleDragEnd = async (result) => {
-    if (!result.destination) return;
-
-    const reordered = Array.from(photos);
-    const [moved] = reordered.splice(result.source.index, 1);
-    reordered.splice(result.destination.index, 0, moved);
-    setPhotos(reordered); // optimistic update immédiat
-
-    try {
-      const results = await reorderTempImages({ filenames: reordered.map(p => p.filename) }).unwrap();
-      // Mettre à jour les filenames avec les nouveaux noms
-      setPhotos(reordered.map((photo, i) => ({
-        ...photo,
-        filename: results[i].newFilename,
-      })));
-    } catch (error) {
-      console.error('Erreur reorder:', error);
-      setPhotos(photos); // rollback
-    }
-  };
-
   const totalUsed = photos.length + loadingCount;
-  const slots = [...photos];
+  const emptySlots = [];
 
   // ✅ Slots de chargement
   for (let i = 0; i < loadingCount; i++) {
-    slots.push({ id: `loading-${i}`, isLoading: true });
+    emptySlots.push({ id: `loading-${i}`, isLoading: true });
   }
 
   if (showAllSlots) {
-    // Affiche tous les slots vides jusqu'à MAX_PHOTOS, avec un seul bouton "+"
     const remaining = MAX_PHOTOS - totalUsed;
     for (let i = 0; i < remaining; i++) {
-      slots.push({ id: `add-${i}`, isAdd: true });
+      emptySlots.push({ id: `add-${i}`, isAdd: true });
     }
   } else {
-    // Comportement par défaut : un seul slot "+"
-    if (totalUsed < MAX_PHOTOS) slots.push({ id: 'add', isAdd: true });
+    if (totalUsed < MAX_PHOTOS) emptySlots.push({ id: 'add', isAdd: true });
   }
 
-  // Padding pour aligner la grille (plus nécessaire avec showAllSlots car MAX_PHOTOS est divisible par 3)
-  while (slots.length % 3 !== 0) slots.push({ id: `empty-pad-${slots.length}`, isEmpty: true });
+  while ((photos.length + emptySlots.length) % 3 !== 0) {
+    emptySlots.push({ id: `empty-pad-${emptySlots.length}`, isEmpty: true });
+  }
 
   return (
     <>
@@ -177,83 +175,36 @@ const HandlePhotos = ({ setBtnText, setIsDisabled, btnText = 'Suivant', showAllS
       {isLoadingTempImages && <PulseLoader color='#222' size={10} className="mt-12 ml-12"/>}
       {isSuccessTempImages &&
         <>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="photos" direction="horizontal">
-              {(provided) => (
-                // ⛔ avant : className="grid grid-cols-3 gap-2"
-                // ✅ après : flex + flex-wrap, le "gap" devient du padding porté par
-                // chaque slot (voir plus bas), annulé sur les bords par -m-1 ici.
-                // @hello-pangea/dnd ne lit jamais le `gap` du conteneur grid pour ses
-                // calculs de repositionnement → c'était une source d'erreur de calcul.
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="flex flex-wrap -m-1"
-                >
-                  {slots.map((slot, index) => {
-                    const slotPosition = index;
-                    if (slot.isAdd) return (
-                      <div key={slot.id} className="w-1/3 p-1">
-                        <div
-                          onClick={() => handleSlotClick(slotPosition)}
-                          className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#505050] bg-gray-100 flex items-center justify-center cursor-pointer"
-                        >
-                          <span className="text-2xl text-gray-950">+</span>
-                        </div>
-                      </div>
-                    );
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-3 gap-2">
+                {photos.map((photo) => (
+                  <PhotoCard key={photo.id} id={photo.id} url={photo.url} onRemove={handleRemove} />
+                ))}
 
-                    if (slot.isEmpty) return (
-                      <div key={slot.id} className="w-1/3 p-1">
-                        <div
-                          className={`aspect-[3/4] rounded-xl ${slot.isPlaceholder ? 'border-2 border-dashed border-[#505050] bg-gray-100' : ''}`}
-                        />
-                      </div>
-                    );
+                {emptySlots.map((slot) => {
+                  if (slot.isAdd) return (
+                    <div
+                      key={slot.id}
+                      onClick={handleSlotClick}
+                      className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#505050] bg-gray-100 flex items-center justify-center cursor-pointer"
+                    >
+                      <span className="text-2xl text-gray-950">+</span>
+                    </div>
+                  );
 
-                    if (slot.isLoading) return (
-                      <div key={slot.id} className="w-1/3 p-1">
-                        <div className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
-                          <PulseLoader color='#505050' size={8} className="ml-6 mt-16"/>
-                        </div>
-                      </div>
-                    );
+                  if (slot.isLoading) return (
+                    <div key={slot.id} className="aspect-[3/4] rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
+                      <PulseLoader color='#505050' size={8} className="ml-6 mt-16"/>
+                    </div>
+                  );
 
-                    return (
-                      <Draggable key={slot.id} draggableId={slot.id} index={index}>
-                        {(provided, snapshot) => (
-                          // ✅ le padding (spacing) vit ICI, sur l'élément que la lib
-                          // mesure réellement pour calculer la cible de drop / le
-                          // placeholder. C'est l'élément visuel (carte) qui est à
-                          // l'intérieur, pas le rect mesuré par la lib.
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="w-1/3 p-1"
-                          >
-                            <div
-                              className={`relative aspect-[3/4] rounded-xl overflow-hidden border-2
-                                ${snapshot.isDragging ? 'border-brand' : 'border-black'}`}
-                            >
-                              <img src={slot.url} alt="" className="w-full h-full object-cover" />
-                              <button
-                                onClick={() => handleRemove(slot.id)}
-                                className="absolute bottom-1 right-1 w-5 h-5 bg-black rounded-full flex items-center justify-center shadow text-xs text-white"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+                  // slot.isEmpty (padding pour aligner la grille)
+                  return <div key={slot.id} className="aspect-[3/4] rounded-xl" />;
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
 
           <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleAddPhoto} />
           <p className="text-black-950 mt-4">Pour réorganiser tes photos, effectue un drag and drop.</p>

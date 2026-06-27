@@ -8,6 +8,10 @@ export default function Footer() {
   const { auth, isSideBarOpen,  windowWidth } = useContext(dataApplicationsContext);
   const [inputValue, setInputValue] = useState('');
 
+  const [currentCompetId, setCurrentCompetId] = useState(
+    () => localStorage.getItem('currentCompetId') // lazy init ✅ réactif au mount
+  );
+
   const handleChange = (e) => {
     setInputValue(e.target.value);
   }
@@ -20,18 +24,30 @@ export default function Footer() {
     navigate(link)
   }
 
-  const noFooterPaths = ['/profil/edit', '/profil/settings']
-  if (noFooterPaths.includes(location.pathname)) return null;
+  const isActive = (path) => location.pathname.startsWith(path);
+  const fillClass = (path) => isActive(path) ? `-fill text-[#df0000]` : '';
+  const trophyClass = () => {
+    const activePaths = ['/', '/competitions'];
+    if (!currentCompetId && activePaths.includes(location.pathname)) return `-fill text-[#df0000]`;
+    return fillClass('/competitions')
+  }
+
+  const noFooterPaths = ['/profil/edit', '/profil/edit-pictures']
+  const noFooterPrefixes = ['/profil/settings']
+
+  if (
+    noFooterPaths.includes(location.pathname) ||
+    noFooterPrefixes.some(prefix => location.pathname.startsWith(prefix))
+  ) return null;
   
   let content
   if (auth?.user?.has_seen_wodmatch_welcome) {
-    const fill = (path) =>  location.pathname.startsWith(path) ? `-fill text-[#df0000]` : '';
     content = 
       <div className="footer-icons-containe">
-        <i className={`bi bi-trophy${fill('/competitions')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/competitions')}></i>
-        <i className={`bi bi-heart${fill('/favoris')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/favoris')}></i>
-        <i className={`bi bi-chat${fill('/chat')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/chat')}></i>
-        <i className={`bi bi-person${fill('/profil')} cursor-pointer text-3xl`} onClick={() => handleNavigate('/profil')}></i>
+        <i className={`bi bi-trophy${trophyClass()} cursor-pointer text-2xl`} onClick={() => handleNavigate('/competitions')}></i>
+        <i className={`bi bi-heart${fillClass('/favoris')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/favoris')}></i>
+        <i className={`bi bi-chat${fillClass('/chat')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/chat')}></i>
+        <i className={`bi bi-person${fillClass('/profil')} cursor-pointer text-3xl`} onClick={() => handleNavigate('/profil')}></i>
       </div>
   } else {
     const footerClass = (location.pathname === `/` && !auth?.user?.email) ? 'mt-[60px]' : '';

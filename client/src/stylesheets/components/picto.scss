@@ -1,0 +1,127 @@
+.tags-wrapper {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 26px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  height: 100%;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.small-picto {
+  width: 30px;
+}
+
+.tags-wrapper.overflow {
+  overflow-x: auto;
+}
+
+.close-filter-compet {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 2.5%;
+  cursor: pointer;
+  // z-index: 2000;
+  font-size: 18px;
+}
+
+.picto-filter-rapide-wrapper {
+  background-color: #222;
+  height: 58px;
+  position: relative;
+  display: flex;
+  color: #fff;
+  gap: 32px;
+  padding-left: 7%;
+  align-items: center;
+  
+  .upcomint-btn {
+    margin-bottom: 0;
+    font-weight: 500;
+    cursor: pointer;
+    padding-bottom: 4px;
+  }
+  .upcomint-btn.active {
+    border-bottom: 3px solid #fff;
+  }
+}
+
+.icon-open-queue {
+  width: 36px;
+  height: 36px;
+  margin-right: 16px;
+  opacity: .3;
+  cursor: pointer;
+  transition: opacity .15s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.picto-filter-rapide-container {
+  background-color: #fff;
+  height: 100px;
+  width: 100vw;
+  overflow-x: auto;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 26px;
+  padding-left: 5%;
+  padding-right: 5%;    
+  align-items: flex-end;
+  justify-content: flex-start;
+  position: sticky;
+  z-index: 10;
+  top: 43px;
+  margin-bottom: 18px;
+  margin-top: -53px;
+  border-bottom: 2px solid $gray04;
+  transition: top .5s;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .icon-filter-container {
+    display: flex;
+    flex-direction: column;
+    height: 60%;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    // width: max-content;
+    padding-bottom: 8px !important;
+  }
+
+  .icon-filter-container.active {
+    border-bottom: 3px solid $blackPrimary;
+  }
+  
+  .icon-filter {
+    height: 32px;
+    width: 32px;
+    opacity: .8;
+  }
+
+  .label-icon-filter {
+    font-weight: 500;
+    font-size: 13px;
+    text-align: center;
+    width: max-content;
+    opacity: .8;
+  }
+}
+
+.footer-more-padding {
+  padding-bottom: 110px;
+}
+
+.picto-genre {
+  font-size: 14px;
+  margin-right: 12px;
+}
