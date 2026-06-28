@@ -2,6 +2,8 @@
     background-color: #fff;
     padding-top: 24px;
     border-bottom: 1px solid $gray07;
+    position: sticky;
+    top: -60px;
 }
 
 .search-bar-compet {
@@ -43,4 +45,36 @@
   border-radius: 8px;
   border: 1px solid $gray08;
   background-color: #fff;
+}
+
+.filtre-btn-reset {
+  outline: none;
+  background-color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  border: 1px solid $gray07;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  color: $blackPrimary;
+
+  &:hover {
+    border: 1px solid $gray09;
+    color: $blackPrimary;
+    font-weight: 600;
+  }
+}
+
+.img-fullscreen {
+  height: calc(100dvh - 70px);
+  width: 100vw;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-image: linear-gradient(
+      rgba(245,245,245, 1) 0%,
+      rgba(245,245,245, 0.1) 30%
+      ),
+      url('https://res.cloudinary.com/dkz9knsgj/image/upload/v1782660790/drilldown_ptcaiy.jpg');
 }

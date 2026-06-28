@@ -11,10 +11,19 @@ export const tagsApiSlice = wodzoneApiSlice.injectEndpoints({
       }),
       providesTags: ['Tag', 'Competition']
     }),
+    getEventModes: builder.query({
+      query: () => ({
+        url: `/competitions/event-modes`,
+        validateStatus: (response, result) => {
+          return response.status === 200 && !result.isError
+        }, 
+      }),
+      providesTags: ['Competition', 'EventMode']
+    }),
   }),
 })
 
 
 export const { 
-  useGetTagsQuery
+  useGetTagsQuery, useGetEventModesQuery
 } = tagsApiSlice

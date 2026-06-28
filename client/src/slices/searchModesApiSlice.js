@@ -11,9 +11,19 @@ export const searchModesApiSlice = wodmatchApiSlice.injectEndpoints({
       }),
       providesTags: ['SearchMode']
     }),
+    handleUserSearchMode: builder.mutation({
+      query: data => ({
+          url: `/searchModes/handle-user-search-mode`,
+          method: 'POST',
+          body: {
+              ...data,
+          }
+      }),
+      invalidatesTags: ['SearchMode', 'User']
+    }),
   }),
 })
 
 export const { 
-  useGetSearchModesQuery
+  useGetSearchModesQuery, useHandleUserSearchModeMutation
 } = searchModesApiSlice

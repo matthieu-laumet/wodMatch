@@ -1,4 +1,3 @@
-// components/InputText.jsx
 export default function InputText({ 
   label, name, register, errors, type = "text", inputMode = null, placeholder, className, inputClassName, labelClassName,
 }) {

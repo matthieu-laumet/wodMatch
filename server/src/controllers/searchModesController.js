@@ -1,4 +1,4 @@
-const { getAllSearchModes } = require("../models/searchModes.model");
+const { getAllSearchModes, upsertUserSearchMode } = require("../models/searchModes.model");
 
 
 async function getSearchModes(req, res) {
@@ -11,19 +11,18 @@ async function getSearchModes(req, res) {
   }
 }
 
-// async function CleanUpsertUserSearchModes(req, res) {
-//   try {
-//     const { searchModeIds } = req.body;
-//     const id_user = req.id_user;
-//     const result = await replaceUserSearchModes({ id_user, searchModeIds });
-//     res.status(200).send(result);
-//   } catch (error) {
-//     console.log(error.message)
-//     res.status(500).json({ error: 'Erreur serveur' });
-//   }
-// }
+async function handleUserSearchMode(req, res) {
+  try {
+    const { id_search_mode } = req.body;
+    const id_user = req.id_user;
+    const result = await upsertUserSearchMode({ id_user, id_search_mode });
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+}
 
 module.exports = {
-  getSearchModes, 
-  // CleanUpsertUserSearchModes
+  getSearchModes, handleUserSearchMode
 }

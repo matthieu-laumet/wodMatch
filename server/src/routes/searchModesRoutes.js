@@ -10,12 +10,12 @@ const validateProtectedRoutes = require('../../middleware/validateProtectedRoute
 router.get('/gets-all-searchModes', searchModesController.getSearchModes);
 
 // // ==================== PROTECTION ====================
-// router.use(validateProtectedRoutes([
-//   '/clean-upsert-user-searchModes'
-// ]));
-// router.use(verifyJWT); // Tout ce qui suit nécessite JWT
+router.use(validateProtectedRoutes([
+  '/handle-user-search-mode'
+]));
+router.use(verifyJWT); // Tout ce qui suit nécessite JWT
 // // ====================================================
-// router.post('/clean-upsert-user-searchModes', searchModesController.CleanUpsertUserSearchModes);
+router.post('/handle-user-search-mode', searchModesController.handleUserSearchMode);
 
 
 module.exports = router;

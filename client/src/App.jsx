@@ -31,10 +31,6 @@ function App() {
     return () => window.removeEventListener('resize', documentHeight);
   }, []);
 
-  const [currentCompetId, setCurrentCompetId] = useState(
-    () => localStorage.getItem('currentCompetId') // lazy init ✅ réactif au mount
-  );
-
   return (
     <>
       <ToastContainer
@@ -45,10 +41,10 @@ function App() {
         <Route element={<PersistLogin />}>
           <Route path='/' element={<Layout />}>
             <Route element={<RequireAuth />}>
-              <Route index element={currentCompetId ? <ExploreWorld /> : <Competitions />} />
+              <Route index element={<Competitions />} />
+              <Route path='/competitions/:id_competition' element={<ExploreWorld />} />
               <Route path='/welcome' element={<WelcomeOnBoard />} />
               <Route path='/onboarding' element={<Onboarding />} />
-              <Route path='/competitions' element={<Competitions />} />
               <Route path='/favoris' element={<Profil />} />
               <Route path='/chat' element={<Profil />} />
               <Route path='profil'>

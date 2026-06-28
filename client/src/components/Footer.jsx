@@ -24,13 +24,8 @@ export default function Footer() {
     navigate(link)
   }
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  const isActive = (path) => location.pathname === path;
   const fillClass = (path) => isActive(path) ? `-fill text-[#df0000]` : '';
-  const trophyClass = () => {
-    const activePaths = ['/', '/competitions'];
-    if (!currentCompetId && activePaths.includes(location.pathname)) return `-fill text-[#df0000]`;
-    return fillClass('/competitions')
-  }
 
   const noFooterPaths = ['/profil/edit', '/profil/edit-pictures']
   const noFooterPrefixes = ['/profil/settings']
@@ -44,7 +39,10 @@ export default function Footer() {
   if (auth?.user?.has_seen_wodmatch_welcome) {
     content = 
       <div className="footer-icons-containe">
-        <i className={`bi bi-trophy${trophyClass()} cursor-pointer text-2xl`} onClick={() => handleNavigate('/competitions')}></i>
+        {location.pathname.startsWith('/competitions') && 
+          <i className={`bi bi-hand-index-fill text-[#df0000] cursor-pointer text-2xl`} onClick={() => handleNavigate('/')}></i>
+        }
+        <i className={`bi bi-trophy${fillClass('/')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/')}></i>
         <i className={`bi bi-heart${fillClass('/favoris')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/favoris')}></i>
         <i className={`bi bi-chat${fillClass('/chat')} cursor-pointer text-2xl`} onClick={() => handleNavigate('/chat')}></i>
         <i className={`bi bi-person${fillClass('/profil')} cursor-pointer text-3xl`} onClick={() => handleNavigate('/profil')}></i>

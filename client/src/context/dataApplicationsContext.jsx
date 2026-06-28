@@ -24,18 +24,20 @@ const dataApplicationsContext = createContext({
 export const AppDataProvider = ({ children }) => {
   const [auth, setAuth] = useState([]);
   const [activeInput, setActiveInput] = useState(null); 
-  const [filterCompetitions, setFilterCompetitions] = useState([
+  const [filters, setFilters] = useState([
     { minPrice: MINPRICE, maxPrice: MAXPRICE }, 
     {departements: []}
   ]);
   const [isConnected, setIsConnected] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [searchCompetsResults, setSearchCompetsResults] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   return (
     <dataApplicationsContext.Provider value={{
       auth, setAuth, isConnected, setIsConnected, windowWidth, setWindowWidth, 
-      isAuthLoading, setIsAuthLoading, activeInput, setActiveInput, filterCompetitions, setFilterCompetitions
+      isAuthLoading, setIsAuthLoading, activeInput, setActiveInput, filters, setFilters,
+      searchCompetsResults, setSearchCompetsResults
     }}>
       {children}
     </dataApplicationsContext.Provider>
