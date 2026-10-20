@@ -25,7 +25,7 @@ const Onboarding = () => {
   };
 
   const handleNext = async () => {
-    if (isDisabled) return
+    // if (isDisabled) return
     window.scroll(0, 0);
     if (section === 3) {
       return await handleSubmitOnboarding();
@@ -75,7 +75,7 @@ const Onboarding = () => {
       <div className="mt-auto pb-6">
         <button
           onClick={handleNext}
-          disabled={isDisabled}
+          // disabled={isDisabled}
           className={`w-full py-4 rounded-2xl text-white font-semibold text-lg transition-all
             ${isDisabled ? 'bg-[#222] opacity-40 cursor-not-allowed' : 'bg-[#222] active:scale-95'}`}
         >

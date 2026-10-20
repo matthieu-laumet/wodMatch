@@ -1,4 +1,10 @@
-const { getImageRaw, uploadOneImg, listTempImages, getUserTempImagesService, reorderTempImagesService } = require('../services/leevia.service');
+const path = require('path');
+const { pipeline } = require('stream');
+const sharp = require('sharp');
+const {
+  getImageRaw, uploadOneImg, getUserTempImagesService, reorderTempImagesService,
+  listUserTempFilenamesService, invalidateTempList,
+} = require('../services/leevia.service');
 const { webdavClient } = require('../utils/leevia.utils');
 const crypto = require('crypto');
 
@@ -59,6 +65,7 @@ async function uploadTempImages(req, res) {
     const results = await Promise.all(
       req.files.map(file => uploadOneImg({ file, prefix: `temp/${id_user}/`, slot }))
     );
+    invalidateTempList(id_user);
     res.json(results);
   } catch (error) {
     console.error('Erreur upload temp:', error.message);
@@ -71,9 +78,11 @@ async function reorderTempImages(req, res) {
     const id_user = req.id_user;
     const { filenames } = req.body; // tableau ordonné des filenames actuels
     const results = await reorderTempImagesService({ filenames, id_user })
+    invalidateTempList(id_user);
     res.json(results);
   } catch (error) {
     console.error('Erreur reorder:', error.message);
+    if (error.message === 'Nom de fichier invalide') return res.status(400).json({ error: error.message });
     res.status(500).json({ error: "Erreur lors du renommage" });
   }
 }
@@ -85,6 +94,9 @@ async function getUserTempImages(req, res) {
     res.json(images);
   } catch (error) {
     console.error('Erreur getUserTempImages:', error.message);
+    if (error.response?.status === 429) {
+      return res.status(503).json({ error: 'Stockage temporairement saturé, réessayez dans un instant' });
+    }
     res.status(500).json({ error: 'Erreur lors de la récupération des images' });
   }
 }
@@ -100,6 +112,7 @@ async function deleteTempImage(req, res) {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     await webdavClient.delete(filename);
+    invalidateTempList(id_user);
     res.json({ success: true });
   } catch (error) {
     console.error('Erreur suppression temp:', error.message);
@@ -107,6 +120,47 @@ async function deleteTempImage(req, res) {
   }
 }
 
+
+async function listTempImagesNames(req, res) {
+  try {
+    res.json(await listUserTempFilenamesService(req.id_user));
+  } catch (error) {
+    console.error('Erreur listTempImagesNames:', error.message);
+    const status = error.response?.status === 429 ? 503 : 500;
+    res.status(status).json({ error: 'Erreur lors de la récupération des images' });
+  }
+}
+
+async function getTempImage(req, res) {
+  const name = path.basename(req.params.filename);
+  if (!/\.(jpe?g|png|webp)$/i.test(name)) return res.sendStatus(400);
+
+  try {
+    const upstream = await webdavClient.get(`temp/${req.id_user}/${name}`, {
+      responseType: 'stream',
+    });
+    res.set({
+      'Content-Type': 'image/jpeg',
+      'Cache-Control': 'private, max-age=86400',
+    });
+    const thumb = sharp()
+      .rotate()
+      .resize({ width: 600, withoutEnlargement: true })
+      .jpeg({ quality: 80 });
+
+    pipeline(upstream.data, thumb, res, err => {
+      if (err) {
+        console.error('Erreur stream thumb:', err.message);
+        if (!res.headersSent) res.sendStatus(500);
+      }
+    });
+  } catch (e) {
+    res.sendStatus(e.response?.status === 404 ? 404 : 502);
+  }
+}
+
+
 module.exports = {
-  getImage, uploadImg, uploadTempImages, getUserTempImages, reorderTempImages, deleteTempImage
+  getImage, uploadImg, uploadTempImages, getUserTempImages, reorderTempImages,
+  deleteTempImage, listTempImagesNames, getTempImage,
 }

@@ -2,6 +2,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 
 const WEBDAV_URL = process.env.WEBDAV_URL; // ex: https://webdav.leevia.com/ton-espace
+const RETRYABLE = ['get', 'propfind', 'head'];
 
 const webdavClient = axios.create({
   baseURL: WEBDAV_URL, // ✅ manquait
@@ -11,6 +12,22 @@ const webdavClient = axios.create({
   },
   timeout: 10000
 });
+
+
+webdavClient.interceptors.response.use(undefined, async (error) => {
+  const cfg = error.config;
+  const method = cfg?.method?.toLowerCase();
+  if (error.response?.status !== 429 || !cfg || !RETRYABLE.includes(method)) throw error;
+
+  cfg.__retry = (cfg.__retry || 0) + 1;
+  if (cfg.__retry > 3) throw error;
+
+  const retryAfter = Number(error.response.headers?.['retry-after']);
+  const delay = retryAfter ? retryAfter * 1000 : 500 * 2 ** cfg.__retry;
+  await new Promise(r => setTimeout(r, delay));
+  return webdavClient.request(cfg);
+});
+
 
 // Méthode MKCOL pour créer un dossier en WebDAV
 webdavClient.createDirectory = async (dirPath) => {

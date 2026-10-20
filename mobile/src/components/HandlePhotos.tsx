@@ -11,6 +11,7 @@ import Animated, {
 import { useWodmatchApi } from '../lib/api';
 import { MAX_PHOTOS } from '../constants/config';
 import CropModal from './CropModal';
+import { File } from 'expo-file-system';
 
 type Photo = { id: string; filename: string; uri: string };
 type Props = {
@@ -137,8 +138,11 @@ export default function HandlePhotos({ setBtnText, setIsDisabled, btnText = 'Sui
   const cellHeight = Math.floor(cellWidth * (4 / 3));
 
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [cropSource, setCropSource] = useState<{ uri: string; width: number; height: number } | null>(null);
+  type Picked = { uri: string; width: number; height: number };
+  const [cropQueue, setCropQueue] = useState<Picked[]>([]);
+  const cropSource = cropQueue[0] ?? null; // photo en cours de recadrage
   const [loadingCount, setLoadingCount] = useState(0);
+  const [batchTotal, setBatchTotal] = useState(0);
   const [initialLoading, setInitialLoading] = useState(true);
   const busy = useRef(false); // évite deux suppressions / réordonnancements en parallèle
   const photosRef = useRef<Photo[]>([]);
@@ -187,27 +191,32 @@ export default function HandlePhotos({ setBtnText, setIsDisabled, btnText = 'Sui
       body: JSON.stringify({ filenames: list.map(p => p.filename) }),
     });
 
-  // 1) sélection rapide (pas d'éditeur natif), puis ouverture du recadrage
   const addPhoto = async () => {
+    const remaining = MAX_PHOTOS - photos.length - loadingCount;
+    if (remaining <= 0) return;
+
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: false,
+      allowsMultipleSelection: true,
+      selectionLimit: remaining, // impossible d'en choisir plus que la place restante
+      orderedSelection: true,    // iOS : numérote dans l'ordre de sélection (ignoré si non supporté)
       quality: 1,
     });
     if (res.canceled) return;
-    const a = res.assets[0];
-    setCropSource({ uri: a.uri, width: a.width, height: a.height });
+
+    const picked = res.assets.map(a => ({ uri: a.uri, width: a.width, height: a.height }));
+    setBatchTotal(picked.length);
+    setCropQueue(picked);
   };
 
-  // 2) upload de l'image déjà recadrée et compressée
   const uploadPhoto = async (uri: string) => {
-    setCropSource(null);
     const slot = photos.length + loadingCount;
 
     setLoadingCount(c => c + 1);
     try {
       const form = new FormData();
-      form.append('files', { uri, name: `photo-${Date.now()}.jpg`, type: 'image/jpeg' } as any);
+      form.append('files', new File(uri), `photo-${Date.now()}.jpg`);
       form.append('slot', String(slot));
 
       const results = await api('/images/upload-temp-images', { method: 'POST', body: form });
@@ -298,6 +307,7 @@ export default function HandlePhotos({ setBtnText, setIsDisabled, btnText = 'Sui
       <Text style={styles.text}>
         Montre à une team pourquoi elle doit te choisir. Sélectionne des photos qui révèlent tes talents d'athlète.
       </Text>
+      <Text style={styles.count}>{totalUsed}/{MAX_PHOTOS} photos</Text>
 
       {initialLoading ? (
         <ActivityIndicator color="#222" style={{ marginTop: 32 }} />
@@ -356,8 +366,12 @@ export default function HandlePhotos({ setBtnText, setIsDisabled, btnText = 'Sui
           uri={cropSource.uri}
           imgWidth={cropSource.width}
           imgHeight={cropSource.height}
-          onConfirm={uploadPhoto}
-          onCancel={() => setCropSource(null)}
+          progress={batchTotal > 1 ? `${batchTotal - cropQueue.length + 1}/${batchTotal}` : undefined}
+          onConfirm={uri => {
+            setCropQueue(q => q.slice(1));
+            uploadPhoto(uri);
+          }}
+          onCancel={() => setCropQueue([])}
         />
       )}
     </View>
@@ -370,7 +384,7 @@ const styles = StyleSheet.create({
 
   abs: { position: 'absolute', left: 0, top: 0 },
   center: { alignItems: 'center', justifyContent: 'center' },
-
+  count: { fontSize: 14, color: '#555', marginBottom: 12 },
   card: { borderRadius: 12, overflow: 'hidden', borderWidth: 2, borderColor: '#000' },
   chip: {
     position: 'absolute',
@@ -384,7 +398,7 @@ const styles = StyleSheet.create({
   },
 
   slot: { borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', borderColor: '#bbb' },
-  add: { backgroundColor: '#f3f3f3', borderColor: '#505050' },
+  add: { backgroundColor: '#fff', borderColor: '#505050' },
   plus: { fontSize: 28, color: '#111' },
 
   hint: { marginTop: 16, fontSize: 14, color: '#555' },

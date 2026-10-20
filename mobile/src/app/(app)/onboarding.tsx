@@ -193,10 +193,10 @@ export default function Onboarding() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
+  screen: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 24, paddingTop: 24 },
-  track: { flex: 1, height: 6, borderRadius: 3, backgroundColor: '#eee', overflow: 'hidden' },
-  bar: { height: 6, backgroundColor: '#222' },
+  track: { flex: 1, height: 6, borderRadius: 3, backgroundColor: '#d4d2d2', overflow: 'hidden' },
+  bar: { height: 6, backgroundColor: '#df0000' },
   carousel: { flex: 1, overflow: 'hidden' },
   content: { paddingHorizontal: 24, paddingTop: 16, paddingBottom: 24 },
   footer: { padding: 24, paddingTop: 8 },

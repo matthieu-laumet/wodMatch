@@ -9,7 +9,13 @@ export default function AppLayout() {
 
   return (
     <OnboardingProvider>
-      <Stack screenOptions={{ headerShown: true, header: () => <Navbar /> }}>
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          header: () => <Navbar />,
+          contentStyle: { backgroundColor: '#f5f5f5' }, // ← cette ligne
+        }}
+      >
         {/* Nouveaux utilisateurs : uniquement welcome + onboarding */}
         <Stack.Protected guard={isNewUser}>
           <Stack.Screen name="welcome" />

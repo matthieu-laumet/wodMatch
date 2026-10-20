@@ -53,10 +53,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccessTokenState(t);
   };
 
-  const signOut = async () => {
+   // Nettoyage local uniquement
+  const clearSession = async () => {
     await SecureStore.deleteItemAsync(REFRESH_KEY);
     setToken(null);
     setUser(null);
+  };
+
+  // Déconnexion volontaire : on prévient le serveur, puis on nettoie
+  const signOut = async () => {
+    try {
+      const refreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+      await fetch(`${WODZONE}/api/users/logout`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(5000),
+        headers: {
+          ...BASE_HEADERS,
+          'Content-Type': 'application/json',
+          ...(tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {}),
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+    } catch (e) {
+      console.warn('logout serveur', e);
+    } finally {
+      await clearSession();
+    }
   };
 
   const doRefresh = () => {

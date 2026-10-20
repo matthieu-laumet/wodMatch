@@ -13,9 +13,10 @@ type Props = {
   imgHeight: number;
   onConfirm: (uri: string) => void;
   onCancel: () => void;
+  progress?: string; // ex: "2/4"
 };
 
-export default function CropModal({ uri, imgWidth, imgHeight, onConfirm, onCancel }: Props) {
+export default function CropModal({ uri, imgWidth, imgHeight, progress, onConfirm, onCancel }: Props) {
   const { width: screenW } = useWindowDimensions();
   const [busy, setBusy] = useState(false);
 
@@ -103,7 +104,7 @@ export default function CropModal({ uri, imgWidth, imgHeight, onConfirm, onCance
   return (
     <Modal visible animationType="slide" onRequestClose={onCancel}>
       <GestureHandlerRootView style={styles.root}>
-        <Text style={styles.title}>Recadre ta photo</Text>
+        <Text style={styles.title}>Recadre ta photo{progress ? ` (${progress})` : ''}</Text>
         <Text style={styles.hint}>Glisse pour déplacer, pince pour zoomer</Text>
 
         <GestureDetector gesture={gesture}>
