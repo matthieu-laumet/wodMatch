@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useWodmatchApi } from '../../lib/api';
 import { useOnboarding } from '../../context/OnboardingContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TITLE_APP = 'wodMatch';
 const GOLD = '#c9a227';
@@ -31,7 +32,18 @@ export default function Welcome() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} color={DARK} />;
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem('onboardActive')
+      .then(v => {
+        if (v === '1') router.replace('/onboarding');
+        else setChecking(false);
+      })
+      .catch(() => setChecking(false));
+  }, []);
+
+  if (checking || loading) return <ActivityIndicator style={{ flex: 1 }} color={DARK} />;
 
   const canContinue = data.searchMode !== null;
 

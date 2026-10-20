@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function RootNavigator() {
   const { user, isLoading } = useAuth();
@@ -23,8 +24,10 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

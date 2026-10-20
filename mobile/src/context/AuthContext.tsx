@@ -7,6 +7,8 @@ SplashScreen.preventAutoHideAsync();
 const WODZONE = process.env.EXPO_PUBLIC_WODZONE_URL;
 const WODMATCH = process.env.EXPO_PUBLIC_WODMATCH_URL;
 const REFRESH_KEY = 'refreshToken';
+const API_KEY = process.env.EXPO_PUBLIC_MOBILE_API_KEY;
+const BASE_HEADERS: Record<string, string> = { 'x-client': 'mobile', ...(API_KEY ? { 'x-api-key': API_KEY } : {}), };
 
 type User = { email: string; has_seen_wodmatch_welcome?: boolean; [k: string]: any };
 
@@ -29,7 +31,7 @@ async function fetchWmUser(token: string) {
   const url = `${WODMATCH}/api/users/get-current-wm-user`;
   try {
     const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}`, 'x-client': 'mobile' },
+      headers: { ...BASE_HEADERS, Authorization: `Bearer ${token}` },
     });
     const text = await res.text();
     if (res.ok) return JSON.parse(text);
@@ -65,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!refreshToken) return null;
           const res = await fetch(`${WODZONE}/api/refresh`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-client': 'mobile' },
+            headers: { ...BASE_HEADERS, 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),
           });
           const text = await res.text();
@@ -109,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, pwd: string) => {
     const res = await fetch(`${WODZONE}/api/users/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-client': 'mobile' },
+      headers: { ...BASE_HEADERS, 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.toLowerCase().trim(), pwd }),
     });
     const data = await res.json().catch(() => ({}));

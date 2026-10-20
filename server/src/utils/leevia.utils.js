@@ -12,7 +12,7 @@ const webdavClient = axios.create({
   timeout: 10000
 });
 
-// ✅ Méthode MKCOL pour créer un dossier en WebDAV
+// Méthode MKCOL pour créer un dossier en WebDAV
 webdavClient.createDirectory = async (dirPath) => {
   const parts = dirPath.replace(/\/$/, '').split('/');
   let current = '';

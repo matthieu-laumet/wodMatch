@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext';
 
 const WODZONE = process.env.EXPO_PUBLIC_WODZONE_URL;
 const WODMATCH = process.env.EXPO_PUBLIC_WODMATCH_URL;
+const API_KEY = process.env.EXPO_PUBLIC_MOBILE_API_KEY;
 
 function useApi(base: string) {
   const { getAccessToken, refresh } = useAuth();
@@ -13,6 +14,7 @@ function useApi(base: string) {
         ...init,
         headers: {
           'x-client': 'mobile',
+          ...(API_KEY ? { 'x-api-key': API_KEY } : {}),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...(init.body && !isForm ? { 'Content-Type': 'application/json' } : {}),
           ...init.headers,
