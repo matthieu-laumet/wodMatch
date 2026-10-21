@@ -52,7 +52,11 @@ async function updateUserService({ id_user, type, payload }) {
     if (isUsed) throw Object.assign(new Error('Téléphone déjà utilisé...'), { status: 409 });
     await updateOneUserTelephone({ telephone: normalizedNew, id_user });
   }
-  await sendEmail({ object: 'updated_info', inputUpdated: type, email: currentEmail });
+  try {
+    await sendEmail({ object: 'updated_info', inputUpdated: type, email: currentEmail });
+  } catch (e) {
+    console.error('[updateUserService] notification non envoyée:', e.message);
+  }
   return { message: 'ok' };
 }
 

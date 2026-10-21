@@ -25,7 +25,7 @@ router.post('/add-blocked-user', usersController.addBlockedUser);
 router.put('/update-user-email', usersController.updateUserEmail);
 router.put('/update-user-telephone', usersController.updateUserTelephone);
 router.put('/handle-hide-user-profil', usersController.handleHideUserProfil);
-router.delete('/delete-blocked-user/:id_user_blocked/:blocked_email', usersController.deleteBlockedUser);
+router.delete('/delete-blocked-user/:id_blocked_user_contact', usersController.deleteBlockedUser);
 
 
 module.exports = router;

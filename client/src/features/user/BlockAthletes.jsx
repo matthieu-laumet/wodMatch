@@ -19,7 +19,7 @@ export default function BlockAthletes() {
 
   const handleDelete = async (contact) => {
     try {
-      await deleteBlockedUser({ id_user_blocked: contact.id_user_blocked, blocked_email: contact.blocked_email })
+      await deleteBlockedUser({ id_blocked_user_contact: contact.id_blocked_user_contact })
     } catch (error) {
       console.log(error)
     }

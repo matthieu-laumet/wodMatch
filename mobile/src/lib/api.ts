@@ -28,7 +28,11 @@ function useApi(base: string) {
     }
 
     const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(data?.error || data?.message || `Erreur ${res.status}`);
+    if (!res.ok) {
+      const err: any = new Error(data?.error || data?.message || `Erreur ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
     return data;
   };
 }

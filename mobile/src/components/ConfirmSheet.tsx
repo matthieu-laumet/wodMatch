@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Modal, Pressable, StyleSheet, Text } from 'react-native';
+import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { gray } from '@/constants/theme';
 import { BlurView } from 'expo-blur';
@@ -10,10 +11,11 @@ type Props = {
   onCancel: () => void;
   confirmLabel?: string;
   cancelLabel?: string;
+  message?: string; // nouveau : affiche la carte avec l'icône d'alerte
 };
 
 export default function ConfirmSheet({
-  visible, onConfirm, onCancel, confirmLabel = 'Supprimer', cancelLabel = 'Annuler',
+  visible, onConfirm, onCancel, message, confirmLabel = 'Supprimer', cancelLabel = 'Annuler',
 }: Props) {
   const insets = useSafeAreaInsets();
   const anim = useRef(new Animated.Value(0)).current;
@@ -38,6 +40,13 @@ export default function ConfirmSheet({
         <Animated.View
           style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 12) + 32, transform: [{ translateY }] }]}
         >
+          {message ? (
+            // Pressable vide : évite qu'un tap sur la carte ferme la feuille
+            <Pressable style={styles.card} onPress={() => {}}>
+              <MaterialCommunityIcons name="alert" size={36} color="#f5a623" />
+              <Text style={styles.message}>{message}</Text>
+            </Pressable>
+          ) : null}
           <Pressable style={styles.btn} onPress={onConfirm}>
             <Text style={[styles.text, styles.confirm]}>{confirmLabel}</Text>
           </Pressable>
@@ -53,6 +62,11 @@ export default function ConfirmSheet({
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   sheet: { paddingHorizontal: 12, gap: 12 },
+  card: {
+    backgroundColor: '#fff', borderRadius: 16, paddingVertical: 24, paddingHorizontal: 20,
+    alignItems: 'center', gap: 14, marginBottom: 12,
+  },
+  message: { fontSize: 16, lineHeight: 22, color: gray.g08, textAlign: 'center' },
   btn: { backgroundColor: '#fff', borderRadius: 16, paddingVertical: 22, alignItems: 'center' },
   text: { fontSize: 17, fontWeight: '600', letterSpacing: 1 },
   confirm: { color: '#e53935' },

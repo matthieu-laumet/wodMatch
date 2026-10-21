@@ -90,18 +90,8 @@ export const usersApiSlice = wodmatchApiSlice.injectEndpoints({
       invalidatesTags: ['User']
     }),
     deleteBlockedUser: builder.mutation({
-      query: data => ({
-          url: `/users/delete-blocked-user`,
-          method: 'PUT',
-          body: {
-              ...data,
-          }
-      }),
-      invalidatesTags: ['User']
-    }),
-    deleteBlockedUser: builder.mutation({
-      query: ({ id_user_blocked, blocked_email }) => ({  // ← destructure l'objet
-        url: `/users/delete-blocked-user/${id_user_blocked}/${encodeURIComponent(blocked_email)}`,
+      query: ({ id_blocked_user_contact }) => ({  // ← destructure l'objet
+        url: `/users/delete-blocked-user/${id_blocked_user_contact}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['User', 'Blocked']  // ← doit être au même niveau que query

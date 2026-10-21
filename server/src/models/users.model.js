@@ -163,10 +163,10 @@ async function insertOneBlockedUser({ id_user, blocked_email, contact_fullname, 
   );
 }
 
-async function deleteOneBlockedUser({ id_user, blocked_email, id_user_blocked }) {
+async function deleteOneBlockedUser({ id_user, id_blocked_user_contact }) {
   await pool().query(
-    `DELETE FROM wodmatch.blocked_user_contacts WHERE id_user=$1 AND (blocked_email=$2 OR id_user_blocked=$3)
-    ;`, [id_user, blocked_email, id_user_blocked]
+    `DELETE FROM wodmatch.blocked_user_contacts WHERE id_user = $1 AND id_blocked_user_contact = $2`,
+    [id_user, id_blocked_user_contact]
   );
 }
 

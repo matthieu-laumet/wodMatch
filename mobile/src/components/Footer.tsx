@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { gray } from '@/constants/theme';
+import { navigateGuarded } from '@/lib/leaveGuard';
 
 const RED = '#df0000';
 
@@ -46,7 +47,7 @@ export default function Footer() {
             key={item.path}
             style={styles.item}
             hitSlop={8}
-            onPress={() => !active && router.replace(item.path as any)}
+            onPress={() => !active && navigateGuarded(() => router.replace(item.path as any))}
           >
             <Ionicons
               name={active ? item.iconActive : item.icon}

@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { navigateGuarded } from '@/lib/leaveGuard';
 
 const NAV_HEIGHT = 60;
 
@@ -22,7 +23,7 @@ export default function Navbar({ right }: Props) {
 
   return (
     <View style={[styles.nav, { paddingTop: insets.top, height: NAV_HEIGHT + insets.top }]}>
-      <Pressable onPress={() => router.push('/' as any)}>
+      <Pressable onPress={() => navigateGuarded(() => router.replace('/' as any))}>
         <Image
           source={require('../../assets/images/logo_home.png')}
           style={styles.logo}

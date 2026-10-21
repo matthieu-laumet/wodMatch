@@ -10,6 +10,7 @@ async function sendEmail(emailData) {
     });
   } catch (error) {
     console.error('[sendEmail]', error.message);
+    console.error('[sendEmail]', error.message, error.response?.status, error.response?.data);
     throw new Error('Erreur envoi email');
   }
 }

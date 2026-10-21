@@ -214,13 +214,13 @@ export default function Settings({ }) {
             label="Règle et Communauté" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
           />
           <EditableLine
-            label="Politique relative au cookies" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
+            label="Politique relative au cookies" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://www.app.wodzone.fr/cookie-policy', '_blank')}
           />
           <EditableLine
             label="Politique de confidentialité" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr/topics/about/62', '_blank')}
           />
           <EditableLine
-            label="Condition d'utilisation" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr', '_blank')}
+            label="Condition de service" value={null} className="mt-[-1px]"  onClick={(e) => handleNavigate(e, 'https://help.wodzone.fr/topics/about/60', '_blank')}
           />
 
           <div className="full-line block mt-12" onClick={handleLogout}>

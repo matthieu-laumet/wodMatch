@@ -103,12 +103,14 @@ async function addBlockedUser(req, res) {
 
 async function deleteBlockedUser(req, res) {
   try {
-    const id_user = req.id_user;
-    const { id_user_blocked, blocked_email } = req.params;
-    await deleteOneBlockedUser({ id_user, id_user_blocked, blocked_email });
-    res.status(200).send({ message: 'insertion ok'});
+    const id_blocked_user_contact = Number(req.params.id_blocked_user_contact);
+    if (!Number.isInteger(id_blocked_user_contact) || id_blocked_user_contact <= 0) {
+      return res.status(400).json({ error: 'Requête invalide' });
+    }
+    await deleteOneBlockedUser({ id_user: req.id_user, id_blocked_user_contact });
+    res.status(200).json({ message: 'suppression ok' });
   } catch (error) {
-    console.log('[handleHideUserProfil]', error.message)
+    console.log('[deleteBlockedUser]', error.message);
     res.status(error.status || 500).json({ error: 'Erreur serveur' });
   }
 }
