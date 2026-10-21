@@ -5,9 +5,14 @@ import { useOnboarding } from '../../context/OnboardingContext';
 import { SvgUri } from 'react-native-svg';
 
 type Level = { id_level: number; label: string; icon: string };
-type Props = { setBtnText: (t: string) => void; setIsDisabled: (b: boolean) => void };
+type Props = {
+  setBtnText: (t: string) => void;
+  setIsDisabled: (b: boolean) => void;
+  variant?: 'onboarding' | 'edit';
+};
 
-export default function OnboardLevel({ setBtnText, setIsDisabled }: Props) {
+export default function OnboardLevel({ setBtnText, setIsDisabled, variant = 'onboarding' }: Props) {
+  const edit = variant === 'edit';
   const api = useWodmatchApi();
   const { data, set } = useOnboarding();
   const selected: Level[] = data.levels ?? [];
@@ -31,19 +36,29 @@ export default function OnboardLevel({ setBtnText, setIsDisabled }: Props) {
 
   return (
     <View>
-      <Text style={styles.title}>Quel est ton niveau de Fitness ?</Text>
-      <Text style={styles.text}>Promis c'est la dernière étape.{'\n'}Tu peux choisir plusieurs propositions</Text>
-      
-      <View style={{ marginTop: 32 }}>
+      {edit ? (
+        <Text style={styles.sectionEdit}>Niveau de Fitness</Text>
+      ) : (
+        <>
+          <Text style={styles.title}>Quel est ton niveau de Fitness ?</Text>
+          <Text style={styles.text}>Promis c'est la dernière étape.{'\n'}Tu peux choisir plusieurs propositions</Text>
+        </>
+      )}
+
+      <View style={{ marginTop: edit ? 12 : 32 }}>
         {loading ? (
           <ActivityIndicator color="#222" style={{ marginTop: 24 }} />
         ) : (
           levels.map(level => {
             const on = selected.some(s => s.id_level === level.id_level);
             return (
-              <Pressable key={level.id_level} onPress={() => toggle(level)} style={[styles.item, on && styles.itemOn]}>
-                <SvgUri uri={level.icon} width={32} height={32} />
-                <Text style={styles.label}>{level.label}</Text>
+              <Pressable
+                key={level.id_level}
+                onPress={() => toggle(level)}
+                style={[styles.item, edit && styles.itemEdit, on && styles.itemOn]}
+              >
+                <SvgUri uri={level.icon} width={edit ? 28 : 32} height={edit ? 28 : 32} />
+                <Text style={[styles.label, edit && { fontSize: 14 }]}>{level.label}</Text>
               </Pressable>
             );
           })
@@ -54,6 +69,8 @@ export default function OnboardLevel({ setBtnText, setIsDisabled }: Props) {
 }
 
 const styles = StyleSheet.create({
+  sectionEdit: { fontSize: 18, fontWeight: '700', color: '#222' },
+  itemEdit: { paddingVertical: 10, marginBottom: 10, borderRadius: 8 },
   title: { fontSize: 22, fontWeight: '700', color: '#222', marginBottom: 6 },
   text: { fontSize: 15, color: '#555', lineHeight: 21 },
   item: {

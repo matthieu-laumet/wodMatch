@@ -118,7 +118,7 @@ export default function Onboarding() {
       await AsyncStorage.multiRemove([SECTION_KEY, ACTIVE_KEY]);
       reset();
       updateUser({ has_seen_wodmatch_welcome: result.has_seen_wodmatch_welcome });
-      router.replace('/'); // le web va sur /profil : adapte selon tes routes
+      router.replace('/profil' as any);
     } catch (e: any) {
       Alert.alert('Erreur', e.message);
     } finally {

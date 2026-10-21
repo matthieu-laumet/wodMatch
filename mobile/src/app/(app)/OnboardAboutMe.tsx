@@ -1,23 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Animated, Easing, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useWodmatchApi } from '../../lib/api';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { MAX_BIO_LENGTH, MAX_FUNREP_LENGTH } from '../../constants/config';
-import { Ionicons } from '@expo/vector-icons';
-
+import ConfirmSheet from '@/components/ConfirmSheet';
+import { gray } from '@/constants/theme';
 
 type FunRep = { id_fun_rep: number | null; label: string; description: string };
-type Props = { setBtnText: (t: string) => void; setIsDisabled: (b: boolean) => void };
+type Props = {
+  setBtnText: (t: string) => void;
+  setIsDisabled: (b: boolean) => void;
+  variant?: 'onboarding' | 'edit';
+};
 
-export default function OnboardAboutMe({ setBtnText, setIsDisabled }: Props) {
+export default function OnboardAboutMe({ setBtnText, setIsDisabled, variant = 'onboarding' }: Props) {
   const api = useWodmatchApi();
   const { data, set } = useOnboarding();
+  const edit = variant === 'edit';
   const filled: FunRep[] = data.funReps ?? [];
 
   const [allFunReps, setAllFunReps] = useState<FunRep[]>([]);
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<FunRep | null>(null);
+  const [pendingId, setPendingId] = useState<number | null>(null); // fun rep en attente de confirmation
 
   const [step, setStep] = useState<'list' | 'write'>('list');
   const [paneWidth, setPaneWidth] = useState(0);
@@ -87,18 +96,23 @@ export default function OnboardAboutMe({ setBtnText, setIsDisabled }: Props) {
   };
 
   const remove = (id: number | null) => set({ funReps: filled.filter(f => f.id_fun_rep !== id) });
+  const confirmRemove = (id: number | null) => setPendingId(id);
 
   return (
     <View>
-      <View style={styles.row}>
-        <Text style={styles.title}>À propos de moi</Text>
-        <Text style={styles.badge}>Important</Text>
-      </View>
-      <Text style={styles.text}>
-        Montre ta grinta 💪 Explique aux teams pourquoi tu mérites une place parmi eux. C'est ton moment !
-      </Text>
+      {!edit && (
+        <>
+          <View style={styles.row}>
+            <Text style={styles.title}>À propos de moi</Text>
+            <Text style={styles.badge}>Important</Text>
+          </View>
+          <Text style={styles.text}>
+            Montre ta grinta 💪 Explique aux teams pourquoi tu mérites une place parmi eux. C'est ton moment !
+          </Text>
+        </>
+      )}
 
-      <Text style={styles.label}>Bio :</Text>
+      <Text style={[styles.label, edit && styles.labelEdit]}>{edit ? "Ma bio d'athlète :" : 'Bio :'}</Text>
       <TextInput
         style={styles.textarea}
         multiline
@@ -109,27 +123,60 @@ export default function OnboardAboutMe({ setBtnText, setIsDisabled }: Props) {
       />
       <Text style={styles.counter}>{MAX_BIO_LENGTH - data.bio.length}</Text>
 
-      <Text style={[styles.title, { marginTop: 16 }]}>Fun reps</Text>
+      <Text style={[styles.title, edit ? styles.sectionEdit : { marginTop: 16 }]}>
+        {edit ? 'Fun Reps' : 'Fun reps'}
+      </Text>
       {filled.length === 0 && <Text style={styles.text}>Fais la différence avec une anecdote</Text>}
+
       {filled.map(f => (
-        <Pressable key={f.id_fun_rep} style={styles.card} onPress={() => openModal(f)}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cardLabel}>{f.label}</Text>
-            <Text style={styles.cardDesc}>{f.description}</Text>
-          </View>
-          <Pressable onPress={() => remove(f.id_fun_rep)} hitSlop={10}>
-            <Text style={{ fontSize: 18 }}>✕</Text>
+        <View key={f.id_fun_rep} style={{ marginTop: edit ? 16 : 10 }}>
+          <Pressable style={[styles.card, { marginTop: 0 }]} onPress={() => openModal(f)}>
+            <View style={{ flex: 1 }}>
+              <View style={styles.cardTitleRow}>
+                {edit && (
+                  <MaterialCommunityIcons
+                    name="kettlebell"
+                    size={24}
+                    color="#df0000"
+                    style={{ transform: [{ rotate: '-16deg' }], marginTop: -4 }}
+                  />
+                )}
+                <Text style={[styles.cardLabel, { flexShrink: 1 }, edit && { fontSize: 15 }]}>{f.label}</Text>
+              </View>
+              <Text style={[styles.cardDesc, edit && { paddingLeft: 30 }]}>{f.description}</Text>
+            </View>
+
+            {!edit && (
+              <Pressable onPress={() => confirmRemove(f.id_fun_rep)} hitSlop={10}>
+                <Text style={{ fontSize: 18 }}>✕</Text>
+              </Pressable>
+            )}
           </Pressable>
-        </Pressable>
+
+          {edit && (
+            <Pressable style={styles.removeBadge} onPress={() => confirmRemove(f.id_fun_rep)} hitSlop={8}>
+              <Ionicons name="close" size={16} color="#222" />
+            </Pressable>
+          )}
+        </View>
       ))}
+
       <Pressable style={styles.addBtn} onPress={() => openModal()}>
         <Text style={styles.cardLabel}>Ajouter une fun rep sur moi</Text>
         <Text style={styles.cardDesc}>Sois drôle, c'est ton moment</Text>
-
         <View style={styles.plusBadge}>
           <Ionicons name="add" size={20} color="#fff" />
         </View>
       </Pressable>
+
+      <ConfirmSheet
+        visible={pendingId !== null}
+        onCancel={() => setPendingId(null)}
+        onConfirm={() => {
+          remove(pendingId);
+          setPendingId(null);
+        }}
+      />
 
       <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
         <View style={styles.overlay}>
@@ -241,14 +288,20 @@ const styles = StyleSheet.create({
   addFunBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   title: { fontSize: 24, fontWeight: '600', color: '#222' },
-  badge: { backgroundColor: '#cc0000', color: '#fff', fontSize: 14, fontWeight: '700', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 6, overflow: 'hidden' },
+  badge: {
+    backgroundColor: '#cc0000', color: '#fff', fontSize: 14, fontWeight: '700', paddingHorizontal: 16,
+    paddingVertical: 8, borderRadius: 6, overflow: 'hidden',
+  },
   text: { fontSize: 16, color: '#222', marginVertical: 8 },
   label: { fontSize: 16, fontWeight: '700', color: '#222', marginTop: 16, marginBottom: 8 },
-  textarea: { borderWidth: 2, borderColor: '#9aa0a6', borderRadius: 10, padding: 12, minHeight: 180, fontSize: 16, color: '#222', backgroundColor: '#fff' },
+  textarea: {
+    borderWidth: 2, borderColor: '#9aa0a6', borderRadius: 10, padding: 12, minHeight: 180, fontSize: 16,
+    color: '#222', backgroundColor: '#fff',
+  },
   counter: { alignSelf: 'flex-end', color: '#777', marginTop: 4 },
-  card: { 
-    flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, borderWidth: 1.5, borderColor: '#9aa0a6', marginTop: 10,
-    backgroundColor: '#fff'
+  card: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, borderWidth: 1.5,
+    borderColor: '#9aa0a6', marginTop: 10, backgroundColor: '#fff',
   },
   cardLabel: { fontWeight: '700', fontSize: 16, color: '#222' },
   cardDesc: { color: '#555', marginTop: 2 },
@@ -257,12 +310,16 @@ const styles = StyleSheet.create({
     alignItems: 'center', backgroundColor: '#eceaea',
   },
   plusBadge: {
-    position: 'absolute', top: -16, right: -10, width: 32, height: 32, borderRadius: 999, 
+    position: 'absolute', top: -16, right: -10, width: 32, height: 32, borderRadius: 999,
     backgroundColor: '#cc0000', alignItems: 'center', justifyContent: 'center',
   },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 16 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: '#ccc' },
-  chipOn: { backgroundColor: '#222', borderColor: '#222' },
-  ok: { backgroundColor: '#222', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 20 },
-  okText: { color: '#fff', fontWeight: '700', fontSize: 17 },
+
+  // --- variante édition ---
+  labelEdit: { fontSize: 18, marginTop: 8 },
+  sectionEdit: { fontSize: 18, fontWeight: '700', marginTop: 40 },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
+  removeBadge: {
+    position: 'absolute', top: -12, right: -8, width: 28, height: 28, borderRadius: 14,
+    backgroundColor: '#fff', borderWidth: 1, borderColor: gray.g07, alignItems: 'center', justifyContent: 'center',
+  },
 });

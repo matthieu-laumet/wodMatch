@@ -24,6 +24,30 @@ export const Colors = {
   },
 } as const;
 
+export const brand = {
+  red: '#df0000',
+  dark: '#222222',
+} as const;
+
+export const gray = {
+  g005: '#f0f0f0',
+  g01: '#F5F5F5',
+  g02: '#ebebeb',
+  g025: '#e4e3e3',
+  g03: '#DCDCDC',
+  g04: '#D3D3D3',
+  g045: '#c4c4c4',
+  g05: '#bebebe',
+  g06: '#A9A9A9',
+  g065: '#9c9c9c',
+  g07: '#808080',
+  g08: '#696969',
+  g085: '#505050',
+  g09: '#303030',
+  g095: '#181818',
+  g10: '#130E0A',
+} as const;
+
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({

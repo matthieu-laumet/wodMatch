@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import { OnboardingProvider } from '@/context/OnboardingContext';
 import { Stack } from 'expo-router';
 import Navbar from '../../components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function AppLayout() {
   const { user } = useAuth();
@@ -24,10 +25,13 @@ export default function AppLayout() {
 
         {/* Utilisateurs existants : le reste de l'app */}
         <Stack.Protected guard={!isNewUser}>
-          <Stack.Screen name="index" />
-          {/* ajoute ici TOUS tes autres écrans de (app) */}
+          <Stack.Screen name="index" options={{ animation: 'none' }} />
+          <Stack.Screen name="favoris" options={{ animation: 'none' }} />
+          <Stack.Screen name="chat" options={{ animation: 'none' }} />
+          <Stack.Screen name="profil" options={{ animation: 'none' }} />
         </Stack.Protected>
       </Stack>
+      <Footer />
     </OnboardingProvider>
   );
 }
