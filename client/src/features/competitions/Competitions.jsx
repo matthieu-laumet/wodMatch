@@ -68,7 +68,7 @@ export default function Competitions() {
   if (auth.user.is_hidden) {
     return (
       <div className="full-screen pl-12 pr-12 pt-12 flex flex-col bg-profil-hiiden">
-        <h3 className="text-2xl font-semibold">Ton profil est maqué</h3>
+        <h3 className="text-2xl font-semibold">Ton profil est masqué</h3>
         <p className="mt-6 mb-6">
           Les WODs ne se font pas solo. Réaffiche ton profil pour retrouver ta prochaine équipe.
           Les Burppes, c'est quand même plus sympa à plusieurs

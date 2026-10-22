@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import * as SplashScreen from 'expo-splash-screen';
+import { Image } from 'expo-image';
+import { useQueryClient } from '@tanstack/react-query';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,6 +44,7 @@ async function fetchWmUser(token: string) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await SecureStore.deleteItemAsync(REFRESH_KEY);
     setToken(null);
     setUser(null);
+    queryClient.clear();
+    Image.clearMemoryCache();
+    await Image.clearDiskCache();
   };
 
   // Déconnexion volontaire : on prévient le serveur, puis on nettoie
