@@ -136,7 +136,7 @@ function CompetitionList() {
       stickySectionHeadersEnabled
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={s.content}
-      refreshControl={<RefreshControl refreshing={competsQ.isRefetching} onRefresh={() => competsQ.refetch()} />}
+      refreshControl={<RefreshControl refreshing={competsQ.isRefetching} onRefresh={() => { competsQ.refetch(); }} />}
     />
   );
 }

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, AntDesign, FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import GetImage from './GetImage';
 import { liaisonVille } from '../utils/textTransform';
@@ -9,9 +9,15 @@ import type { Competition } from '../types/competition';
 
 const MONTHS = ['JAN', 'FÉV', 'MARS', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
 
-type Props = { competition: Competition; isFavorite: boolean; showFavorite?: boolean; isLast?: boolean };
+type Props = {
+  competition: Competition;
+  isFavorite: boolean;
+  showFavorite?: boolean;
+  isLast?: boolean;
+  disabled?: boolean;
+};
 
-function CompetitionCard({ competition, isFavorite, showFavorite = true, isLast = false }: Props) {
+function CompetitionCard({ competition, isFavorite, showFavorite = true, isLast = false, disabled = false }: Props) {
   const toggleFavorite = useToggleFavorite();
 
   const prices = competition.divisions?.map(d => d.price) ?? [];
@@ -33,6 +39,7 @@ function CompetitionCard({ competition, isFavorite, showFavorite = true, isLast 
   return (
     <Pressable
       style={[s.card, isLast && s.cardLast]}
+      disabled={disabled}
       onPress={() => router.push(`/competitions/${competition.id_competition}`)}
     >
       <View style={s.left}>
@@ -51,7 +58,10 @@ function CompetitionCard({ competition, isFavorite, showFavorite = true, isLast 
           <Text style={s.modes} numberOfLines={1}>{modes}</Text>
           {showFavorite && (
             <Pressable hitSlop={12} onPress={() => toggleFavorite.mutate(competition.id_competition)}>
-              <Ionicons name={isFavorite ? 'star' : 'star-outline'} size={22} />
+              {isFavorite 
+                ? <AntDesign name={'star'} size={22} color={'#df0000'}/>
+                : <FontAwesome name="star-o" size={24} color="black" />
+              }
             </Pressable>
           )}
         </View>

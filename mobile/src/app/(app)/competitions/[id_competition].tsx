@@ -1,5 +1,9 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator, Pressable, StyleSheet, ScrollView, Text, View,
+  type ScrollViewInstance,
+} from 'react-native';
 import { Image } from 'expo-image';
+import { useRef, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -8,11 +12,11 @@ import { useAuth } from '../../../context/AuthContext';
 import { useCompetition, useHandleUserSearchMode, useSearchModes } from '../../../hooks/queries';
 import CompetitionCard from '../../../components/CompetitionCard';
 import SwipeElement from '../../../components/SwipeElement';
+import SearchFiltersModal from '@/components/SearchFiltersModal';
+import ParticipantDetails from '@/components/ParticipantDetails';
 
-const HERO_IMAGE =
-  'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782672401/77a1611d746ad20a1728e672eb9d681450587978_dd17zo.jpg';
-const NO_MORE_IMAGE =
-  'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782660790/drilldown_ptcaiy.jpg';
+const HERO_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782672401/77a1611d746ad20a1728e672eb9d681450587978_dd17zo.jpg';
+const NO_MORE_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782660790/drilldown_ptcaiy.jpg';
 
 const SWIPE_OVERLAP = 28; // moitié de la hauteur des boutons
 
@@ -47,6 +51,17 @@ export default function ExploreWorld() {
   const { data: competition, isLoading } = useCompetition(Number(id_competition));
   const { data: searchModes } = useSearchModes();
   const changeMode = useHandleUserSearchMode();
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const [heroH, setHeroH] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const toggleDetails = () => {
+    if (detailsOpen) {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+    }
+    setDetailsOpen(v => !v);
+  };
 
   const noMoreProfils = false; // TODO: viendra de l'API des profils
 
@@ -67,70 +82,123 @@ export default function ExploreWorld() {
 
   return (
     <View style={s.root}>
-      {/* Zone photo */}
-      <View style={s.hero}>
-        <Image source={{ uri: HERO_IMAGE }} style={StyleSheet.absoluteFill} contentFit="cover" />
-        <LinearGradient
-          colors={[
-            'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.5)',
-          ]}
-          locations={[0, 0.05, 0.2, 0.7, 0.9, 1]}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
-
-        <View style={[s.modeHeader, { paddingTop: 16 }]}>
-          <View style={s.modes}>
-            {searchModes?.map(mode => {
-              const isActive = user?.id_search_mode === mode.id_search_mode;
-              return (
-                <Pressable
-                  key={mode.id_search_mode}
-                  style={[s.modeBtn, isActive && s.modeBtnActive]}
-                  onPress={() => changeMode.mutate(mode.id_search_mode)}
-                >
-                  <Image source={{ uri: mode.icon }} style={s.modeIcon} contentFit="contain" />
-                  {isActive && <Text style={s.modeLabel}>{mode.label_short}</Text>}
-                </Pressable>
-              );
-            })}
-          </View>
-          {/* TODO: ouvrir les filtres de recherche */}
-          <Pressable hitSlop={8}>
-            <Ionicons name="options-outline" size={30} color="#fff" style={s.shadow} />
+      {detailsOpen && (
+        <View style={s.detailsHeader}>
+          <Ionicons name="people" size={28} color="#222" />
+          <Text style={s.detailsTitle} numberOfLines={1}>Timon & Pumba</Text>{/* TODO: nom du profil */}
+          <Pressable hitSlop={8} onPress={toggleDetails}>
+            <Ionicons name="close-circle-outline" size={34} color="#444" />
           </Pressable>
         </View>
+      )}
+      <ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        scrollEnabled={detailsOpen}
+        onLayout={e => { if (!detailsOpen) setHeroH(e.nativeEvent.layout.height); }}
+        contentContainerStyle={{ paddingBottom: detailsOpen ? insets.bottom - 30 : 0 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={[s.hero, { height: heroH }]}>
+          <Image source={{ uri: HERO_IMAGE }} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <LinearGradient
+            colors={[
+              'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.5)',
+            ]}
+            locations={[0, 0.05, 0.2, 0.7, 0.9, 1]}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
 
-        {/* TODO: remplacer par le profil affiché (placeholder identique au web) */}
-        <View style={s.participant}>
-          <View>
-            <Text style={[s.pName, s.shadow]}>Les pas là pour être ici</Text>
-            <Text style={[s.pText, s.shadow]}>Recherche 1 athlète (F)</Text>
-            <Text style={[s.pText, s.shadow]}>Niveau Inter</Text>
+          <View style={[s.modeHeader, { paddingTop: 16 }]}>
+            <View style={s.modes}>
+              {searchModes?.map(mode => {
+                const isActive = user?.id_search_mode === mode.id_search_mode;
+                return (
+                  <Pressable
+                    key={mode.id_search_mode}
+                    style={[s.modeBtn, isActive && s.modeBtnActive]}
+                    onPress={() => changeMode.mutate(mode.id_search_mode)}
+                  >
+                    <Image source={{ uri: mode.icon }} style={s.modeIcon} contentFit="contain" />
+                    {isActive && <Text style={s.modeLabel}>{mode.label_short}</Text>}
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Pressable hitSlop={8} onPress={() => setFiltersOpen(true)}>
+              <Ionicons name="options-outline" size={36} color="#fff" style={s.shadow} />
+            </Pressable>
           </View>
-          <Pressable hitSlop={8}>
-            <Ionicons name="share-outline" size={30} color="#fff" style={s.shadow} />
-          </Pressable>
-        </View>
-      </View>
 
-      {/* Boutons de swipe à cheval entre la photo et le footer */}
-      <View style={s.footerWrap} pointerEvents="box-none">
-        <View style={s.swipe} pointerEvents="box-none">
-          <SwipeElement />
+          <View style={s.participant}>
+            <View>
+              <Text style={[s.pName, s.shadow]}>Les pas là pour être ici</Text>
+              <Text style={[s.pText, s.shadow]}>Recherche 1 athlète (F)</Text>
+              <Text style={[s.pText, s.shadow]}>Niveau Inter</Text>
+            </View>
+            <Pressable hitSlop={8} onPress={toggleDetails}>
+              <Ionicons name="share-outline" size={30} color="#fff" style={s.shadow} />
+            </Pressable>
+          </View>
         </View>
-        <View style={s.footer}>
-          <CompetitionCard competition={competition} isFavorite={false} showFavorite={false} isLast />
+
+        {detailsOpen && <ParticipantDetails />}
+      </ScrollView>
+
+        {detailsOpen ? (
+          <>
+            <LinearGradient
+              colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0.9)', 'rgba(255,255,255,1)']}
+              locations={[0, 0.75, 1]}
+              style={[s.fade, { height: 130 }]}
+              pointerEvents="none"
+            />
+            <View style={[s.swipeBar, { bottom: insets.bottom + 8 }]} pointerEvents="box-none">
+              <View style={[s.swipeBar, { bottom: -16 }]} pointerEvents="box-none">
+                <SwipeElement variant="compact" />
+              </View>
+            </View>
+          </>
+        ) : (
+        <View style={s.footerWrap} pointerEvents="box-none">
+          <View style={s.swipe} pointerEvents="box-none">
+            <SwipeElement />
+          </View>
+          <View style={s.footer}>
+            <CompetitionCard competition={competition} isFavorite={false} showFavorite={false} isLast disabled />
+          </View>
         </View>
-      </View>
+      )}
+
+      <SearchFiltersModal
+        visible={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        onApply={filters => console.log('filtres', filters)}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
+  detailsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: '7%',
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#A9A9A9',
+  },
+detailsTitle: { flex: 1, fontSize: 18, fontWeight: '600', color: '#222' },
+  fade: { position: 'absolute', left: 0, right: 0, bottom: 0 },
+  swipeBar: { position: 'absolute', left: 0, right: 0 },
+  swipeFloating: { position: 'absolute', left: 0, right: 0 },
   root: { flex: 1, backgroundColor: '#F5F5F5' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  hero: { flex: 1 },
+  hero: {},
   modeHeader: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: '7%' },
   modes: { flexDirection: 'row', gap: 12 },
   modeBtn: {
@@ -142,7 +210,7 @@ const s = StyleSheet.create({
   modeLabel: { fontSize: 14 },
   participant: {
     position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: '7%',
-    paddingBottom: SWIPE_OVERLAP + 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+    paddingBottom: SWIPE_OVERLAP + 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   pName: { fontSize: 18, fontWeight: '600', color: '#fff', marginBottom: 4 },
   pText: { fontSize: 14, fontWeight: '500', color: '#fff' },
