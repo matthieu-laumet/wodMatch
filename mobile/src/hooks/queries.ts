@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import type { Competition, EventMode, Favorite, SearchMode, Tag } from '../types/competition';
+import type { Competition, EventMode, Favorite, SearchMode, Tag, TeamProfile } from '../types/competition';
 import { useWodzoneApi, useWodmatchApi } from '@/lib/api';
 
 export const useTags = () => {
@@ -111,7 +111,7 @@ export const useHandleUserSearchMode = () => {
 
 export const useTeamsFeed = (id_competition: number) => {
   const api = useWodmatchApi();
-  return useQuery<any[]>({
+  return useQuery<TeamProfile[]>({
     queryKey: ['feed', id_competition],
     queryFn: () => api(`/feed/${id_competition}`),
     enabled: !!id_competition,

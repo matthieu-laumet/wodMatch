@@ -14,19 +14,13 @@ import CompetitionCard from '../../../components/CompetitionCard';
 import SwipeElement from '../../../components/SwipeElement';
 import SearchFiltersModal from '@/components/SearchFiltersModal';
 import ParticipantDetails from '@/components/ParticipantDetails';
+import { searchingLabel } from '@/lib/team';
 
 const HERO_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782672401/77a1611d746ad20a1728e672eb9d681450587978_dd17zo.jpg';
 const NO_MORE_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782660790/drilldown_ptcaiy.jpg';
 
 const SWIPE_OVERLAP = 28; // moitié de la hauteur des boutons
 
-type Searching = { gender: string | null; count: number };
-
-function searchingLabel(searching?: Searching[]) {
-  if (!searching?.length) return 'Team complète';
-  const parts = searching.map(s => `${s.count} athlète${s.count > 1 ? 's' : ''}${s.gender ? ` (${s.gender})` : ''}`);
-  return `Recherche ${parts.join(' + ')}`;
-}
 
 function NoMoreProfiles() {
   return (
@@ -76,8 +70,6 @@ export default function ExploreWorld() {
     setDetailsOpen(v => !v);
   };
 
-  const noMoreProfils = !feedLoading && !profile;
-
   if (isLoading || feedLoading) {
     return <View style={s.center}><ActivityIndicator /></View>;
   }
@@ -91,7 +83,7 @@ export default function ExploreWorld() {
       </View>
     );
   }
-  if (noMoreProfils) return <NoMoreProfiles />;
+  if (!profile) return <NoMoreProfiles />;
 
   return (
     <View style={s.root}>
@@ -157,7 +149,7 @@ export default function ExploreWorld() {
           </View>
         </View>
 
-        {detailsOpen && <ParticipantDetails profile={profile}/>}
+        {detailsOpen && <ParticipantDetails profile={profile} competition={competition} />}
       </ScrollView>
 
         {detailsOpen ? (

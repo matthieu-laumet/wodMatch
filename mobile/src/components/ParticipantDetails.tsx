@@ -1,25 +1,14 @@
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { gray } from '@/constants/theme';
+import { TeamProfile } from '@/types/competition';
+import { searchingText } from '@/lib/team';
 
-type Props = { profile: any };
-
-// ---- PLACEHOLDERS : à remplacer par l'API ----
-const PROFILE = {
-  name: 'Timon & Pumba',
-  searching: '1 athlète (F) - Catégorie Inter',
-  about:
-    "On est une team niveau inter en quête d'une athlète féminine prête à tout donner sur le floor 🏋️ Si t'aimes transpirer, rigoler et soulever lourd dans la bonne humeur, rejoins-nous pour des WODs de feu et une ambiance 100% good vibes 😎🔥",
-  competition: { name: 'Agen Showdown 2025', address: '8 AVENUE FRANCOIS MITTERRAND, 47550 BOE', dates: '25-26 Octobre 2025' },
-  members: [
-    { name: 'Matthieu LAUMET, 34 ans', box: 'CrossFit Pat' },
-    { name: 'Pierre LEGOUX, 32 ans', box: 'CrossFit Pat' },
-  ],
-  strengths: ['T2B', 'Gymnastique', 'Rings', 'Handstand Walk', 'Muscle-ups', 'Handstand Push-up'],
-  bets: ['Ergo', 'Run', 'Cardio', 'Worms', 'Dumbbell', 'Burpees', 'Squat Snatch'],
-  goals: 'Passer un bon moment tous ensemble dans la bonne humeur. Se dépasser quelque soit le résultat',
+type Props = {
+  profile: TeamProfile;
+  competition: { name: string; address?: string | null; dates?: string | null }; // adapte aux vrais champs
 };
-// -----------------------------------------------
+
 
 function Section({ icon, title, children }: { icon: any; title: string; children: React.ReactNode }) {
   return (
@@ -45,55 +34,65 @@ function Tags({ items, filled }: { items: string[]; filled?: boolean }) {
   );
 }
 
-export default function ParticipantDetails({ profile }: Props) {
-  const p = profile;
+export default function ParticipantDetails({ profile: p, competition }: Props) {
+  const searching = p.searching.length ? searchingText(p.searching) : 'Team complète';
+  const category = p.division.name ? ` - Catégorie ${p.division.name}` : '';
 
   return (
     <View>
       <Section icon="search-outline" title="La team recherche">
-        <Text style={s.bold}>{p.searching}</Text>
+        <Text style={s.bold}>{searching}{category}</Text>
       </Section>
 
       <Section icon="chatbubble-ellipses-outline" title="À propos de la team">
-        <Text style={s.body}>{p.about}</Text>
+        <Text style={s.body}>{p.bio}</Text>
       </Section>
 
       <Section icon="barbell-outline" title="Le cœur du WOD">
         <View style={s.line}>
           <Ionicons name="location-outline" size={20} color={gray.g06} />
           <View style={{ flex: 1 }}>
-            <Text style={s.body}>{p.competition.name}</Text>
-            <Text style={s.small}>{p.competition.address}</Text>
+            <Text style={s.body}>{competition.name}</Text>
+            {!!competition.address && <Text style={s.small}>{competition.address}</Text>}
           </View>
         </View>
         <View style={s.separator} />
         <View style={s.line}>
           <Ionicons name="calendar-outline" size={20} color={gray.g06} />
-          <Text style={s.body}>{p.competition.dates}</Text>
+          <Text style={s.body}>{competition.dates}</Text>
         </View>
         <View style={s.separator} />
         {p.members.map(m => (
-          <View key={m.name} style={[s.line, { marginBottom: 8 }]}>
+          <View key={m.id_user} style={[s.line, { marginBottom: 8 }]}>
             <Ionicons name="people-outline" size={20} color={gray.g06} />
             <View>
-              <Text style={s.body}>{m.name}</Text>
-              <Text style={s.small}>{m.box}</Text>
+              <Text style={s.body}>
+                {[m.first_name, m.last_name].filter(Boolean).join(' ')}
+                {m.age != null ? `, ${m.age} ans` : ''}
+              </Text>
+              {!!m.club_name && <Text style={s.small}>{m.club_name}</Text>}
             </View>
           </View>
         ))}
       </Section>
 
-      <Section icon="flash-outline" title="Les points forts de la team">
-        <Tags items={p.strengths} filled />
-      </Section>
+      {p.skills.length > 0 && (
+        <Section icon="flash-outline" title="Les points forts de la team">
+          <Tags items={p.skills} filled />
+        </Section>
+      )}
 
-      <Section icon="happy-outline" title="Là où ils/elles misent sur toi">
-        <Tags items={p.bets} />
-      </Section>
+      {p.fun_reps.length > 0 && (
+        <Section icon="happy-outline" title="Là où ils/elles misent sur toi">
+          <Tags items={p.fun_reps} />
+        </Section>
+      )}
 
-      <Section icon="locate-outline" title="Les objectifs pour cette compétition">
-        <Text style={s.body}>{p.goals}</Text>
-      </Section>
+      {!!p.objective && (
+        <Section icon="locate-outline" title="Les objectifs pour cette compétition">
+          <Text style={s.body}>{p.objective}</Text>
+        </Section>
+      )}
 
       <View style={s.actions}>
         <Pressable

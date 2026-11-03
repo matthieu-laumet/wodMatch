@@ -27,3 +27,29 @@ export type SearchMode = {
   icon: string;
   label_short: string;
 };
+
+export type Searching = { gender: string | null; count: number };
+
+export type TeamMember = {
+  id_user: number;
+  role: string;
+  first_name?: string;
+  last_name?: string;
+  avatar?: string | null;
+  club_name?: string | null;
+  age: number | null;
+};
+
+export type TeamProfile = {
+  type: 'team';
+  id_team: number;
+  name: string;
+  bio: string | null;
+  objective: string | null;
+  division: { id_division: number; name: string | null };
+  members: TeamMember[];
+  searching: Searching[];
+  avg_age: number | null;
+  skills: string[];
+  fun_reps: string[];
+};
