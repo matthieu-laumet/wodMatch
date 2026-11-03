@@ -79,7 +79,7 @@ export default function Settings() {
     try {
       await api('/users/handle-hide-user-profil', { method: 'PUT', body: JSON.stringify({ is_hidden: true }) });
       updateUser({ is_hidden: true } as any);
-      router.replace('/' as any);
+      router.replace('/home' as any);
     } catch (e: any) {
       Alert.alert('Erreur', e.message);
     }

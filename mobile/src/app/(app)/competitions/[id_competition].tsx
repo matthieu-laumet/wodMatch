@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
-import { useCompetition, useHandleUserSearchMode, useSearchModes } from '../../../hooks/queries';
+import { useCompetition, useHandleUserSearchMode, useSearchModes, useTeamsFeed } from '../../../hooks/queries';
 import CompetitionCard from '../../../components/CompetitionCard';
 import SwipeElement from '../../../components/SwipeElement';
 import SearchFiltersModal from '@/components/SearchFiltersModal';
@@ -19,6 +19,14 @@ const HERO_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v178267240
 const NO_MORE_IMAGE = 'https://res.cloudinary.com/dkz9knsgj/image/upload/v1782660790/drilldown_ptcaiy.jpg';
 
 const SWIPE_OVERLAP = 28; // moitié de la hauteur des boutons
+
+type Searching = { gender: string | null; count: number };
+
+function searchingLabel(searching?: Searching[]) {
+  if (!searching?.length) return 'Team complète';
+  const parts = searching.map(s => `${s.count} athlète${s.count > 1 ? 's' : ''}${s.gender ? ` (${s.gender})` : ''}`);
+  return `Recherche ${parts.join(' + ')}`;
+}
 
 function NoMoreProfiles() {
   return (
@@ -50,11 +58,16 @@ export default function ExploreWorld() {
   const { user } = useAuth();
   const { data: competition, isLoading } = useCompetition(Number(id_competition));
   const { data: searchModes } = useSearchModes();
+  const { data: feed, isLoading: feedLoading } = useTeamsFeed(Number(id_competition));
   const changeMode = useHandleUserSearchMode();
   const scrollRef = useRef<ScrollViewInstance>(null);
   const [heroH, setHeroH] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
+
+  const profile = feed?.[0];
+  const avatar = profile?.members?.[0]?.avatar;
+  const heroUri = typeof avatar === 'string' && avatar.startsWith('http') ? avatar : HERO_IMAGE;
 
   const toggleDetails = () => {
     if (detailsOpen) {
@@ -63,9 +76,9 @@ export default function ExploreWorld() {
     setDetailsOpen(v => !v);
   };
 
-  const noMoreProfils = false; // TODO: viendra de l'API des profils
+  const noMoreProfils = !feedLoading && !profile;
 
-  if (isLoading) {
+  if (isLoading || feedLoading) {
     return <View style={s.center}><ActivityIndicator /></View>;
   }
   if (!competition) {
@@ -85,7 +98,7 @@ export default function ExploreWorld() {
       {detailsOpen && (
         <View style={s.detailsHeader}>
           <Ionicons name="people" size={28} color="#222" />
-          <Text style={s.detailsTitle} numberOfLines={1}>Timon & Pumba</Text>{/* TODO: nom du profil */}
+          <Text style={s.detailsTitle} numberOfLines={1}>{profile.name}</Text>
           <Pressable hitSlop={8} onPress={toggleDetails}>
             <Ionicons name="close-circle-outline" size={34} color="#444" />
           </Pressable>
@@ -101,7 +114,7 @@ export default function ExploreWorld() {
         bounces={false}
       >
         <View style={[s.hero, { height: heroH }]}>
-          <Image source={{ uri: HERO_IMAGE }} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <Image source={{ uri: heroUri }} style={StyleSheet.absoluteFill} contentFit="cover" />
           <LinearGradient
             colors={[
               'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.5)',
@@ -134,9 +147,9 @@ export default function ExploreWorld() {
 
           <View style={s.participant}>
             <View>
-              <Text style={[s.pName, s.shadow]}>Les pas là pour être ici</Text>
-              <Text style={[s.pText, s.shadow]}>Recherche 1 athlète (F)</Text>
-              <Text style={[s.pText, s.shadow]}>Niveau Inter</Text>
+              <Text style={[s.pName, s.shadow]}>{profile.name}</Text>
+              <Text style={[s.pText, s.shadow]}>{searchingLabel(profile.searching)}</Text>
+              <Text style={[s.pText, s.shadow]}>Catégorie {profile.division.name}</Text>
             </View>
             <Pressable hitSlop={8} onPress={toggleDetails}>
               <Ionicons name="share-outline" size={30} color="#fff" style={s.shadow} />
@@ -144,7 +157,7 @@ export default function ExploreWorld() {
           </View>
         </View>
 
-        {detailsOpen && <ParticipantDetails />}
+        {detailsOpen && <ParticipantDetails profile={profile}/>}
       </ScrollView>
 
         {detailsOpen ? (

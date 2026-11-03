@@ -2,6 +2,8 @@ import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { gray } from '@/constants/theme';
 
+type Props = { profile: any };
+
 // ---- PLACEHOLDERS : à remplacer par l'API ----
 const PROFILE = {
   name: 'Timon & Pumba',
@@ -43,8 +45,8 @@ function Tags({ items, filled }: { items: string[]; filled?: boolean }) {
   );
 }
 
-export default function ParticipantDetails() {
-  const p = PROFILE;
+export default function ParticipantDetails({ profile }: Props) {
+  const p = profile;
 
   return (
     <View>

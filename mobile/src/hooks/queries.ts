@@ -108,3 +108,12 @@ export const useHandleUserSearchMode = () => {
     onError: (_e, _id, ctx) => updateUser({ id_search_mode: ctx?.prev }),
   });
 };
+
+export const useTeamsFeed = (id_competition: number) => {
+  const api = useWodmatchApi();
+  return useQuery<any[]>({
+    queryKey: ['feed', id_competition],
+    queryFn: () => api(`/feed/${id_competition}`),
+    enabled: !!id_competition,
+  });
+};
