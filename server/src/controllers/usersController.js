@@ -1,4 +1,4 @@
-const { getWMUserById, updateHideOneUserProfile, getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists, verifyVisibilityAndGetEmail } = require("../models/users.model");
+const { getWMUserById, updateHideOneUserProfile, getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists, verifyVisibilityAndGetEmail, syncUserIdentity } = require("../models/users.model");
 const { onboardingUserService, updateUserProlfilService, updateUserService } = require("../services/users.service");
 
 
@@ -6,6 +6,7 @@ async function getCurrentWMUser(req, res) {
   try {
     const id_user = req.id_user;
     const result = await getWMUserById({ id_user });
+    if (result) syncUserIdentity({ id_user }).catch(e => console.error('[syncUserIdentity]', e.message));
     res.status(200).send(result);
   } catch (error) {
     console.log(error.message)
@@ -20,8 +21,8 @@ async function onboardingUser(req, res) {
     const result = await onboardingUserService({ id_user, levels, userBio, userFunReps, skills, userSearchMode });
     res.status(200).send(result);
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({ error: 'Erreur serveur' });
+    console.log('[onboardingUser]', error.message)
+    res.status(error.status || 500).json({ error: error.status ? error.message : 'Erreur serveur' });
   }
 }
 

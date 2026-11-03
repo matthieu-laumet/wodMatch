@@ -2,12 +2,22 @@ const { upsertOneUserFunReps } = require('../models/funReps.model');
 const { upsertUserLevel, getUsersLevels, deleteAllUserLevels } = require('../models/levels.model');
 const { upsertUserSearchMode } = require('../models/searchModes.model');
 const { upsertUserSkill } = require('../models/skills.model');
-const { upsertUserBio, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone, getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed } = require('../models/users.model');
+const {
+  upsertUserBio, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone, getUserInfo,
+  isEmailAlreadyUsed, isTelephoneAlreadyUsed, syncUserIdentity
+} = require('../models/users.model');
 const { formatPhoneFR } = require('../utils/users.utils');
 const { sendEmail } = require('./emailService');
 
 
 async function onboardingUserService({ id_user, levels, userBio, userFunReps, skills, userSearchMode }) {
+  // 1. D'abord : copie birth_date + gender depuis WODZONE et crée la ligne wm_users
+  const { birth_date, gender } = await syncUserIdentity({ id_user });
+  if (!birth_date || !gender) {
+    throw Object.assign(new Error('Date de naissance ou genre manquant'), { status: 422 });
+  }
+
+  // 2. Ensuite comme avant
   await Promise.all([
     upsertUserSearchMode({ id_user, id_search_mode: userSearchMode }),
     upsertUserBio({ id_user, bio: userBio }),
@@ -41,7 +51,11 @@ async function updateUserService({ id_user, type, payload }) {
     const isUsed = await isEmailAlreadyUsed({ email: newEmail });
     if (isUsed) throw Object.assign(new Error('E-mail déjà utilisé...'), { status: 409 });
     await updateOneUserEmail({ email: newEmail, id_user });
-    await sendEmail({ object: 'updated_info', inputUpdated: type, email: newEmail });
+    try {
+      await sendEmail({ object: 'updated_info', inputUpdated: type, email: newEmail });
+    } catch (e) {
+      console.error('[updateUserService] email vers nouvelle adresse non envoyé:', e.message);
+    }
   }
   if (type === 'téléphone') {
     const newTelephone = payload.telephone;

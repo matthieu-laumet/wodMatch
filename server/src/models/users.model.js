@@ -201,10 +201,49 @@ async function getAllVisiblesAthleteLists({ id_user }) {
   return results.rows;
 }
 
+async function syncUserIdentity({ id_user }) {
+  const src = await pool({ bdd: 'WODZONE' }).query(
+    `SELECT birth_date::text AS birth_date, gender FROM wodzone.users WHERE id=$1;`,
+    [id_user]
+  );
+  if (src.rows.length === 0) throw Object.assign(new Error('User non trouvé...'), { status: 409 });
+  const { birth_date, gender } = src.rows[0];
+
+  await pool().query(`
+    INSERT INTO wodmatch.wm_users (id_user, birth_date, gender, created_at, updated_at)
+    VALUES ($1, $2, $3, NOW(), NOW())
+    ON CONFLICT (id_user) DO UPDATE
+      SET birth_date = EXCLUDED.birth_date, gender = EXCLUDED.gender, updated_at = NOW()
+      WHERE (wm_users.birth_date, wm_users.gender) IS DISTINCT FROM (EXCLUDED.birth_date, EXCLUDED.gender)
+  ;`, [id_user, birth_date, gender]);
+
+  return { birth_date, gender };
+}
+
+async function syncAllUsersIdentity() {
+  const { rows: wm } = await pool().query(`SELECT id_user FROM wodmatch.wm_users;`);
+  if (wm.length === 0) return 0;
+
+  const { rows: src } = await pool({ bdd: 'WODZONE' }).query(
+    `SELECT id, birth_date::text AS birth_date, gender FROM wodzone.users WHERE id = ANY($1::int[]);`,
+    [wm.map(r => r.id_user)]
+  );
+
+  const result = await pool().query(`
+    UPDATE wodmatch.wm_users w
+    SET birth_date = v.birth_date::date, gender = v.gender
+    FROM unnest($1::int[], $2::text[], $3::text[]) AS v(id, birth_date, gender)
+    WHERE w.id_user = v.id
+      AND (w.birth_date, w.gender) IS DISTINCT FROM (v.birth_date::date, v.gender)
+  ;`, [src.map(r => r.id), src.map(r => r.birth_date), src.map(r => r.gender)]);
+  return result.rowCount;
+}
+
+
 module.exports = {
   upsertUserBio, getWMUserById, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone,
   getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed, updateHideOneUserProfile,
   getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists,
-  verifyVisibilityAndGetEmail
+  verifyVisibilityAndGetEmail, syncUserIdentity, syncAllUsersIdentity
   // upsertUserLevel, deleteAllUserLevels
 }
