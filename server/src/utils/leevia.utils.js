@@ -3,6 +3,9 @@ const crypto = require('crypto');
 
 const WEBDAV_URL = process.env.WEBDAV_URL; // ex: https://webdav.leevia.com/ton-espace
 const RETRYABLE = ['get', 'propfind', 'head'];
+const TEMP_ROOT = 'wodmatch/users/';
+const userTempDir = (id_user) => `${TEMP_ROOT}${id_user}/`;
+const isTempPath = (filename) => filename.startsWith(TEMP_ROOT);
 
 const webdavClient = axios.create({
   baseURL: WEBDAV_URL, // ✅ manquait
@@ -47,12 +50,13 @@ webdavClient.createDirectory = async (dirPath) => {
 };
 
 const userImageUrl = (filename) => {
-  if (filename.includes('temp/')) return filename
-  return `app/users/${filename}`; // relatif, baseURL fait le reste
-}
+  if (isTempPath(filename)) return filename;
+  return `app/users/${filename}`;
+};
+
 
 function validateFilename(filename) {
-  if (!filename || filename.includes('..') || (filename.includes('/') && !filename.includes('temp/'))) {
+  if (!filename || filename.includes('..') || (filename.includes('/') && !isTempPath(filename))) {
     throw new Error('Nom de fichier invalide');
   }
 }
@@ -62,5 +66,6 @@ function generateUniqueId() {
 }
 
 module.exports = {
-  webdavClient, userImageUrl, validateFilename, generateUniqueId, WEBDAV_URL
+  webdavClient, userImageUrl, validateFilename, generateUniqueId, WEBDAV_URL,
+  TEMP_ROOT, userTempDir, isTempPath,
 };

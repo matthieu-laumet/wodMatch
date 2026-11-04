@@ -8,6 +8,7 @@ export type Competition = {
   name: string;
   compet_name?: string;
   begin: string;
+  end: string;
   img_small?: string;
   location?: string;
   divisions: Division[];
@@ -18,7 +19,7 @@ export type Competition = {
   compet_ville?: string;
   coordinates?: { lat: number | string; lon: number | string }[];
   // ajoutés par la recherche géographique
-    distance?: number;
+  distance?: number;
   queryMatchCity?: string;
 };
 
@@ -51,5 +52,7 @@ export type TeamProfile = {
   searching: Searching[];
   avg_age: number | null;
   skills: string[];
-  fun_reps: string[];
+  objective_skills: string[];
+  fun_reps: { label: string; description: string }[];
+  photos: string[];
 };

@@ -113,7 +113,35 @@ export const useTeamsFeed = (id_competition: number) => {
   const api = useWodmatchApi();
   return useQuery<TeamProfile[]>({
     queryKey: ['feed', id_competition],
-    queryFn: () => api(`/feed/${id_competition}`),
+    queryFn: () => api(`/feed/get-teams-feed/${id_competition}`),
     enabled: !!id_competition,
   });
 };
+
+export function useSwipe(id_competition: number) {
+  const api = useWodmatchApi();
+  const qc = useQueryClient();
+  const key = ['feed', id_competition]; // même clé que useTeamsFeed
+
+  return useMutation({
+    mutationFn: (v: { id_team_to: number; direction: 'like' | 'pass' }) =>
+      api(`/swipes/post-swipe/${id_competition}`, {
+        method: 'POST',
+        body: JSON.stringify(v),
+      }) as Promise<{ match: boolean }>,
+    onMutate: async ({ id_team_to }) => {
+      await qc.cancelQueries({ queryKey: key });
+      const prev = qc.getQueryData<TeamProfile[]>(key);
+      qc.setQueryData<TeamProfile[]>(key, old => old?.filter(t => t.id_team !== id_team_to));
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev);
+    },
+    onSettled: () => {
+      if ((qc.getQueryData<TeamProfile[]>(key)?.length ?? 0) <= 3) {
+        qc.invalidateQueries({ queryKey: key });
+      }
+    },
+  });
+}

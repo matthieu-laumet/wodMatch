@@ -5,10 +5,18 @@ const {
   getImageRaw, uploadOneImg, getUserTempImagesService, reorderTempImagesService,
   listUserTempFilenamesService, invalidateTempList,
 } = require('../services/leevia.service');
-const { webdavClient } = require('../utils/leevia.utils');
+const { webdavClient, userTempDir } = require('../utils/leevia.utils');
 const crypto = require('crypto');
 
-const ALLOWED_PATH_PATTERN = /^.*$/i;
+const IMG_EXT = '(jpg|jpeg|png|gif|webp)';
+const ALLOWED_PATH_PATTERN = new RegExp(
+  `^(` +
+    `app\\/competitions\\/\\d+\\/[\\w.-]+\\.${IMG_EXT}` +
+    `|app\\/users\\/[\\w.-]+\\.${IMG_EXT}` +
+    `|wodmatch\\/teams\\/\\d+\\/[\\w.-]+\\.${IMG_EXT}` +
+    `|[\\w.-]+\\.${IMG_EXT}` +
+  `)$`, 'i'
+);
 // const ALLOWED_PATH_PATTERN = /^(app\/competitions\/\d+\/[\w-]+\.(jpg|jpeg|png|gif|webp)|app\/users\/[\w-]+\.(jpg|jpeg|png|gif|webp)|[\w-]+\.(jpg|jpeg|png|gif|webp))$/i;
 
 async function getImage(req, res) {
@@ -63,7 +71,7 @@ async function uploadTempImages(req, res) {
     const id_user = req.id_user;
     const slot = req.body.slot !== undefined ? parseInt(req.body.slot) : null;
     const results = await Promise.all(
-      req.files.map(file => uploadOneImg({ file, prefix: `temp/${id_user}/`, slot }))
+      req.files.map(file => uploadOneImg({ file, prefix: userTempDir(id_user), slot }))
     );
     invalidateTempList(id_user);
     res.json(results);
@@ -108,7 +116,7 @@ async function deleteTempImage(req, res) {
 
     const id_user = req.id_user;
     // Sécurité : on s'assure que le fichier appartient bien à l'utilisateur
-    if (!filename.startsWith(`temp/${id_user}/`)) {
+    if (!filename.startsWith(userTempDir(id_user)) || filename.includes('..')) {
       return res.status(403).json({ error: 'Accès refusé' });
     }
     await webdavClient.delete(filename);
@@ -136,9 +144,7 @@ async function getTempImage(req, res) {
   if (!/\.(jpe?g|png|webp)$/i.test(name)) return res.sendStatus(400);
 
   try {
-    const upstream = await webdavClient.get(`temp/${req.id_user}/${name}`, {
-      responseType: 'stream',
-    });
+    const upstream = await webdavClient.get(`${userTempDir(req.id_user)}${name}`, { responseType: 'stream' });
     res.set({
       'Content-Type': 'image/jpeg',
       'Cache-Control': 'private, max-age=86400',

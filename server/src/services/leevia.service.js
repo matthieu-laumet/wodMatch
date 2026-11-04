@@ -1,4 +1,4 @@
-const { webdavClient, generateUniqueId, WEBDAV_URL, validateFilename, userImageUrl } = require('../utils/leevia.utils');
+const { webdavClient, generateUniqueId, WEBDAV_URL, validateFilename, userImageUrl, userTempDir } = require('../utils/leevia.utils');
 const path = require('path');
 const sharp = require('sharp');
 
@@ -11,7 +11,7 @@ async function listUserTempFilenamesService(id_user) {
   const hit = listCache.get(id_user);
   if (hit && Date.now() - hit.at < LIST_TTL) return hit.data;
 
-  const dirPath = `temp/${id_user}/`;
+  const dirPath = userTempDir(id_user);
   let data = [];
   try {
     const response = await webdavClient.request({
@@ -36,10 +36,8 @@ const invalidateTempList = id_user => listCache.delete(id_user);
 
 
 async function getImageRaw(filename) {
-  // Plus de validateFilename ici, ou une version qui accepte les /
-  const url = filename.startsWith('app/') 
-    ? `${WEBDAV_URL}/${filename}`      // chemin complet → app/competitions/1/xxx.jpg
-    : `${WEBDAV_URL}/app/users/${filename}`;  // ancien format → xxx.jpg seul
+  const isFullPath = /^(app|wodmatch\/teams)\//.test(filename);
+  const url = isFullPath ? `${WEBDAV_URL}/${filename}` : `${WEBDAV_URL}/app/users/${filename}`;
 
   const response = await webdavClient.get(url, { responseType: 'arraybuffer' });
   return {
@@ -86,7 +84,7 @@ async function uploadOneImg({ file, prefix = '', slot = null }) {
 }
 
 async function reorderTempImagesService({ filenames, id_user }) {
-  const prefix = `temp/${id_user}/`;
+  const prefix = userTempDir(id_user);
   // sécurité : le client ne peut toucher que ses propres fichiers
   if (!Array.isArray(filenames) ||
       filenames.some(f => typeof f !== 'string' || f.includes('..') || !f.startsWith(prefix))) {
@@ -127,7 +125,7 @@ async function mapLimit(items, limit, fn) {
 
 
 async function getUserTempImagesService(id_user) {
-  const dirPath = `temp/${id_user}/`;
+  const dirPath = userTempDir(id_user);
   try {
     const response = await webdavClient.request({
       method: 'PROPFIND',

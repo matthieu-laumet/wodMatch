@@ -25,7 +25,7 @@ export default function AppLayout() {
 
         {/* Utilisateurs existants : le reste de l'app */}
         <Stack.Protected guard={!isNewUser}>
-          <Stack.Screen name="index" options={{ animation: 'none' }} />
+          <Stack.Screen name="home" options={{ animation: 'none' }} />
           <Stack.Screen name="favoris" options={{ animation: 'none' }} />
           <Stack.Screen name="chat" options={{ animation: 'none' }} />
           <Stack.Screen name="profil" options={{ animation: 'none' }} />

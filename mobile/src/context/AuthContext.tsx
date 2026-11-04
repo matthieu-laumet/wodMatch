@@ -11,6 +11,7 @@ const WODMATCH = process.env.EXPO_PUBLIC_WODMATCH_URL;
 const REFRESH_KEY = 'refreshToken';
 const API_KEY = process.env.EXPO_PUBLIC_MOBILE_API_KEY;
 const BASE_HEADERS: Record<string, string> = { 'x-client': 'mobile', ...(API_KEY ? { 'x-api-key': API_KEY } : {}), };
+let inflight: Promise<{ accessToken: string; user: any } | null> | null = null;
 
 type User = { email: string; has_seen_wodmatch_welcome?: boolean; [k: string]: any };
 
@@ -43,13 +44,13 @@ async function fetchWmUser(token: string) {
   return {};
 }
 
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const tokenRef = useRef<string | null>(null);
-  const inflight = useRef<Promise<{ accessToken: string; user: any } | null> | null>(null);
 
   const setToken = (t: string | null) => {
     tokenRef.current = t;
@@ -88,19 +89,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const doRefresh = () => {
-    if (!inflight.current) {
-      inflight.current = (async () => {
-        try {
-          const refreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
-          if (!refreshToken) return null;
-          const res = await fetch(`${WODZONE}/api/refresh`, {
-            method: 'POST',
-            headers: { ...BASE_HEADERS, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
-          });
-          const text = await res.text();
+    if (!inflight) {
+      inflight = (async () => {
+      try {
+        const refreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+        if (!refreshToken) return null;
+        const res = await fetch(`${WODZONE}/api/refresh`, {
+          method: 'POST',
+          headers: { ...BASE_HEADERS, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+        const text = await res.text();
           if (!res.ok) {
-            if (res.status === 401 || res.status === 403) await signOut();
+            if (res.status === 401) await clearSession();
             return null;
           }
           const data = JSON.parse(text);
@@ -111,11 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.error(e);
           return null;
         } finally {
-          inflight.current = null;
+          inflight = null;
         }
       })();
     }
-    return inflight.current;
+    return inflight;
   };
 
   const refresh = async () => (await doRefresh())?.accessToken ?? null;

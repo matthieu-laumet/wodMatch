@@ -28,6 +28,13 @@ async function getWMUserById({ id_user }) {
   return results.rows[0];
 }
 
+async function getWMgender({ id_user }) {
+  const { rows } = await pool().query(
+    `SELECT gender FROM wodmatch.wm_users WHERE id_user = $1`, [id_user]
+  );
+  return rows[0]?.gender ?? null;
+}
+
 async function upsertUserBio({ id_user, bio }) {
   const results = await pool().query(`
     INSERT INTO wodmatch.wm_users (id_user, bio, created_at, updated_at)
@@ -244,6 +251,6 @@ module.exports = {
   upsertUserBio, getWMUserById, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone,
   getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed, updateHideOneUserProfile,
   getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists,
-  verifyVisibilityAndGetEmail, syncUserIdentity, syncAllUsersIdentity
+  verifyVisibilityAndGetEmail, syncUserIdentity, syncAllUsersIdentity, getWMgender
   // upsertUserLevel, deleteAllUserLevels
 }

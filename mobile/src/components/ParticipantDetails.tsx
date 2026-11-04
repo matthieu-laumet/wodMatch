@@ -3,10 +3,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { gray } from '@/constants/theme';
 import { TeamProfile } from '@/types/competition';
 import { searchingText } from '@/lib/team';
+import { convertDateEvent } from '@/utils/date.transform';
 
 type Props = {
   profile: TeamProfile;
-  competition: { name: string; address?: string | null; dates?: string | null }; // adapte aux vrais champs
+  competition: { name: string; address?: string | null; dates?: string | null, begin: string, end: string };
 };
 
 
@@ -59,7 +60,7 @@ export default function ParticipantDetails({ profile: p, competition }: Props) {
         <View style={s.separator} />
         <View style={s.line}>
           <Ionicons name="calendar-outline" size={20} color={gray.g06} />
-          <Text style={s.body}>{competition.dates}</Text>
+          <Text style={s.body}>{convertDateEvent(competition.begin, competition.end, true)}</Text>
         </View>
         <View style={s.separator} />
         {p.members.map(m => (
@@ -82,9 +83,21 @@ export default function ParticipantDetails({ profile: p, competition }: Props) {
         </Section>
       )}
 
+      {p.objective_skills?.length > 0 && (
+        <Section icon="star-outline" title="Là où ils/elles misent sur toi">
+          <Tags items={p.objective_skills} filled />
+        </Section>
+      )}
+
       {p.fun_reps.length > 0 && (
-        <Section icon="happy-outline" title="Là où ils/elles misent sur toi">
-          <Tags items={p.fun_reps} />
+        <Section icon="happy-outline" title="Fun facts sur la team">
+          {p.fun_reps.map((f, i) => (
+            <View key={f.label}>
+              {i > 0 && <View style={s.separator} />}
+              <Text style={s.bold}>{f.label}</Text>
+              <Text style={s.body}>{f.description}</Text>
+            </View>
+          ))}
         </Section>
       )}
 
