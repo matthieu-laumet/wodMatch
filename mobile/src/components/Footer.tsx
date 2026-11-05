@@ -18,7 +18,7 @@ type Item = {
 
 const ITEMS: Item[] = [
   { path: '/', icon: 'trophy-outline', iconActive: 'trophy', size: 26 },
-  { path: '/favoris', icon: 'heart-outline', iconActive: 'heart', size: 26 },
+  { path: '/likeMatch', icon: 'heart-outline', iconActive: 'heart', size: 26 },
   { path: '/chat', icon: 'chatbubble-outline', iconActive: 'chatbubble', size: 26 },
   { path: '/profil', icon: 'person-outline', iconActive: 'person', size: 30 },
 ];

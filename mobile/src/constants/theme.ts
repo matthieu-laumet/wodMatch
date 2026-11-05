@@ -15,6 +15,15 @@ export const Colors = {
     backgroundSelected: '#E0E1E6',
     textSecondary: '#60646C',
   },
+  ink: '#141414',
+  red: '#E8000F',
+  green: '#16A34A',
+  greenSoft: '#E3F5E9',
+  greenText: '#146C35',
+  muted: '#6B6B6B',
+  line: '#E6E6E6',
+  surface: '#F6F6F6',
+  white: '#FFFFFF',
   dark: {
     text: '#ffffff',
     background: '#000000',
@@ -87,3 +96,9 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+// Charge Barlow Condensed avec @expo-google-fonts/barlow-condensed (useFonts) ;
+// sans ça, React Native retombe sur la police système.
+export const fonts = {
+  display: 'BarlowCondensed_800ExtraBold',
+};

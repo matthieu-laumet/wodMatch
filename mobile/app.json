@@ -1,16 +1,18 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "WODMatch",
+    "slug": "wodmatch",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "fr.wodzone.wodmatch",
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "fr.wodzone.wodmatch",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -34,6 +36,7 @@
         }
       ],
       "expo-font",
+      "expo-notifications",
       "expo-image",
       "expo-status-bar",
       "expo-web-browser",
@@ -42,6 +45,17 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "5fbae3f3-dfb8-4511-80b9-d5ce7c2b680e"
+      }
+    },
+    "owner": "wodzone"
   }
 }

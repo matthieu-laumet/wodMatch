@@ -145,3 +145,11 @@ export function useSwipe(id_competition: number) {
     },
   });
 }
+
+export const useRegisterPushToken = () => {
+  const api = useWodmatchApi();
+  return useMutation({
+    mutationFn: (v: { token: string; platform: string }) =>
+      api('/users/push-token', { method: 'POST', body: JSON.stringify(v) }),
+  });
+};

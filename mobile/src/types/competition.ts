@@ -4,8 +4,11 @@ export type Tag = { id_tag: number; tag_slug: string; tag_name: string; tag_img?
 export type Favorite = { id_competition: number };
 
 export type Competition = {
-  id_competition: number;
+  id: number;
   name: string;
+  city: string;
+  startDate: string;
+  id_competition: number;
   compet_name?: string;
   begin: string;
   end: string;
@@ -56,3 +59,50 @@ export type TeamProfile = {
   fun_reps: { label: string; description: string }[];
   photos: string[];
 };
+
+// Types de l'écran. Chaque champ indique la table / colonne d'où il viendra.
+
+export type PipelineStep = 'match' | 'exchange' | 'wod_test' | 'roster';
+
+/** Quelqu'un (ou une team) qui m'a liké : swipes.direction = 'like' */
+export interface Liker {
+  id: string;
+  name: string;
+  avatarUrl?: string;  // wm_users photo, ou team_photos.url pour une team
+}
+
+/** matches.status -> étape du pipeline */
+export interface MatchSummary {
+  id: number;          // id_match
+  name: string;
+  step: PipelineStep;
+  nextLabel?: string;  // ex. 'WOD test sam. 14'
+}
+
+export interface Slot {                // team_slots
+  gender: 'F' | 'H' | null;
+  filledBy: number | null;             // filled_by (null = place libre)
+}
+
+/** Onglet « Je recrute » : une team que j'ai créée (teams.created_by) */
+export interface RecruitItem {
+  competition: Competition;
+  team: { id: number; name: string; division: string; slots: Slot[] };
+  likers: Liker[];                     // swipes vers id_team_to = team.id
+  matches: MatchSummary[];             // matches.id_team = team.id
+  id: number; 
+  name: string; 
+  city: string; 
+  startDate: string; 
+  division_name: string; 
+}
+
+
+/** Onglet « Je rejoins » : je suis seul·e (user_searches.is_active) */
+export interface JoinItem {
+  competition: Competition;
+  division: string;                    // user_search_divisions -> divisions
+  searchActive: boolean;               // user_searches.is_active
+  likers: Liker[];                     // teams qui m'ont liké (id_user_to = moi)
+  matches: MatchSummary[];             // matches.id_user = moi
+}

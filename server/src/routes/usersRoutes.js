@@ -3,6 +3,7 @@ const router = express.Router();
 
 // Routes
 const usersController = require('../controllers/usersController');
+const pushTokensController = require('../controllers/pushTokens.controller');
 const verifyJWT = require('../../middleware/verifyJWT');
 const validateProtectedRoutes = require('../../middleware/validateProtectedRoutes');
 
@@ -12,7 +13,8 @@ const validateProtectedRoutes = require('../../middleware/validateProtectedRoute
 // ==================== PROTECTION ====================
 router.use(validateProtectedRoutes([
   '/get-current-wm-user', '/onboarding-user', '/update-user-prolfil', '/update-user-email', '/update-user-telephone',
-  '/handle-hide-user-profil', '/get-blocked-athlets', '/add-blocked-user', '/delete-blocked-user', '/get-visibles-athlete-lists'
+  '/handle-hide-user-profil', '/get-blocked-athlets', '/add-blocked-user', '/delete-blocked-user', '/get-visibles-athlete-lists',
+  '/push-token',
 ]));
 router.use(verifyJWT); // Tout ce qui suit nécessite JWT
 // ====================================================
@@ -26,6 +28,9 @@ router.put('/update-user-email', usersController.updateUserEmail);
 router.put('/update-user-telephone', usersController.updateUserTelephone);
 router.put('/handle-hide-user-profil', usersController.handleHideUserProfil);
 router.delete('/delete-blocked-user/:id_blocked_user_contact', usersController.deleteBlockedUser);
+
+router.post('/push-token', pushTokensController.savePushToken);
+router.delete('/push-token', pushTokensController.removePushToken);
 
 
 module.exports = router;

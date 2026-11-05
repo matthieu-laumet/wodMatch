@@ -3,6 +3,8 @@ import * as SecureStore from 'expo-secure-store';
 import * as SplashScreen from 'expo-splash-screen';
 import { Image } from 'expo-image';
 import { useQueryClient } from '@tanstack/react-query';
+import { Platform } from 'react-native';
+import { registerForPush } from '@/lib/push';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const tokenRef = useRef<string | null>(null);
+  const pushTokenRef = useRef<string | null>(null);
 
   const setToken = (t: string | null) => {
     tokenRef.current = t;
@@ -71,6 +74,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       const refreshToken = await SecureStore.getItemAsync(REFRESH_KEY);
+
+      if (pushTokenRef.current) {
+        await fetch(`${WODMATCH}/api/users/push-token`, {
+          method: 'DELETE',
+          signal: AbortSignal.timeout(5000),
+          headers: {
+            ...BASE_HEADERS,
+            'Content-Type': 'application/json',
+            ...(tokenRef.current ? { Authorization: `Bearer ${tokenRef.current}` } : {}),
+          },
+          body: JSON.stringify({ token: pushTokenRef.current }),
+        }).catch(() => {});
+        pushTokenRef.current = null;
+      }
       await fetch(`${WODZONE}/api/users/logout`, {
         method: 'POST',
         signal: AbortSignal.timeout(5000),
@@ -136,6 +153,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (!user?.id_user) return; // adapte au champ id de ton user
+    (async () => {
+      try {
+        const token = await registerForPush();
+        if (!token || !tokenRef.current) return;
+        pushTokenRef.current = token;
+        await fetch(`${WODMATCH}/api/users/push-token`, {
+          method: 'POST',
+          headers: {
+            ...BASE_HEADERS,
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+          body: JSON.stringify({ token, platform: Platform.OS }),
+        });
+      } catch (e) {
+        console.warn('push token', e); // ne doit jamais bloquer l'app
+      }
+    })();
+  }, [user?.id_user]);
 
   const signIn = async (email: string, pwd: string) => {
     const res = await fetch(`${WODZONE}/api/users/login`, {
