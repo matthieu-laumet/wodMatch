@@ -10,6 +10,7 @@ SplashScreen.preventAutoHideAsync();
 
 const WODZONE = process.env.EXPO_PUBLIC_WODZONE_URL;
 const WODMATCH = process.env.EXPO_PUBLIC_WODMATCH_URL;
+console.log('URLS', WODZONE, WODMATCH);
 const REFRESH_KEY = 'refreshToken';
 const API_KEY = process.env.EXPO_PUBLIC_MOBILE_API_KEY;
 const BASE_HEADERS: Record<string, string> = { 'x-client': 'mobile', ...(API_KEY ? { 'x-api-key': API_KEY } : {}), };

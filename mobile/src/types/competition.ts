@@ -26,6 +26,9 @@ export type Competition = {
   queryMatchCity?: string;
 };
 
+/** Version réduite de Competition, suffisante pour l'écran Likes & matchs */
+export type CompetitionSummary = Pick<Competition, 'id' | 'name' | 'city' | 'startDate' | 'begin' | 'end'>;
+
 export type SearchMode = {
   id_search_mode: number;
   icon: string;
@@ -68,41 +71,36 @@ export type PipelineStep = 'match' | 'exchange' | 'wod_test' | 'roster';
 export interface Liker {
   id: string;
   name: string;
-  avatarUrl?: string;  // wm_users photo, ou team_photos.url pour une team
+  avatarUrl?: string; // wm_users photo, ou team_photos.url pour une team
 }
 
 /** matches.status -> étape du pipeline */
 export interface MatchSummary {
-  id: number;          // id_match
+  id: number; // id_match
   name: string;
   step: PipelineStep;
-  nextLabel?: string;  // ex. 'WOD test sam. 14'
+  nextLabel?: string; // ex. 'WOD test sam. 14'
 }
 
-export interface Slot {                // team_slots
+export interface Slot {
+  // team_slots
   gender: 'F' | 'H' | null;
-  filledBy: number | null;             // filled_by (null = place libre)
+  filledBy: number | null; // filled_by (null = place libre)
 }
 
 /** Onglet « Je recrute » : une team que j'ai créée (teams.created_by) */
 export interface RecruitItem {
-  competition: Competition;
+  competition: CompetitionSummary;
   team: { id: number; name: string; division: string; slots: Slot[] };
-  likers: Liker[];                     // swipes vers id_team_to = team.id
-  matches: MatchSummary[];             // matches.id_team = team.id
-  id: number; 
-  name: string; 
-  city: string; 
-  startDate: string; 
-  division_name: string; 
+  likers: Liker[]; // swipes vers id_team_to = team.id
+  matches: MatchSummary[]; // matches.id_team = team.id
 }
-
 
 /** Onglet « Je rejoins » : je suis seul·e (user_searches.is_active) */
 export interface JoinItem {
-  competition: Competition;
-  division: string;                    // user_search_divisions -> divisions
-  searchActive: boolean;               // user_searches.is_active
-  likers: Liker[];                     // teams qui m'ont liké (id_user_to = moi)
-  matches: MatchSummary[];             // matches.id_user = moi
+  competition: CompetitionSummary;
+  division: string; // user_search_divisions -> divisions
+  searchActive: boolean; // user_searches.is_active
+  likers: Liker[]; // teams qui m'ont liké (id_user_to = moi)
+  matches: MatchSummary[]; // matches.id_user = moi
 }

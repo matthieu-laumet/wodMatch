@@ -1,18 +1,17 @@
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { EmptyState, JoinCard, RecruitCard } from '@/components/Cards';
-import { joinMock, recruitMock } from '@/components/Mock';
-import { brand, Colors, fonts, gray } from '@/constants/theme';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { JoinTab, RecruitTab } from '@/components/Cards';
+import { brand, Colors, gray } from '@/constants/theme';
+import { useLikesHub } from '@/hooks/queries'; // ← adapte le chemin
+import { plural } from '@/utils/helper';
 
 type Tab = 'join' | 'recruit';
 
-// TODO: remplacer par les vraies données (voir les commentaires dans types.ts)
-const useLikesHub = () => ({ recruit: recruitMock, join: [] });
-
 export default function LikeMatch() {
-  const { recruit, join } = useLikesHub();
+  const { data, isLoading, refetch, isRefetching } = useLikesHub();
+  const recruit = data?.recruit ?? [];
+  const join = data?.join ?? [];
 
-  // Onglet ouvert par défaut : celui où il y a des likes à traiter
   const pending = useMemo(
     () => ({
       recruit: recruit.reduce((n, i) => n + i.likers.length, 0),
@@ -20,27 +19,32 @@ export default function LikeMatch() {
     }),
     [recruit, join],
   );
-  const [tab, setTab] = useState<Tab>(pending.recruit === 0 && pending.join > 0 ? 'join' : 'recruit');
 
-  // Tri : compétitions avec likes à traiter d'abord, puis par date
+  // null tant que l'utilisateur n'a pas choisi : l'onglet par défaut se calcule
+  // APRÈS le chargement (avec useState(initial) il serait figé sur des données vides)
+  const [picked, setPicked] = useState<Tab | null>(null);
+  const tab: Tab = picked ?? (pending.recruit === 0 && pending.join > 0 ? 'join' : 'recruit');
+
   const byPriority = <T extends { competition: { startDate: string }; likers: unknown[] }>(a: T, b: T) =>
     b.likers.length - a.likers.length || a.competition.startDate.localeCompare(b.competition.startDate);
 
   const handlers = {
-    onTreat: (id: number) => console.log('TODO ouvrir le détail compétition', id), // router.push(`/likes/${id}`)
-    onSwipe: (id: number) => console.log('TODO ouvrir le swipe', id),              // router.push('/swipe')
+    onTreat: (id: number) => console.log('TODO ouvrir le détail compétition', id),
+    onSwipe: (id: number) => console.log('TODO ouvrir le swipe', id),
   };
 
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* <Text style={styles.heading}>Likes & matchs</Text>
-      <Text style={styles.subTitle}>Choisis ton rôle puis ta compétition</Text> */}
+  const count = pending[tab];
 
+  return (
+    <ScrollView
+      style={styles.screen} contentContainerStyle={styles.content}
+      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={async () => { await refetch(); }} />}
+    >
       <View style={styles.tabs}>
         {(['join', 'recruit'] as const).map((t) => {
           const active = tab === t;
           return (
-            <Pressable key={t} onPress={() => setTab(t)} accessibilityRole="tab" accessibilityState={{ selected: active }}
+            <Pressable key={t} onPress={() => setPicked(t)} accessibilityRole="tab" accessibilityState={{ selected: active }}
               style={styles.tab}>
               <Text style={[styles.tabText, active && styles.tabTextActive]}>{t === 'join' ? 'Je rejoins' : 'Je recrute'}</Text>
               {!active && pending[t] > 0 && <View style={styles.badge} />}
@@ -49,35 +53,25 @@ export default function LikeMatch() {
         })}
       </View>
 
-      {tab === 'recruit' && 
+      {isLoading ? (
+        <ActivityIndicator style={{ marginTop: 32 }} />
+      ) : (
         <View style={styles.list}>
-          {recruit.length > 0 && 
-            <>
-              <View style={styles.headerLine}>
-                <Text style={styles.heading}>À traiter</Text>
-                <Text style={styles.subTitle}>3 Personnes t'on likés</Text>
-              </View>
-              {[...recruit].sort(byPriority).map((item) => <RecruitCard key={item.team.id} item={item} h={handlers} />)}
-            </>
-          }
-        </View>
-      }
+          {count > 0 && (
+            <View style={styles.headerLine}>
+              <Text style={styles.heading}>À traiter</Text>
+              <Text style={styles.subTitle}>
+                {tab === 'recruit'
+                  ? plural(count, 'personne t’a liké', 'personnes t’ont liké')
+                  : plural(count, 'team t’a liké', 'teams t’ont liké')}
+              </Text>
+            </View>
+          )}
 
-      {/* <View style={styles.list}>
-        {tab === 'recruit' ? (
-          <>
-            {[...recruit].sort(byPriority).map((item) => <RecruitCard key={item.team.id} item={item} h={handlers} />)}
-            <EmptyState title="Une autre compétition en vue ?" action="+ Créer une team" onPress={() => console.log('TODO créer une team')} />
-          </>
-        ) : join.length === 0 ? (
-          <EmptyState title="Tu ne cherches aucune team pour l'instant." action="Choisir une compétition" onPress={() => console.log('TODO compétitions')} />
-        ) : (
-          <>
-            {[...join].sort(byPriority).map((item) => <JoinCard key={item.competition.id} item={item} h={handlers} />)}
-            <EmptyState title="Une autre compétition ?" action="+ Chercher une team" onPress={() => console.log('TODO compétitions')} />
-          </>
-        )}
-      </View> */}
+          {tab === 'recruit' && <RecruitTab items={recruit} handlers={handlers} />}
+          {tab === 'join' && <JoinTab items={join} handlers={handlers} />}
+        </View>
+      )}
     </ScrollView>
   );
 }

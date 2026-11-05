@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import type { Competition, EventMode, Favorite, SearchMode, Tag, TeamProfile } from '../types/competition';
+import type { Competition, EventMode, Favorite, JoinItem, RecruitItem, SearchMode, Tag, TeamProfile } from '../types/competition';
 import { useWodzoneApi, useWodmatchApi } from '@/lib/api';
 
 export const useTags = () => {
@@ -139,6 +139,7 @@ export function useSwipe(id_competition: number) {
       if (ctx?.prev) qc.setQueryData(key, ctx.prev);
     },
     onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['likesHub'] }); // ← ajout
       if ((qc.getQueryData<TeamProfile[]>(key)?.length ?? 0) <= 3) {
         qc.invalidateQueries({ queryKey: key });
       }
@@ -151,5 +152,13 @@ export const useRegisterPushToken = () => {
   return useMutation({
     mutationFn: (v: { token: string; platform: string }) =>
       api('/users/push-token', { method: 'POST', body: JSON.stringify(v) }),
+  });
+};
+
+export const useLikesHub = () => {
+  const api = useWodmatchApi();
+  return useQuery<{ recruit: RecruitItem[]; join: JoinItem[] }>({
+    queryKey: ['likesHub'],
+    queryFn: () => api('/likes/get-likes-hub'),
   });
 };

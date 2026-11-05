@@ -39,6 +39,7 @@ app.use('/api/images', require('./src/routes/imagesRoutes'));
 app.use('/api/feed', require('./src/routes/feedRoutes'));
 app.use('/api/funReps', require('./src/routes/funRepsRoutes'));
 app.use('/api/levels', require('./src/routes/levelsRoutes'));
+app.use('/api/likes', require('./src/routes/likesRoutes'));
 app.use('/api/searchModes', require('./src/routes/searchModesRoutes'));
 app.use('/api/skills', require('./src/routes/skillsRoutes'));
 app.use('/api/swipes', require('./src/routes/swipeRoutes'));

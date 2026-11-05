@@ -1,10 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Avatar, AvatarStack, Countdown, Cta, Gauge, MatchLine } from './MatchComponents';
-import { JoinItem, RecruitItem } from '@/types/competition';
-import { daysUntil, likersSentence, missingLabel, plural, subtitle } from '@/utils/helper';
+import { AvatarStack, Countdown, Cta, Gauge, MatchLine } from './MatchComponents';
+import type { JoinItem, RecruitItem } from '@/types/competition';
+import { daysUntil, formatDate, likersSentence, missingLabel, plural } from '@/utils/helper';
 import { Colors, fonts } from '@/constants/theme';
 
-type Handlers = { onTreat: (competitionId: number) => void; onSwipe: (competitionId: number) => void };
+export type Handlers = { onTreat: (competitionId: number) => void; onSwipe: (competitionId: number) => void };
+type TabProps<T> = { items: T[]; handlers: Handlers };
+
+// Tri : compétitions avec likes à traiter d'abord, puis par date
+const byPriority = <T extends { competition: { startDate: string }; likers: unknown[] }>(a: T, b: T) =>
+  b.likers.length - a.likers.length || a.competition.startDate.localeCompare(b.competition.startDate);
 
 /** Bouton : rouge s'il y a des likes à traiter, sinon secondaire. */
 function MainAction({ likes, hasMatches, competitionId, h }: { likes: number; hasMatches: boolean; competitionId: number; h: Handlers }) {
@@ -13,67 +18,97 @@ function MainAction({ likes, hasMatches, competitionId, h }: { likes: number; ha
   return <Cta primary={false} label="Aller swiper" onPress={() => h.onSwipe(competitionId)} />;
 }
 
-export function RecruitCard({ item, h }: { item: RecruitItem; h: Handlers }) {
-  const { competition: c, team, likers, matches } = item;
-  const filled = team.slots.filter((s) => s.filledBy !== null).length;
-  return (
-    <View style={styles.card}>
-      <View style={styles.head}>
-        <View style={styles.flex}>
-          <Text style={styles.title}>{c.name}</Text>
-          <Text style={styles.sub}>{c.division_name}</Text>
-        </View>
-        <Countdown days={daysUntil(c.startDate)} />
-      </View>
-      <View style={styles.row}>
-        <Gauge slots={team.slots} />
-        <Text style={styles.small}><Text style={styles.bold}>{filled}/{team.slots.length}</Text> · {missingLabel(team.slots, team.division)}</Text>
-      </View>
-      {likers.length > 0 && (
-        <View style={[styles.row, { marginTop: 14 }]}>
-          <AvatarStack people={likers} />
-          <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'personne')}</Text>
-        </View>
-      )}
-      <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={h} />
-      <MatchLine matches={matches} />
-    </View>
-  );
-}
-
-export function JoinCard({ item, h }: { item: JoinItem; h: Handlers }) {
-  const { competition: c, likers, matches, division } = item;
-  return (
-    <View style={styles.card}>
-      <View style={styles.head}>
-        <View style={styles.flex}>
-          <Text style={styles.title}>{c.name}</Text>
-          <Text style={styles.sub}>{c.city} · {subtitle(c).split(' · ')[1]}</Text>
-        </View>
-        <Countdown days={daysUntil(c.startDate)} />
-      </View>
-      <View style={styles.row}>
-        <View style={styles.pill}><Text style={styles.pillText}>Tu cherches une team</Text></View>
-        <Text style={styles.small}>{division}</Text>
-      </View>
-      {likers.length > 0 && (
-        <View style={[styles.row, { marginTop: 14 }]}>
-          <AvatarStack people={likers} />
-          <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'team')}</Text>
-        </View>
-      )}
-      <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={h} />
-      <MatchLine matches={matches} />
-    </View>
-  );
-}
-
 export function EmptyState({ title, action, onPress }: { title: string; action: string; onPress: () => void }) {
   return (
     <View style={styles.empty}>
       <Text style={styles.emptyTitle}>{title}</Text>
       <Cta primary={false} label={action} onPress={onPress} />
     </View>
+  );
+}
+
+export function RecruitTab({ items, handlers }: TabProps<RecruitItem>) {
+  return (
+    <>
+      {[...items].sort(byPriority).map(({ competition: c, team, likers, matches }) => {
+        const filled = team.slots.filter((s) => s.filledBy !== null).length;
+        return (
+          <View key={team.id} style={styles.card}>
+            <View style={styles.head}>
+              <View style={styles.flex}>
+                <Text style={styles.title}>{c.name}</Text>
+                <Text style={styles.sub}>{team.division}</Text>
+              </View>
+              <Countdown days={daysUntil(c.startDate)} />
+            </View>
+            <View style={styles.row}>
+              <Gauge slots={team.slots} />
+              <Text style={styles.small}>
+                <Text style={styles.bold}>{filled}/{team.slots.length}</Text> · {missingLabel(team.slots, team.division)}
+              </Text>
+            </View>
+            {likers.length > 0 && (
+              <View style={[styles.row, { marginTop: 14 }]}>
+                <AvatarStack people={likers} />
+                <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'personne')}</Text>
+              </View>
+            )}
+            <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={handlers} />
+            <MatchLine matches={matches} />
+          </View>
+        );
+      })}
+      {/* <EmptyState
+        title="Une autre compétition en vue ?"
+        action="+ Créer une team"
+        onPress={() => console.log('TODO créer une team')}
+      /> */}
+    </>
+  );
+}
+
+export function JoinTab({ items, handlers }: TabProps<JoinItem>) {
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        title="Tu ne cherches aucune team pour l'instant."
+        action="Choisir une compétition"
+        onPress={() => console.log('TODO compétitions')}
+      />
+    );
+  }
+
+  return (
+    <>
+      {[...items].sort(byPriority).map(({ competition: c, likers, matches, division }) => (
+        <View key={c.id} style={styles.card}>
+          <View style={styles.head}>
+            <View style={styles.flex}>
+              <Text style={styles.title}>{c.name}</Text>
+              <Text style={styles.sub}>{c.city} · {formatDate(c.startDate)}</Text>
+            </View>
+            <Countdown days={daysUntil(c.startDate)} />
+          </View>
+          <View style={styles.row}>
+            <View style={styles.pill}><Text style={styles.pillText}>Tu cherches une team</Text></View>
+            <Text style={styles.small}>{division}</Text>
+          </View>
+          {likers.length > 0 && (
+            <View style={[styles.row, { marginTop: 14 }]}>
+              <AvatarStack people={likers} />
+              <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'team')}</Text>
+            </View>
+          )}
+          <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={handlers} />
+          <MatchLine matches={matches} />
+        </View>
+      ))}
+      <EmptyState
+        title="Une autre compétition ?"
+        action="+ Chercher une team"
+        onPress={() => console.log('TODO compétitions')}
+      />
+    </>
   );
 }
 
