@@ -105,11 +105,17 @@ async function getLikesHub({ id_user }) {
   // 4) Assemblage (même forme que les mocks)
   const likesByTeam = groupBy(recruitLikes.rows, 'id_team');
   const matchesByTeam = groupBy(recruitMatches.rows, 'id_team');
+  // Le créateur est toujours membre validé, même s'il n'a pas de ligne dans team_slots
+  const withOwner = (t) => {
+    const slots = t.slots ?? [];
+    const hasOwner = slots.some((s) => String(s.filledBy) === String(t.created_by));
+    return hasOwner ? slots : [{ gender: null, filledBy: t.created_by, isOwner: true }, ...slots];
+  };
   const recruit = teams
     .filter(t => compMap.has(t.id_competition))
     .map(t => ({
       competition: compMap.get(t.id_competition),
-      team: { id: t.id_team, name: t.name, division: divMap.get(t.id_division) ?? '', slots: t.slots ?? [] },
+      team: { id: t.id_team, name: t.name, division: divMap.get(t.id_division) ?? '', slots: withOwner(t) },
       likers: (likesByTeam.get(t.id_team) ?? []).map(l => person(l.id_user)),
       matches: (matchesByTeam.get(t.id_team) ?? []).map(m => ({
         id: m.id_match, name: person(m.id_user).name, step: m.status,

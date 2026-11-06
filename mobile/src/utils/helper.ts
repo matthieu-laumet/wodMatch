@@ -34,7 +34,7 @@ export const missingLabel = (slots: Slot[], division: string) => {
   const h = open.filter((s) => s.gender === 'H').length;
   const any = open.length - f - h;
   const parts = [f && `${f} F`, h && `${h} H`, any && `${any} athlète${any > 1 ? 's' : ''}`].filter(Boolean);
-  return `manque ${parts.join(' + ')} · ${division}`;
+  return `Recherche ${parts.join(' + ')} · ${division}`;
 };
 
 export const STEP_LABEL: Record<PipelineStep, string> = {

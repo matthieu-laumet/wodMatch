@@ -1,14 +1,19 @@
 import { useEffect } from 'react';
-import { Stack, router } from 'expo-router';
+import { SplashScreen, Stack, router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import { FiltersProvider } from '../context/FiltersContext';
+import { useFonts } from 'expo-font';
+import { Anton_400Regular } from '@expo-google-fonts/anton';
+import { BarlowCondensed_800ExtraBold_Italic } from '@expo-google-fonts/barlow-condensed';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 60_000, retry: 1 } },
 });
+
+SplashScreen.preventAutoHideAsync(); 
 
 function RootNavigator() {
   const { user, isLoading } = useAuth();
@@ -46,6 +51,17 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Anton_400Regular, // tu peux la retirer si tu ne l'utilises plus ailleurs
+    BarlowCondensed_800ExtraBold_Italic,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) SplashScreen.hideAsync();
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) return null;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>

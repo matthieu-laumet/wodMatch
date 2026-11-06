@@ -29,7 +29,12 @@ export default function LikeMatch() {
   const rows = useMemo<Row[]>(() => {
     const recruit: Row[] = (data?.recruit ?? []).map((item) => ({ kind: 'recruit', key: `r-${item.team.id}`, item }));
     const join: Row[] = (data?.join ?? []).map((item) => ({ kind: 'join', key: `j-${item.competition.id}`, item }));
-    return [...recruit, ...join].sort(priority);
+    const all = [...recruit, ...join].sort(priority);
+
+    // TEST : duplique la première card pour voir l'affichage compact (à supprimer ensuite)
+    if (__DEV__ && all.length === 1) return [...all, { ...all[0], key: `${all[0].key}-copy` }];
+
+    return all;
   }, [data]);
 
   // Le bandeau compte TOUT, quel que soit le filtre ; les pastilles de filtre signalent ce qui attend ailleurs.
@@ -75,9 +80,9 @@ export default function LikeMatch() {
           </View>
 
           <View style={styles.list}>
-            {visible.map((r) => r.kind === 'recruit'
-              ? <RecruitCard key={r.key} item={r.item} h={handlers} />
-              : <JoinCard key={r.key} item={r.item} h={handlers} />)}
+            {visible.map((r, i) => r.kind === 'recruit'
+              ? <RecruitCard key={r.key} item={r.item} h={handlers} compact={i > 0} />
+              : <JoinCard key={r.key} item={r.item} h={handlers} compact={i > 0} />)}
 
             {visible.length === 0 && (
               <EmptyState

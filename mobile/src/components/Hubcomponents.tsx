@@ -64,8 +64,8 @@ export function StatusBlock({ kind, people, title, subtitle }: { kind: Kind; peo
   return (
     <View style={[styles.block, { backgroundColor: bg }]}>
       <AvatarRow people={people} kind={kind} size={kind === 'like' ? 56 : 48} surface={bg} />
-      <Text style={styles.blockTitle}>{title}</Text>
-      {subtitle ? <Text style={styles.blockSub}>{subtitle}</Text> : null}
+      {/* <Text style={styles.blockTitle}>{title}</Text>
+      {subtitle ? <Text style={styles.blockSub}>{subtitle}</Text> : null} */}
     </View>
   );
 }

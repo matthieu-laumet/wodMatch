@@ -27,20 +27,15 @@ export function AvatarStack({ people }: { people: Liker[] }) {
 }
 
 /** Jauge segmentée : plein = rempli, rouge pointillé = place visée, gris = libre */
-export function Gauge({ slots }: { slots: Slot[] }) {
-  const firstOpen = slots.findIndex((s) => s.filledBy === null);
+export function Gauge({ slots, pending = 0 }: { slots: Slot[]; pending?: number }) {
+  let toValidate = pending; // on remplit les premières places libres avec les candidats
   return (
     <View style={styles.gauge}>
-      {slots.map((s, i) => (
-        <View
-          key={i}
-          style={[
-            styles.segment,
-            s.filledBy !== null && styles.segmentFilled,
-            i === firstOpen && styles.segmentTarget,
-          ]}
-        />
-      ))}
+      {slots.map((s, i) => {
+        const filled = s.filledBy !== null;
+        const isPending = !filled && toValidate-- > 0;
+        return <View key={i} style={[styles.segment, filled && styles.segmentFilled, isPending && styles.segmentPending]} />;
+      })}
     </View>
   );
 }
@@ -73,9 +68,14 @@ export function Cta({ label, onPress, primary }: { label: string; onPress: () =>
   );
 }
 
-export function Countdown({ days }: { days: number }) {
-  return <Text style={[styles.countdown, days <= 14 && { color: Colors.red }]}>J-{days}</Text>;
+export function Countdown({ days, small = false }: { days: number; small?: boolean }) {
+  return (
+    <Text accessibilityLabel={`Dans ${days} jours`} style={[styles.countdown, small && styles.countdownSmall]}>
+      J-{days}
+    </Text>
+  );
 }
+
 
 const styles = StyleSheet.create({
   avatar: { borderWidth: 2, borderColor: Colors.white },
@@ -95,5 +95,16 @@ const styles = StyleSheet.create({
   ctaPrimary: { backgroundColor: Colors.red },
   ctaSecondary: { borderWidth: 1.5, borderColor: Colors.ink },
   ctaText: { color: Colors.white, fontWeight: '700', fontSize: 14 },
-  countdown: { fontFamily: fonts.display, fontSize: 16, color: gray.g06 },
+  countdown: {
+    fontFamily: fonts.countdown,
+    fontSize: 28,
+    lineHeight: 44,
+    fontStyle: 'italic',
+    fontWeight: '800',
+    color: Colors.red,
+    flexShrink: 0,            // ne jamais le laisser passer à la ligne
+    includeFontPadding: false, // Android : aligne bien le bas du texte avec le titre
+  },
+  countdownSmall: { fontSize: 22, lineHeight: 30 },
+  segmentPending: { backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.red, borderStyle: 'dashed' },
 });

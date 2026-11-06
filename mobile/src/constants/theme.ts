@@ -101,4 +101,6 @@ export const MaxContentWidth = 800;
 // sans ça, React Native retombe sur la police système.
 export const fonts = {
   display: 'BarlowCondensed_800ExtraBold',
+  displayItalic: 'BarlowCondensed-ExtraBoldItalic',
+  countdown: 'BarlowCondensed_800ExtraBold_Italic',
 };
