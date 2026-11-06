@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import {
   ActivityIndicator, KeyboardTypeOptions, Pressable, StyleProp, StyleSheet, Text, TextInput, View, ViewStyle,
 } from 'react-native';
@@ -20,7 +20,7 @@ type Props = {
 export default function EditableLine({
   label, value, onSave, isActive = false, onToggle, onPress, keyboardType, placeholder, style,
 }: Props) {
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [input, setInput] = useState(value ?? '');
   const [saving, setSaving] = useState(false);
 

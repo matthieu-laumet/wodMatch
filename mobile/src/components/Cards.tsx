@@ -1,22 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { AvatarStack, Countdown, Cta, Gauge, MatchLine } from './MatchComponents';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Countdown, Cta, Gauge } from './MatchComponents';
 import type { JoinItem, RecruitItem } from '@/types/competition';
 import { daysUntil, formatDate, likersSentence, missingLabel, plural } from '@/utils/helper';
 import { Colors, fonts } from '@/constants/theme';
+import { StatusBlock } from './Hubcomponents';
 
 export type Handlers = { onTreat: (competitionId: number) => void; onSwipe: (competitionId: number) => void };
-type TabProps<T> = { items: T[]; handlers: Handlers };
-
-// Tri : compétitions avec likes à traiter d'abord, puis par date
-const byPriority = <T extends { competition: { startDate: string }; likers: unknown[] }>(a: T, b: T) =>
-  b.likers.length - a.likers.length || a.competition.startDate.localeCompare(b.competition.startDate);
-
-/** Bouton : rouge s'il y a des likes à traiter, sinon secondaire. */
-function MainAction({ likes, hasMatches, competitionId, h }: { likes: number; hasMatches: boolean; competitionId: number; h: Handlers }) {
-  if (likes > 0) return <Cta primary label={`Traiter ${plural(likes, 'like', 'likes')}`} onPress={() => h.onTreat(competitionId)} />;
-  if (hasMatches) return <Cta primary={false} label="Voir les matchs" onPress={() => h.onTreat(competitionId)} />;
-  return <Cta primary={false} label="Aller swiper" onPress={() => h.onSwipe(competitionId)} />;
-}
 
 export function EmptyState({ title, action, onPress }: { title: string; action: string; onPress: () => void }) {
   return (
@@ -27,102 +16,94 @@ export function EmptyState({ title, action, onPress }: { title: string; action: 
   );
 }
 
-export function RecruitTab({ items, handlers }: TabProps<RecruitItem>) {
+type Shell = {
+  competitionId: number;
+  name: string;
+  kicker: string;
+  days: number;
+  likers: { name: string; photoUrl?: string | null }[];
+  likeTitle: string;
+  matches: { name: string; photoUrl?: string | null }[];
+  h: Handlers;
+  children?: React.ReactNode;
+};
+
+/** Card H5 : toute la card est cliquable → détail de la compétition. */
+function CompetitionCard({ competitionId, name, kicker, days, likers, likeTitle, matches, h, children }: Shell) {
+  const hasWork = likers.length > 0 || matches.length > 0;
+  const cta = likers.length > 0 ? 'Traiter les likes' : matches.length > 0 ? 'Voir les matchs' : 'Aller swiper';
+  const open = () => (hasWork ? h.onTreat(competitionId) : h.onSwipe(competitionId));
+
   return (
-    <>
-      {[...items].sort(byPriority).map(({ competition: c, team, likers, matches }) => {
-        const filled = team.slots.filter((s) => s.filledBy !== null).length;
-        return (
-          <View key={team.id} style={styles.card}>
-            <View style={styles.head}>
-              <View style={styles.flex}>
-                <Text style={styles.title}>{c.name}</Text>
-                <Text style={styles.sub}>{team.division}</Text>
-              </View>
-              <Countdown days={daysUntil(c.startDate)} />
-            </View>
-            <View style={styles.row}>
-              <Gauge slots={team.slots} />
-              <Text style={styles.small}>
-                <Text style={styles.bold}>{filled}/{team.slots.length}</Text> · {missingLabel(team.slots, team.division)}
-              </Text>
-            </View>
-            {likers.length > 0 && (
-              <View style={[styles.row, { marginTop: 14 }]}>
-                <AvatarStack people={likers} />
-                <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'personne')}</Text>
-              </View>
-            )}
-            <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={handlers} />
-            <MatchLine matches={matches} />
-          </View>
-        );
-      })}
-      {/* <EmptyState
-        title="Une autre compétition en vue ?"
-        action="+ Créer une team"
-        onPress={() => console.log('TODO créer une team')}
-      /> */}
-    </>
+    <Pressable onPress={open} accessibilityRole="button" accessibilityLabel={`${name}. ${cta}`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
+      <View style={styles.head}>
+        <View style={styles.flex}>
+          <Text style={styles.kicker}>{kicker}</Text>
+          <Text style={styles.title}>{name}</Text>
+        </View>
+        <Countdown days={days} />
+      </View>
+
+      {children}
+
+      {likers.length > 0 && <StatusBlock kind="like" people={likers} title={likeTitle} />}
+      {matches.length > 0 && (
+        <StatusBlock
+          kind="match"
+          people={matches}
+          title={matches.length === 1 ? matches[0].name : `${matches[0].name} et ${plural(matches.length - 1, 'autre', 'autres')}`}
+          subtitle={plural(matches.length, 'match en cours', 'matchs en cours')}
+        />
+      )}
+
+      <View style={styles.footer}>
+        <Text style={styles.hint}>{hasWork ? 'Appuie pour répondre' : 'Rien à traiter pour l’instant'}</Text>
+        <Text style={styles.open}>{hasWork ? 'Ouvrir ›' : `${cta} ›`}</Text>
+      </View>
+    </Pressable>
   );
 }
 
-export function JoinTab({ items, handlers }: TabProps<JoinItem>) {
-  if (items.length === 0) {
-    return (
-      <EmptyState
-        title="Tu ne cherches aucune team pour l'instant."
-        action="Choisir une compétition"
-        onPress={() => console.log('TODO compétitions')}
-      />
-    );
-  }
-
+export function RecruitCard({ item, h }: { item: RecruitItem; h: Handlers }) {
+  const { competition: c, team, likers, matches } = item;
+  const filled = team.slots.filter((s) => s.filledBy !== null).length;
   return (
-    <>
-      {[...items].sort(byPriority).map(({ competition: c, likers, matches, division }) => (
-        <View key={c.id} style={styles.card}>
-          <View style={styles.head}>
-            <View style={styles.flex}>
-              <Text style={styles.title}>{c.name}</Text>
-              <Text style={styles.sub}>{c.city} · {formatDate(c.startDate)}</Text>
-            </View>
-            <Countdown days={daysUntil(c.startDate)} />
-          </View>
-          <View style={styles.row}>
-            <View style={styles.pill}><Text style={styles.pillText}>Tu cherches une team</Text></View>
-            <Text style={styles.small}>{division}</Text>
-          </View>
-          {likers.length > 0 && (
-            <View style={[styles.row, { marginTop: 14 }]}>
-              <AvatarStack people={likers} />
-              <Text style={styles.small}>{likersSentence(likers.map((l) => l.name), 'team')}</Text>
-            </View>
-          )}
-          <MainAction likes={likers.length} hasMatches={matches.length > 0} competitionId={c.id} h={handlers} />
-          <MatchLine matches={matches} />
-        </View>
-      ))}
-      <EmptyState
-        title="Une autre compétition ?"
-        action="+ Chercher une team"
-        onPress={() => console.log('TODO compétitions')}
-      />
-    </>
+    <CompetitionCard
+      competitionId={c.id} name={c.name} days={daysUntil(c.startDate)} h={h}
+      kicker={`${team.name} · ${filled}/${team.slots.length} · ${team.division}`}
+      likers={likers} likeTitle={likersSentence(likers.map((l) => l.name), 'personne')} matches={matches}
+    >
+      <View style={styles.row}>
+        <Gauge slots={team.slots} />
+        <Text style={styles.small}>{missingLabel(team.slots, team.division)}</Text>
+      </View>
+    </CompetitionCard>
+  );
+}
+
+export function JoinCard({ item, h }: { item: JoinItem; h: Handlers }) {
+  const { competition: c, likers, matches, division } = item;
+  return (
+    <CompetitionCard
+      competitionId={c.id} name={c.name} days={daysUntil(c.startDate)} h={h}
+      kicker={`Tu cherches une team · ${division} · ${formatDate(c.startDate)}`}
+      likers={likers} likeTitle={likersSentence(likers.map((l) => l.name), 'team')} matches={matches}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1.5, borderColor: Colors.line, borderRadius: 16, padding: 14, backgroundColor: Colors.white },
-  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  card: { borderWidth: 1.5, borderColor: Colors.line, borderRadius: 20, padding: 14, gap: 12, backgroundColor: Colors.white },
+  pressed: { opacity: 0.85 },
+  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   flex: { flex: 1, paddingRight: 8 },
-  title: { fontFamily: fonts.display, fontSize: 20, fontWeight: '700', textTransform: 'uppercase', color: Colors.ink },
-  sub: { fontSize: 12, color: Colors.muted, marginTop: 3 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 },
-  small: { flex: 1, fontSize: 12, color: '#333' },
-  bold: { fontWeight: '700' },
-  pill: { backgroundColor: Colors.ink, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 },
-  pillText: { color: Colors.white, fontSize: 11, fontWeight: '600' },
-  empty: { borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#BBB', borderRadius: 16, padding: 16 },
+  kicker: { fontSize: 12, fontWeight: '600', color: Colors.muted },
+  title: { fontFamily: fonts.display, fontSize: 26, fontWeight: '800', textTransform: 'uppercase', color: Colors.ink, marginTop: 4 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  small: { flex: 1, fontSize: 12, fontWeight: '600', color: '#333' },
+  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  hint: { fontSize: 12, color: Colors.muted },
+  open: { fontSize: 14, fontWeight: '700', color: Colors.red },
+  empty: { borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#BBB', borderRadius: 16, padding: 16, gap: 10 },
   emptyTitle: { fontSize: 14, fontWeight: '600', color: '#333' },
 });

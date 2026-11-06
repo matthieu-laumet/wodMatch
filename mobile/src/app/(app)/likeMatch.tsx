@@ -1,76 +1,93 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { JoinTab, RecruitTab } from '@/components/Cards';
-import { brand, Colors, gray } from '@/constants/theme';
+import { EmptyState, JoinCard, RecruitCard } from '@/components/Cards';
+import { Colors } from '@/constants/theme';
 import { useLikesHub } from '@/hooks/queries'; // ← adapte le chemin
-import { plural } from '@/utils/helper';
+import { SummaryBanner } from '@/components/Hubcomponents';
 
-type Tab = 'join' | 'recruit';
+type Filter = 'all' | 'recruit' | 'join';
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'all', label: 'Tout' },
+  { key: 'recruit', label: 'Je recrute' },
+  { key: 'join', label: 'Je cherche' },
+];
+
+type Row =
+  | { kind: 'recruit'; key: string; item: NonNullable<ReturnType<typeof useLikesHub>['data']>['recruit'][number] }
+  | { kind: 'join'; key: string; item: NonNullable<ReturnType<typeof useLikesHub>['data']>['join'][number] };
+
+// Tri : likes à traiter d'abord, puis matchs, puis date de compétition
+const priority = (a: Row, b: Row) =>
+  b.item.likers.length - a.item.likers.length ||
+  b.item.matches.length - a.item.matches.length ||
+  a.item.competition.startDate.localeCompare(b.item.competition.startDate);
 
 export default function LikeMatch() {
   const { data, isLoading, refetch, isRefetching } = useLikesHub();
-  const recruit = data?.recruit ?? [];
-  const join = data?.join ?? [];
+  const [filter, setFilter] = useState<Filter>('all');
 
-  const pending = useMemo(
-    () => ({
-      recruit: recruit.reduce((n, i) => n + i.likers.length, 0),
-      join: join.reduce((n, i) => n + i.likers.length, 0),
-    }),
-    [recruit, join],
-  );
+  const rows = useMemo<Row[]>(() => {
+    const recruit: Row[] = (data?.recruit ?? []).map((item) => ({ kind: 'recruit', key: `r-${item.team.id}`, item }));
+    const join: Row[] = (data?.join ?? []).map((item) => ({ kind: 'join', key: `j-${item.competition.id}`, item }));
+    return [...recruit, ...join].sort(priority);
+  }, [data]);
 
-  // null tant que l'utilisateur n'a pas choisi : l'onglet par défaut se calcule
-  // APRÈS le chargement (avec useState(initial) il serait figé sur des données vides)
-  const [picked, setPicked] = useState<Tab | null>(null);
-  const tab: Tab = picked ?? (pending.recruit === 0 && pending.join > 0 ? 'join' : 'recruit');
+  // Le bandeau compte TOUT, quel que soit le filtre ; les pastilles de filtre signalent ce qui attend ailleurs.
+  const totals = useMemo(() => ({
+    likes: rows.reduce((n, r) => n + r.item.likers.length, 0),
+    matches: rows.reduce((n, r) => n + r.item.matches.length, 0),
+    recruit: rows.filter((r) => r.kind === 'recruit').reduce((n, r) => n + r.item.likers.length, 0),
+    join: rows.filter((r) => r.kind === 'join').reduce((n, r) => n + r.item.likers.length, 0),
+  }), [rows]);
 
-  const byPriority = <T extends { competition: { startDate: string }; likers: unknown[] }>(a: T, b: T) =>
-    b.likers.length - a.likers.length || a.competition.startDate.localeCompare(b.competition.startDate);
+  const visible = filter === 'all' ? rows : rows.filter((r) => r.kind === filter);
 
   const handlers = {
     onTreat: (id: number) => console.log('TODO ouvrir le détail compétition', id),
     onSwipe: (id: number) => console.log('TODO ouvrir le swipe', id),
   };
 
-  const count = pending[tab];
-
   return (
     <ScrollView
       style={styles.screen} contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={async () => { await refetch(); }} />}
     >
-      <View style={styles.tabs}>
-        {(['join', 'recruit'] as const).map((t) => {
-          const active = tab === t;
-          return (
-            <Pressable key={t} onPress={() => setPicked(t)} accessibilityRole="tab" accessibilityState={{ selected: active }}
-              style={styles.tab}>
-              <Text style={[styles.tabText, active && styles.tabTextActive]}>{t === 'join' ? 'Je rejoins' : 'Je recrute'}</Text>
-              {!active && pending[t] > 0 && <View style={styles.badge} />}
-            </Pressable>
-          );
-        })}
-      </View>
+      <Text style={styles.heading}>Likes & matchs</Text>
 
       {isLoading ? (
         <ActivityIndicator style={{ marginTop: 32 }} />
       ) : (
-        <View style={styles.list}>
-          {count > 0 && (
-            <View style={styles.headerLine}>
-              <Text style={styles.heading}>À traiter</Text>
-              <Text style={styles.subTitle}>
-                {tab === 'recruit'
-                  ? plural(count, 'personne t’a liké', 'personnes t’ont liké')
-                  : plural(count, 'team t’a liké', 'teams t’ont liké')}
-              </Text>
-            </View>
-          )}
+        <>
+          <SummaryBanner likes={totals.likes} matches={totals.matches} />
 
-          {tab === 'recruit' && <RecruitTab items={recruit} handlers={handlers} />}
-          {tab === 'join' && <JoinTab items={join} handlers={handlers} />}
-        </View>
+          <View style={styles.chips} accessibilityRole="tablist">
+            {FILTERS.map(({ key, label }) => {
+              const active = filter === key;
+              const dot = key !== 'all' && !active && totals[key] > 0;
+              return (
+                <Pressable key={key} onPress={() => setFilter(key)} accessibilityRole="tab" accessibilityState={{ selected: active }}
+                  style={[styles.chip, active && styles.chipActive]}>
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+                  {dot && <View style={styles.dot} />}
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.list}>
+            {visible.map((r) => r.kind === 'recruit'
+              ? <RecruitCard key={r.key} item={r.item} h={handlers} />
+              : <JoinCard key={r.key} item={r.item} h={handlers} />)}
+
+            {visible.length === 0 && (
+              <EmptyState
+                title={filter === 'join' ? 'Tu ne cherches aucune team pour l’instant.' : 'Aucune compétition ici pour l’instant.'}
+                action={filter === 'join' ? 'Choisir une compétition' : '+ Créer une team'}
+                onPress={() => console.log('TODO')}
+              />
+            )}
+          </View>
+        </>
       )}
     </ScrollView>
   );
@@ -78,14 +95,13 @@ export default function LikeMatch() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { padding: 16, paddingBottom: 32 },
-  headerLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  heading: { fontWeight: '700', fontSize: 16, textTransform: 'uppercase', color: Colors.ink },
-  subTitle: { fontWeight: '500', fontSize: 14, color: gray.g07 },
-  tabs: { flexDirection: 'row', marginTop: 2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#808080' },
-  tab: { flex: 1, flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center' },
-  tabTextActive: { borderBottomWidth: 3, width: '100%', fontWeight: '800', color: gray.g10, textAlign: 'center', borderBottomColor: brand.red, paddingBottom: 14 },
-  tabText: { fontWeight: '700', fontSize: 16, color: gray.g07, paddingBottom: 14 },
-  badge: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.red },
-  list: { gap: 12, marginTop: 14 },
+  content: { padding: 16, paddingBottom: 32, gap: 14 },
+  heading: { fontSize: 24, fontWeight: '700', textTransform: 'uppercase', color: Colors.ink },
+  chips: { flexDirection: 'row', gap: 8 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 99, backgroundColor: '#EEE' },
+  chipActive: { backgroundColor: Colors.ink },
+  chipText: { fontSize: 13, fontWeight: '700', color: '#222' },
+  chipTextActive: { color: Colors.white },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.red },
+  list: { gap: 12 },
 });
