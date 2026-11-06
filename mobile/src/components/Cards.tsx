@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Countdown, Cta, Gauge } from './MatchComponents';
 import type { JoinItem, RecruitItem } from '@/types/competition';
 import { daysUntil, formatDate, likersSentence, missingLabel, plural } from '@/utils/helper';
-import { Colors, fonts } from '@/constants/theme';
+import { Colors, fonts, gray } from '@/constants/theme';
 import { AvatarRow, StatusBlock, hub } from './Hubcomponents';
 
 export type Handlers = { onTreat: (competitionId: number) => void; onSwipe: (competitionId: number) => void };
@@ -39,14 +39,37 @@ function CompetitionCard({ competitionId, name, kicker, days, likers, likeTitle,
     matches.length > 0 ? plural(matches.length, 'match', 'matchs') : null,
   ].filter(Boolean).join(' · ');
 
+  const todo = !compact; /** Rouge = likes à traiter, vert = matchs seuls, rien = card neutre. */
+  const tag =
+    likers.length > 0
+      ? { label: 'À traiter', color: hub.like, bg: 'rgba(228,0,15,0.1)', fg: '#B3000C' }
+      : matches.length > 0
+        ? { label: 'Match en cours', color: hub.match, bg: hub.matchBg, fg: Colors.greenText }
+        : null;
+  const accent = todo ? tag : null;
+
   return (
     <Pressable
       onPress={open} accessibilityRole="button" accessibilityLabel={`${name}. ${cta}`}
-      style={({ pressed }) => [styles.card, compact && styles.cardCompact, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        todo ? styles.cardTodo : styles.cardCompact,
+        accent && { borderColor: accent.color, paddingLeft: 20 },
+        pressed && styles.pressed,
+      ]}
     >
+      {accent && <View pointerEvents="none" style={[styles.bar, { backgroundColor: accent.color }]} />}
+
       <View style={styles.countdown} pointerEvents="none">
-        <Countdown days={days} small={compact}/>
+        <Countdown days={days} small={compact} />
       </View>
+
+      {accent && (
+        <View style={[styles.badge, { backgroundColor: accent.bg }]}>
+          <Text style={[styles.badgeText, { color: accent.fg }]}>{accent.label}</Text>
+        </View>
+      )}
+
       <View style={styles.head}>
         <View style={styles.flex}>
           <Text style={styles.kicker}>{kicker}</Text>
@@ -77,10 +100,12 @@ function CompetitionCard({ competitionId, name, kicker, days, likers, likeTitle,
               subtitle={plural(matches.length, 'match en cours', 'matchs en cours')}
             />
           )}
-          <View style={styles.footer}>
-            <Text style={styles.hint}>{hasWork ? 'Appuie pour répondre' : 'Rien à traiter pour l’instant'}</Text>
-            <Text style={styles.open}>{hasWork ? 'Ouvrir ›' : `${cta} ›`}</Text>
-          </View>
+          {/* <View style={styles.footer}>
+            <Text style={[styles.hint, accent && { color: accent.color, fontWeight: '600' }]}>
+              {hasWork ? 'Appuie pour répondre' : 'Rien à traiter pour l’instant'}
+            </Text>
+            <Text style={[styles.open, accent && { color: accent.color }]}>{hasWork ? 'Ouvrir ›' : `${cta} ›`}</Text>
+          </View> */}
         </>
       )}
     </Pressable>
@@ -92,6 +117,7 @@ export function RecruitCard({ item, h, compact }: { item: RecruitItem; h: Handle
   const total = team.slots.length;
   const filled = team.slots.filter((s) => s.filledBy !== null).length;
   const pending = Math.min(likers.length, total - filled); // plus de likes que de places libres : on plafonne
+
   return (
     <CompetitionCard
       competitionId={c.id} name={c.name} days={daysUntil(c.startDate)} h={h}
@@ -113,20 +139,25 @@ export function JoinCard({ item, h, compact }: { item: JoinItem; h: Handlers; co
   return (
     <CompetitionCard
       competitionId={c.id} name={c.name} days={daysUntil(c.startDate)} h={h}
-      kicker={`Tu cherches une team · ${division} · ${formatDate(c.startDate)}`}
-      compact={compact}
+      kicker={`Tu cherches une team · ${division} · ${formatDate(c.startDate)}`} compact={compact}
       likers={likers} likeTitle={likersSentence(likers.map((l) => l.name), 'team')} matches={matches}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1.5, borderColor: Colors.line, borderRadius: 20, padding: 14, gap: 12, backgroundColor: Colors.white },
-  bold: { fontWeight: '700' },
+  card: { borderWidth: 1, borderColor: gray.g06, borderRadius: 20, padding: 14, gap: 12, backgroundColor: Colors.white },
+  cardTodo: { overflow: 'hidden' }, // coupe la barre gauche aux coins arrondis
+  cardCompact: { padding: 12, gap: 10, borderRadius: 16, backgroundColor: '#fff' },
+  bar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 6 },
+  badge: { alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  badgeText: { fontSize: 12, fontWeight: '700' },
+  bold: { fontWeight: '700', color: Colors.ink },
   pressed: { opacity: 0.85 },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   kicker: { fontSize: 12, fontWeight: '600', color: Colors.muted },
-  title: { fontFamily: fonts.display, fontSize: 26, fontWeight: '800', textTransform: 'uppercase', color: Colors.ink, marginTop: 4 },
+  title: { fontFamily: fonts.display, fontSize: 24, fontWeight: '800', textTransform: 'uppercase', color: Colors.ink, marginTop: 4 },
+  titleCompact: { fontSize: 22 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   small: { flex: 1, fontSize: 12, fontWeight: '600', color: '#333' },
   footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -135,8 +166,6 @@ const styles = StyleSheet.create({
   empty: { borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#BBB', borderRadius: 16, padding: 16, gap: 10 },
   emptyTitle: { fontSize: 14, fontWeight: '600', color: '#333' },
   countdown: { position: 'absolute', top: 0, right: 14 },
-  cardCompact: { padding: 12, gap: 10, borderRadius: 16 },
-  titleCompact: { fontSize: 22 },
   flex: { flex: 1, paddingRight: 80 }, // réserve la place du J-xx, sinon un long titre passe dessous
   compactFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   compactAvatars: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },

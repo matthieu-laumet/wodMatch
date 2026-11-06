@@ -1,21 +1,27 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { Colors, fonts } from '@/constants/theme';
+import { useState } from 'react';
 
 /** Couleurs sémantiques du hub : rouge = like à traiter, vert = match. */
 export const hub = { like: '#E4000F', match: '#16A34A', likeBg: '#FFF1F2', matchBg: '#ECFDF3', night: '#111111' };
 
-export type Person = { name: string; photoUrl?: string | null };
+export type Person = { name: string; photoUrl?: string | null; photoHeaders?: Record<string, string> };
 type Kind = 'like' | 'match';
 
 /** Avatar rond : anneau + badge (♥ rouge = like, ✓ vert = match). `surface` = couleur du fond derrière, pour détourer le badge. */
 export function RingAvatar({ person, kind, size = 52, surface = Colors.white }: { person: Person; kind: Kind; size?: number; surface?: string }) {
+  const [failed, setFailed] = useState(false);
   const color = kind === 'like' ? hub.like : hub.match;
   const badge = Math.round(size / 3) + 4;
   return (
     <View style={{ width: size, height: size }} accessibilityLabel={`${person.name}, ${kind === 'like' ? 'like à traiter' : 'match'}`}>
       <View style={[styles.ring, { width: size, height: size, borderRadius: size / 2, borderColor: color }]}>
-        {person.photoUrl ? (
-          <Image source={{ uri: person.photoUrl }} style={styles.photo} />
+        {person.photoUrl && !failed ? (
+          <Image
+            source={{ uri: person.photoUrl, headers: person.photoHeaders }}
+            style={styles.photo}
+            onError={() => setFailed(true)}
+          />
         ) : (
           <Text style={[styles.initial, { fontSize: size / 3 }]}>{person.name.charAt(0).toUpperCase()}</Text>
         )}

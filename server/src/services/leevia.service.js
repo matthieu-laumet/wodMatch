@@ -5,7 +5,8 @@ const sharp = require('sharp');
 // --- liste légère (1 seul PROPFIND, aucune image téléchargée) ---
 const listCache = new Map(); // id_user -> { at, data }
 const LIST_TTL = 30_000;
-
+const firstPhotoCache = new Map(); // id_user -> { at, filename }
+const FIRST_TTL = 5 * 60_000;
 
 async function listUserTempFilenamesService(id_user) {
   const hit = listCache.get(id_user);
@@ -30,9 +31,6 @@ async function listUserTempFilenamesService(id_user) {
   listCache.set(id_user, { at: Date.now(), data });
   return data;
 }
-
-const invalidateTempList = id_user => listCache.delete(id_user);
-
 
 
 async function getImageRaw(filename) {
@@ -154,9 +152,29 @@ async function getUserTempImagesService(id_user) {
   }
 }
 
+async function getFirstPhotoFilenameService(id_user) {
+  const hit = firstPhotoCache.get(id_user);
+  if (hit && Date.now() - hit.at < FIRST_TTL) return hit.filename;
+
+  const list = await listUserTempFilenamesService(id_user);
+  const slotOf = (f) => {
+    const m = path.basename(f.filename).match(/^(\d+)-/);
+    return m ? Number(m[1]) : Infinity;
+  };
+  const filename = [...list].sort((a, b) => slotOf(a) - slotOf(b))[0]?.filename ?? null;
+
+  firstPhotoCache.set(id_user, { at: Date.now(), filename });
+  return filename;
+}
+
+const invalidateTempList = (id_user) => {
+  listCache.delete(id_user);
+  firstPhotoCache.delete(id_user);
+};
+
 
 module.exports = {
   getImageAsBase64, uploadOneImg, getImageRawWodMatch, getImageRaw,
   getUserTempImagesService, reorderTempImagesService,
-  listUserTempFilenamesService, invalidateTempList,
+  listUserTempFilenamesService, invalidateTempList, getFirstPhotoFilenameService
 }

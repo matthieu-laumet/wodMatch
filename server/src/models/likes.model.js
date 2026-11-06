@@ -80,8 +80,8 @@ async function getLikesHub({ id_user }) {
 
   const z = pool({ bdd: 'WODZONE' });
   const [usersRes, compsRes, divsRes] = await Promise.all([
-    z.query(`SELECT id, INITCAP(first_name) AS first_name, avatar
-             FROM wodzone.users WHERE id = ANY($1::int[]);`, [userIds]),
+    z.query(`SELECT id, INITCAP(first_name) AS first_name
+         FROM wodzone.users WHERE id = ANY($1::int[]);`, [userIds]),
     // ⚠️ adapte le nom de table / colonnes de tes compétitions
     z.query(`SELECT id_competition, name, compet_ville AS city,
                 to_char("begin", 'YYYY-MM-DD HH24:MI:SS') AS begin,
@@ -99,7 +99,7 @@ async function getLikesHub({ id_user }) {
   const person = (id) => ({
     id: String(id),
     name: userMap.get(id)?.first_name ?? 'Anonyme',
-    avatar: userMap.get(id)?.avatar ?? null,
+    photoPath: `/images/users/${id}/photo`, // adapte au préfixe réel de ta route
   });
 
   // 4) Assemblage (même forme que les mocks)
@@ -117,9 +117,10 @@ async function getLikesHub({ id_user }) {
       competition: compMap.get(t.id_competition),
       team: { id: t.id_team, name: t.name, division: divMap.get(t.id_division) ?? '', slots: withOwner(t) },
       likers: (likesByTeam.get(t.id_team) ?? []).map(l => person(l.id_user)),
-      matches: (matchesByTeam.get(t.id_team) ?? []).map(m => ({
-        id: m.id_match, name: person(m.id_user).name, step: m.status,
-      })),
+      matches: (matchesByTeam.get(t.id_team) ?? []).map(m => {
+        const p = person(m.id_user);
+        return { id: m.id_match, name: p.name, photoPath: p.photoPath, step: m.status };
+      }),
     }));
 
   const likesByComp = groupBy(joinLikes.rows, 'id_competition');
@@ -139,4 +140,20 @@ async function getLikesHub({ id_user }) {
   return { recruit, join };
 }
 
-module.exports = { getLikesHub };
+
+async function canSeeUserPhoto({ id_user, id_other }) {
+  const { rowCount } = await pool().query(`
+    SELECT 1 WHERE EXISTS (
+      SELECT 1 FROM wodmatch.swipes s
+      JOIN wodmatch.teams t ON t.id_team = s.id_team_to
+      WHERE s.id_user_from = $2 AND t.created_by = $1
+    ) OR EXISTS (
+      SELECT 1 FROM wodmatch.matches m
+      JOIN wodmatch.teams t ON t.id_team = m.id_team
+      WHERE m.id_user = $2 AND t.created_by = $1
+    );`, [id_user, id_other]);
+  return rowCount > 0;
+}
+
+
+module.exports = { getLikesHub, canSeeUserPhoto };

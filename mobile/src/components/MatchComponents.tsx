@@ -27,14 +27,24 @@ export function AvatarStack({ people }: { people: Liker[] }) {
 }
 
 /** Jauge segmentée : plein = rempli, rouge pointillé = place visée, gris = libre */
-export function Gauge({ slots, pending = 0 }: { slots: Slot[]; pending?: number }) {
-  let toValidate = pending; // on remplit les premières places libres avec les candidats
+export function Gauge({ slots, pending = 0, dark = false }: { slots: Slot[]; pending?: number; dark?: boolean }) {
+  let toValidate = pending;
   return (
     <View style={styles.gauge}>
       {slots.map((s, i) => {
         const filled = s.filledBy !== null;
         const isPending = !filled && toValidate-- > 0;
-        return <View key={i} style={[styles.segment, filled && styles.segmentFilled, isPending && styles.segmentPending]} />;
+        return (
+          <View
+            key={i}
+            style={[
+              styles.segment,
+              dark && styles.segmentFreeDark,
+              filled && (dark ? styles.segmentFilledDark : styles.segmentFilled),
+              isPending && (dark ? styles.segmentPendingDark : styles.segmentPending),
+            ]}
+          />
+        );
       })}
     </View>
   );
@@ -68,9 +78,9 @@ export function Cta({ label, onPress, primary }: { label: string; onPress: () =>
   );
 }
 
-export function Countdown({ days, small = false }: { days: number; small?: boolean }) {
+export function Countdown({ days, small = false, onDark = false }: { days: number; small?: boolean; onDark?: boolean }) {
   return (
-    <Text accessibilityLabel={`Dans ${days} jours`} style={[styles.countdown, small && styles.countdownSmall]}>
+    <Text accessibilityLabel={`Dans ${days} jours`} style={[styles.countdown, small && styles.countdownSmall, onDark && styles.countdownDark]}>
       J-{days}
     </Text>
   );
@@ -105,6 +115,10 @@ const styles = StyleSheet.create({
     flexShrink: 0,            // ne jamais le laisser passer à la ligne
     includeFontPadding: false, // Android : aligne bien le bas du texte avec le titre
   },
-  countdownSmall: { fontSize: 22, lineHeight: 30 },
+  countdownSmall: { fontSize: 22, lineHeight: 30, color: gray.g06 },
   segmentPending: { backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.red, borderStyle: 'dashed' },
+  segmentFreeDark: { backgroundColor: '#444' },
+  segmentFilledDark: { backgroundColor: gray.g09 },
+  segmentPendingDark: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#FF4B57', borderStyle: 'dashed' },
+  countdownDark: { color: Colors.red }, // le rouge de la marque est trop sombre sur fond noir
 });
