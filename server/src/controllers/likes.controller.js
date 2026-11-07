@@ -1,8 +1,8 @@
-const { getLikesHub } = require("../models/likes.model");
+const { getLikesHubService } = require("../services/likesHub.service");
 
 async function getHub(req, res) {
   try {
-    const result = await getLikesHub({ id_user: req.id_user });
+    const result = await getLikesHubService({ id_user: req.id_user });
     res.status(200).send(result);
   } catch (error) {
     console.log('[getHub]', error.message);

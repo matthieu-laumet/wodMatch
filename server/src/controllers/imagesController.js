@@ -4,11 +4,10 @@ const sharp = require('sharp');
 const {
   getImageRaw, uploadOneImg, getUserTempImagesService, reorderTempImagesService,
   listUserTempFilenamesService, invalidateTempList,
-  getFirstPhotoFilenameService,
+  getUserAvatarStreamService,
 } = require('../services/leevia.service');
 const { webdavClient, userTempDir } = require('../utils/leevia.utils');
 const crypto = require('crypto');
-const { canSeeUserPhoto } = require('../models/likes.model');
 
 const IMG_EXT = '(jpg|jpeg|png|gif|webp)';
 const ALLOWED_PATH_PATTERN = new RegExp(
@@ -168,39 +167,30 @@ async function getTempImage(req, res) {
 }
 
 
-async function getUserPhoto(req, res) {
-  const id_other = Number(req.params.id_user);
-  if (!Number.isInteger(id_other) || id_other <= 0) return res.sendStatus(400);
+async function getUserAvatar(req, res) {
+  const id = parseInt(req.params.id_user, 10);
+  if (!Number.isInteger(id)) return res.sendStatus(400);
 
   try {
+    const stream = await getUserAvatarStreamService(id);
+    if (!stream) return res.sendStatus(404);
 
-    const isMe = String(req.id_user) === String(id_other);
-    if (!isMe && !(await canSeeUserPhoto({ id_user: req.id_user, id_other }))) return res.sendStatus(403);
+    res.set({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'private, max-age=86400', });
+    const thumb = sharp().rotate().resize({ width: 200, height: 200, fit: 'cover' }).jpeg({ quality: 80 });
 
-    const { rows } = await pool().query(
-      'SELECT avatar_filename FROM wodmatch.wm_users WHERE id_user = $1', [id_other]
-    );
-    let filename = rows[0]?.avatar_filename;
-    if (!filename) return res.sendStatus(404);
-
-    const upstream = await webdavClient.get(filename, { responseType: 'stream' });
-    res.set({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'private, max-age=3600' });
-    const thumb = sharp().rotate().resize({ width: 160, height: 160, fit: 'cover' }).jpeg({ quality: 80 });
-
-    pipeline(upstream.data, thumb, res, (err) => {
+    pipeline(stream, thumb, res, err => {
       if (err) {
-        console.error('Erreur stream photo:', err.message);
+        console.error('Erreur stream avatar:', err.message);
         if (!res.headersSent) res.sendStatus(500);
       }
     });
   } catch (e) {
-    console.error('[getUserPhoto]', e.message);
+    console.error('Erreur getUserAvatar:', e.message);
     res.sendStatus(e.response?.status === 404 ? 404 : 502);
   }
 }
 
-
 module.exports = {
   getImage, uploadImg, uploadTempImages, getUserTempImages, reorderTempImages,
-  deleteTempImage, listTempImagesNames, getTempImage, getUserPhoto
+  deleteTempImage, listTempImagesNames, getTempImage, getUserAvatar
 }

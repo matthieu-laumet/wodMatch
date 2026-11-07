@@ -1,12 +1,13 @@
 const { webdavClient, generateUniqueId, WEBDAV_URL, validateFilename, userImageUrl, userTempDir } = require('../utils/leevia.utils');
 const path = require('path');
 const sharp = require('sharp');
+const axios = require('axios');
+const { getAvatarFilenameById } = require('../models/users.model');
 
 // --- liste légère (1 seul PROPFIND, aucune image téléchargée) ---
 const listCache = new Map(); // id_user -> { at, data }
 const LIST_TTL = 30_000;
-const firstPhotoCache = new Map(); // id_user -> { at, filename }
-const FIRST_TTL = 5 * 60_000;
+
 
 async function listUserTempFilenamesService(id_user) {
   const hit = listCache.get(id_user);
@@ -31,6 +32,9 @@ async function listUserTempFilenamesService(id_user) {
   listCache.set(id_user, { at: Date.now(), data });
   return data;
 }
+
+const invalidateTempList = id_user => listCache.delete(id_user);
+
 
 
 async function getImageRaw(filename) {
@@ -148,33 +152,32 @@ async function getUserTempImagesService(id_user) {
     return images;
   } catch (e) {
     if (e.response?.status === 404) return [];
+    console.error('WebDAV error:', {
+      method: e.config?.method,
+      url: e.config ? axios.getUri(e.config) : undefined,
+      status: e.response?.status,
+      wwwAuth: e.response?.headers?.['www-authenticate'],
+      body: typeof e.response?.data === 'string' ? e.response.data.slice(0, 300) : e.response?.data,
+    });
     throw e;
   }
 }
 
-async function getFirstPhotoFilenameService(id_user) {
-  const hit = firstPhotoCache.get(id_user);
-  if (hit && Date.now() - hit.at < FIRST_TTL) return hit.filename;
 
-  const list = await listUserTempFilenamesService(id_user);
-  const slotOf = (f) => {
-    const m = path.basename(f.filename).match(/^(\d+)-/);
-    return m ? Number(m[1]) : Infinity;
-  };
-  const filename = [...list].sort((a, b) => slotOf(a) - slotOf(b))[0]?.filename ?? null;
+async function getUserAvatarStreamService(id_user) {
+  const filename = await getAvatarFilenameById(id_user);
+  const name = filename && path.basename(filename);
+  if (!name || !/\.(jpe?g|png|webp)$/i.test(name)) return null;
 
-  firstPhotoCache.set(id_user, { at: Date.now(), filename });
-  return filename;
+  const upstream = await webdavClient.get(`${userTempDir(id_user)}${name}`, {
+    responseType: 'stream',
+  });
+  return upstream.data;
 }
-
-const invalidateTempList = (id_user) => {
-  listCache.delete(id_user);
-  firstPhotoCache.delete(id_user);
-};
 
 
 module.exports = {
   getImageAsBase64, uploadOneImg, getImageRawWodMatch, getImageRaw,
   getUserTempImagesService, reorderTempImagesService,
-  listUserTempFilenamesService, invalidateTempList, getFirstPhotoFilenameService
+  listUserTempFilenamesService, invalidateTempList, getUserAvatarStreamService
 }

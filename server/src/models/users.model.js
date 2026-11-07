@@ -246,11 +246,28 @@ async function syncAllUsersIdentity() {
   return result.rowCount;
 }
 
+async function getAvatarFilenameById(id_user) {
+  const { rows } = await pool().query(
+    'SELECT avatar_filename FROM wodmatch.wm_users WHERE id_user = $1',
+    [id_user]
+  );
+  return rows[0]?.avatar_filename ?? null;
+}
+
+async function getAvatarFilenamesByIds(ids) {
+  const { rows } = await pool().query(
+    'SELECT id_user, avatar_filename FROM wodmatch.wm_users WHERE id_user = ANY($1::int[])',
+    [ids]
+  );
+  return rows;
+}
+
 
 module.exports = {
   upsertUserBio, getWMUserById, updateSeenWelcomeUser, updateOneUserEmail, updateOneUserTelephone,
   getUserInfo, isEmailAlreadyUsed, isTelephoneAlreadyUsed, updateHideOneUserProfile,
   getAllBlockedAthletes, insertOneBlockedUser, deleteOneBlockedUser, getAllVisiblesAthleteLists,
-  verifyVisibilityAndGetEmail, syncUserIdentity, syncAllUsersIdentity, getWMgender
+  verifyVisibilityAndGetEmail, syncUserIdentity, syncAllUsersIdentity, getWMgender,
+  getAvatarFilenameById, getAvatarFilenamesByIds
   // upsertUserLevel, deleteAllUserLevels
 }
